@@ -17,7 +17,7 @@ main{padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9p
 h2{font-size:18px;margin:20px 2px 10px}.card{background:#fff;border-radius:14px;padding:14px;margin:9px 0;box-shadow:0 2px 8px #0000000b}.row{display:flex;justify-content:space-between;align-items:center}.name{font-weight:800}.muted{font-size:12px;color:#667085;margin-top:4px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.metric{background:#f3f6fa;border-radius:9px;padding:8px}.metric span{display:block;font-size:10px;color:#667085}.metric b{font-size:15px}.order{color:#d83a3a;font-weight:800}.ok{color:#16834b;font-weight:800}
 table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:12px;overflow:hidden}th,td{padding:10px 6px;border-bottom:1px solid #edf0f3;text-align:center}th{background:#eef3f9;color:#526071}
 nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;background:#fff;border-top:1px solid #e4e8ee;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 5px calc(8px + env(safe-area-inset-bottom));z-index:10}nav button{border:0;background:none;font-size:11px;color:#657080;padding:5px}nav .active{color:#1769e0;font-weight:800}nav .plus{color:#1769e0;font-size:24px;line-height:20px}
-.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.sheet{background:#fff;width:100%;max-width:680px;margin:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.sheet h3{margin:0 0 15px;font-size:20px}label{font-size:12px;color:#667085;display:block;margin:12px 0 5px}input,select{width:100%;padding:13px;border:1px solid #d8dee8;border-radius:10px;font-size:16px}button.primary{width:100%;border:0;border-radius:11px;background:#1769e0;color:#fff;font-weight:800;padding:14px;margin-top:16px;font-size:16px}.close{float:right;border:0;background:#f0f2f5;border-radius:9px;padding:8px 11px}.day{border:1px solid #e1e6ed;border-radius:10px;padding:10px;margin:7px 0}
+#adminItemDetailModal{z-index:30}.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.sheet{background:#fff;width:100%;max-width:680px;margin:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.sheet h3{margin:0 0 15px;font-size:20px}label{font-size:12px;color:#667085;display:block;margin:12px 0 5px}input,select{width:100%;padding:13px;border:1px solid #d8dee8;border-radius:10px;font-size:16px}button.primary{width:100%;border:0;border-radius:11px;background:#1769e0;color:#fff;font-weight:800;padding:14px;margin-top:16px;font-size:16px}.close{float:right;border:0;background:#f0f2f5;border-radius:9px;padding:8px 11px}.day{border:1px solid #e1e6ed;border-radius:10px;padding:10px;margin:7px 0}
 .admin-item{border:1px solid #e2e7ee;border-radius:12px;padding:12px;margin:10px 0}.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.admin-grid label{margin-top:8px}.danger{background:#fff1f1;border:1px solid #ffd0d0;color:#c62828;width:100%;border-radius:11px;padding:12px;font-weight:700;margin-top:10px}
 
 .bulk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #edf0f4}
@@ -97,6 +97,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 .stock-safety.safe{color:#18864b}.stock-safety.safe .safety-dot{background:#20a464}
 .stock-safety.danger{color:#d63b3b}.stock-safety.danger .safety-dot{background:#e43d3d}
 
+.admin-menu{display:grid;grid-template-columns:1fr;gap:10px;margin:18px 0 14px}.admin-menu .primary{margin-top:0}.admin-menu-sub{font-weight:700;font-size:13px;opacity:.9}
 </style>
 </head>
 <body>
@@ -135,13 +136,6 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
     <h2>발주 필요 품목</h2>
     <div id="items"></div>
 
-    <h2>최근 재고 변동</h2>
-    <div style="overflow:auto">
-      <table>
-        <thead><tr><th>날짜</th><th>품목명</th><th>변동</th><th>현재 재고</th><th>구분</th></tr></thead>
-        <tbody id="history"></tbody>
-      </table>
-    </div>
   </div>
 </main>
 
@@ -204,29 +198,49 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <button class="primary" onclick="loginAdmin()">관리자 모드 들어가기</button>
 </div></div>
 
-<!-- 관리자 -->
+<!-- 관리자 메인 -->
 <div class="modal" id="admin"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
   <h3>⚙️ 관리자 모드</h3>
-  <p class="muted">전체 부서의 재고 상태를 한눈에 확인합니다. 품목별 현재고와 최근 2주 사용량, 여유/발주 필요 상태만 표시합니다.</p>
-  <button class="primary" onclick="openInitialStock()">📌 초기 재고 설정</button>
-  <button class="primary" onclick="openAdminStats()">📅 통계 / 기록 관리</button>
+  <p class="muted">전체 부서의 재고 상태를 한눈에 확인합니다. 품목을 누르면 부서별 상세 현황이 바로 표시됩니다.</p>
+  <div class="admin-menu">
+    <button class="primary" onclick="openAdminDepartmentItems()">🏷️ 부서별 품목 관리</button>
+    <button class="primary" onclick="openAdminStockEdit()">📦 재고 수정 <span class="admin-menu-sub">(관리자 권한)</span></button>
+    <button class="primary" onclick="openAdminStats()">📅 통계 / 기록 관리</button>
+    <button class="primary" onclick="openAdminPasswordChange()">🔑 관리자 비밀번호 변경</button>
+  </div>
   <div id="adminlist"></div>
+</div></div>
+
+<!-- 부서별 품목 관리 -->
+<div class="modal" id="adminDepartmentItems"><div class="sheet">
+  <button class="close" onclick="openModal('admin')">닫기</button>
+  <h3>🏷️ 부서별 품목 관리</h3>
+  <p class="muted">품목별 대분류를 변경하고, 품목을 추가·삭제할 수 있습니다.</p>
+  <div id="adminDepartmentItemsList"></div>
   <button class="primary" onclick="saveAdmin()">전체 설정 저장</button>
   <button class="primary" onclick="addItem()">＋ 품목 추가</button>
+  <button class="danger" onclick="resetData()">⚠️ 재고 기록·설정을 모두 초기화</button>
+</div></div>
 
-  <hr style="border:0;border-top:1px solid #e5e9ef;margin:20px 0">
-  <h3 style="font-size:17px;margin:0 0 6px">🔑 관리자 비밀번호 변경</h3>
+<!-- 관리자 비밀번호 변경 -->
+<div class="modal" id="adminPasswordChange"><div class="sheet">
+  <button class="close" onclick="openModal('admin')">닫기</button>
+  <h3>🔑 관리자 비밀번호 변경</h3>
   <p class="muted">현재 비밀번호를 확인한 뒤 새 비밀번호로 변경할 수 있습니다.</p>
   <label>현재 비밀번호</label><input id="oldpw" type="password" inputmode="numeric" placeholder="현재 비밀번호">
   <label>새 비밀번호</label><input id="newpw" type="password" inputmode="numeric" placeholder="새 비밀번호">
   <label>새 비밀번호 확인</label><input id="newpw2" type="password" inputmode="numeric" placeholder="새 비밀번호 다시 입력">
   <button class="primary" onclick="changeAdminPassword()">비밀번호 변경</button>
-
-  <button class="danger" onclick="resetData()">⚠️ 재고 기록·설정을 모두 초기화</button>
 </div></div>
 
 <!-- 관리자 통계 / 기록 관리 -->
+<div class="modal" id="adminItemDetailModal"><div class="sheet">
+  <button class="close" onclick="closeAdminItemDetail()">닫기</button>
+  <h3>📦 품목 상세 현황</h3>
+  <div id="adminItemDetailContent"></div>
+</div></div>
+
 <div class="modal" id="adminStats"><div class="sheet">
   <button class="close" onclick="openModal('admin')">닫기</button>
   <h3>📅 통계 / 기록 관리</h3>
@@ -243,7 +257,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const DATA_VERSION="2026-09-02-v10";
+const DATA_VERSION="2026-09-02-v13";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
   ["라벨 감열(무지) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":3}],
@@ -287,9 +301,12 @@ const DEFAULT_ITEMS=[
   ["에어캡(봉투)",0,0,0,0,"P/S","봉지",{"2026-08-28":61}],
   ["랩(수동)",0,0,0,0,"P/S","박스",{"2026-08-28":18}],
   ["파렛트 덮개 비닐(일반)",0,0,0,0,"P/S","박스",{"2026-08-28":2}],
-  ["오리콘(3호)",0,0,0,0,"P/S","파렛트",{"2026-08-28":0}],
-  ["오리콘(4호)",0,0,0,0,"P/S","파렛트",{"2026-08-28":0}],
-  ["오리콘(5호)",0,0,0,0,"P/S","파렛트",{"2026-08-28":0}]
+  ["라벨 감열(황색) 70*80",0,0,0,0,"DPS","박스",{"2026-08-28":50}],
+  ["아트 라벨(무지) 40*35",0,0,0,0,"DPS","박스",{"2026-08-28":5}],
+  ["오리콘(3호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":38,"2026-08-13":38,"2026-08-27":34,"2026-08-28":0}],
+  ["오리콘(4호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":31,"2026-08-13":28,"2026-08-27":25,"2026-08-28":0}],
+  ["오리콘(5호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":17,"2026-08-13":14,"2026-08-27":10,"2026-08-28":0}],
+  ["오리콘(특대)",0,0,0,0,"P/S","파렛트",{"2026-07-30":16,"2026-08-13":13,"2026-08-27":11,"2026-08-28":0}]
 ];
 
 let items=JSON.parse(localStorage.getItem("submaterial_items")||"null");
@@ -364,6 +381,26 @@ function migrateSeedSnapshotV8(){
 
 migrateRecordCategories();
 migrateSeedSnapshotV8();
+function migrateOriconHistoryV13(){
+  const key="submaterial_oricon_history_v13";
+  if(localStorage.getItem(key)==="1") return;
+  const targets={
+    "오리콘(3호)":{"2026-07-30":38,"2026-08-13":38,"2026-08-27":34},
+    "오리콘(4호)":{"2026-07-30":31,"2026-08-13":28,"2026-08-27":25},
+    "오리콘(5호)":{"2026-07-30":17,"2026-08-13":14,"2026-08-27":10},
+    "오리콘(특대)":{"2026-07-30":16,"2026-08-13":13,"2026-08-27":11}
+  };
+  // 동일 날짜의 기존 초기기록이 있다면 오리콘 데이터만 최신 입력값으로 맞춥니다.
+  Object.keys(targets).forEach(name=>{
+    Object.keys(targets[name]).forEach(date=>{
+      records=records.filter(r=>!(r.initialSnapshot && r.name===name && r.category==="P/S" && r.date===date));
+      records.push({date,time:"000000",name,category:"P/S",type:"재고확인",stock:targets[name][date],previous:0,diff:0,initialSnapshot:true});
+    });
+  });
+  localStorage.setItem("submaterial_records",JSON.stringify(records));
+  localStorage.setItem(key,"1");
+}
+migrateOriconHistoryV13();
 ensureInitialSnapshot();
 function migrateSnapshotOnlyStock(){
   const key="submaterial_snapshot_only_v8";
@@ -512,9 +549,6 @@ function render(){
   document.getElementById("check").textContent=check;
   document.getElementById("good").textContent=good;
 
-  const changes=records.filter(r=>(r.type==="사용"||r.type==="입고"||r.type==="재고확인") && r.category===selectedCategory && categoryItems.some(it=>it[0]===r.name)).slice().reverse().slice(0,15);
-  document.getElementById("history").innerHTML=changes.length ? changes.map(r=>`
-    <tr><td>${r.date}</td><td>${esc(r.name)}</td><td>${r.type==="사용"?"-":"+"}${Number(r.qty).toLocaleString()}${getUnit(r.name)}</td><td>${Number(r.stock).toLocaleString()}${getUnit(r.name)}</td><td>${r.type}</td></tr>`).join("") : `<tr><td colspan="5">아직 재고 변동 기록이 없습니다.</td></tr>`;
 }
 function openModal(id){
   document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
@@ -537,6 +571,7 @@ function openModal(id){
     `).join("");
   }
   if(id==="admin")renderAdmin();
+  if(id==="adminDepartmentItems")renderAdminDepartmentItems();
 }
 
 function closeAll(){
@@ -853,6 +888,17 @@ function renderAdmin(){
       </div>`;
   }).join("");
 
+  document.getElementById("adminlist").innerHTML=`
+    <div class="admin-overview">
+      <div class="admin-overview-row admin-overview-head">
+        <div>품목</div><div>상태</div>
+      </div>
+      ${overview}
+    </div>
+    <div class="muted">품목을 누르면 해당 품목을 사용하는 부서별 현황을 확인할 수 있습니다.</div>`;
+}
+
+function renderAdminDepartmentItems(){
   const manage=items.map((x,i)=>`
     <div class="admin-item">
       <b>${i+1}. ${esc(x[0])} <span class="item-unit">${getUnit(x[0])}</span></b>
@@ -862,18 +908,23 @@ function renderAdmin(){
       </select>
       <button class="danger" onclick="deleteItem(${i})">이 품목 삭제</button>
     </div>`).join("");
+  document.getElementById("adminDepartmentItemsList").innerHTML=manage;
+}
 
-  document.getElementById("adminlist").innerHTML=`
-    <div class="admin-overview">
-      <div class="admin-overview-row admin-overview-head">
-        <div>품목</div><div>상태</div>
-      </div>
-      ${overview}
-    </div>
-    <div class="muted">품목을 누르면 해당 품목을 사용하는 부서별 현황을 확인할 수 있습니다.</div>
-    <div class="admin-manage-title">품목별 대분류 관리</div>
-    <div class="muted">품목의 대분류만 변경할 수 있습니다.</div>
-    ${manage}`;
+function openAdminDepartmentItems(){
+  openModal("adminDepartmentItems");
+  renderAdminDepartmentItems();
+}
+
+function openAdminStockEdit(){
+  openInitialStock();
+}
+
+function openAdminPasswordChange(){
+  openModal("adminPasswordChange");
+  document.getElementById("oldpw").value="";
+  document.getElementById("newpw").value="";
+  document.getElementById("newpw2").value="";
 }
 
 function showAdminItemDetail(index){
@@ -896,13 +947,9 @@ function showAdminItemDetail(index){
     </div>`;
   }).join("");
 
-  const old=document.getElementById("adminItemDetail");
-  if(old) old.remove();
-  const box=document.createElement("div");
-  box.id="adminItemDetail";
-  box.className="admin-status-detail";
-  box.innerHTML=`
-    <div class="admin-status-detail-head">${esc(grouped.name)} · 전체 ${grouped.total.toLocaleString()} ${esc(grouped.unit)}</div>
+  const content=document.getElementById("adminItemDetailContent");
+  content.innerHTML=`
+    <div class="admin-status-detail-head">${esc(grouped.name)}</div>
     <div class="admin-detail-table">
       <div class="admin-status-detail-row admin-status-detail-head">
         <div>부서명</div><div>보유수량</div><div>평균 사용량<br>(최근 2주)</div><div>상태</div>
@@ -917,12 +964,13 @@ function showAdminItemDetail(index){
       <div><span class="legend-dot green"></span><b>여유</b> : 해당 부서의 재고가 충분합니다.</div>
       <div><span class="legend-dot yellow"></span><b>부족 주의</b> : 현재 재고가 사용량 대비 부족할 수 있습니다.</div>
       <div class="admin-detail-footnote">* 평균 사용량은 최근 2주분 산정</div>
-    </div>
-    <button class="close" onclick="document.getElementById('adminItemDetail').remove()">닫기</button>`;
-  document.getElementById("adminlist").appendChild(box);
-  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+    </div>`;
+  openModal("adminItemDetailModal");
 }
 
+function closeAdminItemDetail(){
+  document.getElementById("adminItemDetailModal").style.display="none";
+}
 function saveAdmin(){
   items.forEach((x,i)=>{
     x[5]=document.getElementById(`a-cat-${i}`).value;
