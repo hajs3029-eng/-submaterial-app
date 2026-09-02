@@ -197,18 +197,18 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 const DATA_VERSION="2026-09-02-v3";
 const CATEGORIES=["P/S","수출작업장","입고장","출하장"];
 const DEFAULT_ITEMS=[
-  ["오리콘(3호)",0,380,420,600,"P/S"],
-  ["오리콘(4호)",0,250,310,520,"P/S"],
-  ["오리콘(5호)",0,300,280,450,"P/S"],
-  ["라벨 감열그라(혼합)",63,0,0,0,"P/S"],
-  ["OPP테이프(각색)",146,0,0,0,"P/S"],
-  ["OPP테이프(투명)",81,0,0,0,"P/S"],
-  ["PP밴딩끈 세트(1000M)",11,0,0,0,"P/S"],
-  ["Mini Air 130",29,0,0,0,"P/S"],
-  ["에어캡롤(135×3M)",70,0,0,0,"P/S"],
-  ["에어캡(봉투)",61,0,0,0,"P/S"],
-  ["끈(수동)",18,0,0,0,"P/S"],
-  ["팔렛트 상단덮개 비닐/PE시트(일반)",2,0,0,0,"P/S"]
+  ["오리콘(3호)",0,380,420,600,"P/S","파렛트",{}],
+  ["오리콘(4호)",0,250,310,520,"P/S","파렛트",{}],
+  ["오리콘(5호)",0,300,280,450,"P/S","파렛트",{}],
+  ["라벨 감열(분홍)",63,0,0,0,"P/S","박스",{"2026-07-28":63}],
+  ["OPP테이프(적색)",146,0,0,0,"P/S","박스",{"2026-07-28":146}],
+  ["OPP테이프(투명)",81,0,0,0,"P/S","박스",{"2026-07-28":81}],
+  ["위생백",11,0,0,0,"P/S","박스",{"2026-07-28":11}],
+  ["Mini Air 130",29,0,0,0,"P/S","박스",{"2026-07-28":29}],
+  ["에어캡롤",70,0,0,0,"P/S","봉지",{"2026-07-28":70}],
+  ["에어캡(봉투)",61,0,0,0,"P/S","봉지",{"2026-07-28":61}],
+  ["랩(수동)",18,0,0,0,"P/S","박스",{"2026-07-28":18}],
+  ["팔렛트 상단덮개 비닐/PE시트(일반)",2,0,0,0,"P/S","포대",{"2026-07-28":2}]
 ];
 
 let items=JSON.parse(localStorage.getItem("submaterial_items")||"null");
@@ -225,7 +225,42 @@ if(savedVersion!==DATA_VERSION){
 items=items.map(x=>{if(x.length<6)x[5]="P/S"; return x;});
 
 let records=JSON.parse(localStorage.getItem("submaterial_records")||"[]");
+// 2026-07-28 재고 현황은 현재고가 아니라 해당 날짜의 기준 재고로 기록합니다.
+function ensureInitialSnapshot(){
+  let changed=false;
+  items.forEach(it=>{
+    const snapshots=it[7]||{};
+    Object.keys(snapshots).forEach(date=>{
+      const exists=records.some(r=>r.name===it[0] && r.date===date && r.type==="재고확인" && r.initialSnapshot);
+      if(!exists){
+        records.push({
+          date:date,time:"000000",name:it[0],type:"재고확인",
+          stock:Number(snapshots[date]||0),previous:0,diff:0,
+          initialSnapshot:true
+        });
+        changed=true;
+      }
+    });
+  });
+  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
+}
+
+
 let adminPassword=localStorage.getItem("submaterial_admin_pw")||"1234";
+ensureInitialSnapshot();
+function migrateSnapshotOnlyStock(){
+  const key="submaterial_snapshot_only_v1";
+  if(localStorage.getItem(key)==="1") return;
+  items.forEach(it=>{
+    if(it[7] && Object.keys(it[7]).length){
+      it[1]=0;
+    }
+  });
+  localStorage.setItem("submaterial_items",JSON.stringify(items));
+  localStorage.setItem(key,"1");
+}
+migrateSnapshotOnlyStock();
+
 
 function dateStr(d){
   const x=new Date(d);
