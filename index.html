@@ -260,7 +260,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.17"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.18"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -940,7 +940,7 @@ function renderBulkStockInputs(){
     desc.innerHTML="선택한 날짜에 실제로 확인한 <b>현재 재고</b>를 품목별로 입력해 주세요.<br>해당 날짜 이전의 재고와 비교하여 <b>사용</b> 또는 <b>입고</b>로 기록됩니다.";
   }else{
     title.textContent=selectedCategory ? `📦 ${selectedCategory} 재고 입력` : "📦 전체 재고 입력";
-    desc.innerHTML=selectedCategory ? `${selectedCategory}에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br>입력한 품목만 새 기록으로 저장되고, 빈 칸은 기존 재고와 입력일을 유지합니다.` : "오늘 창고에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br><b>입력한 품목만 저장</b>되고 빈 칸은 기존 재고와 입력일을 그대로 유지합니다.<br>이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동 기록됩니다.";
+    desc.innerHTML=selectedCategory ? `${selectedCategory}에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br>입력한 품목만 새 기록으로 저장됩니다.<br>빈 칸은 기존 재고와 입력일을 유지하고, 숫자 0은 오늘 입력을 취소하여 이전 최신 재고로 돌아갑니다.` : "오늘 창고에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br><b>입력한 품목만 저장</b>됩니다.<br>빈 칸은 기존 재고와 입력일을 그대로 유지하고, 숫자 0은 오늘 입력을 취소합니다.<br>이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동 기록됩니다.";
   }
 }
 
@@ -969,6 +969,31 @@ function toggleNoStock(i){
   }
 }
 
+function removeSameDayInventoryInput(itemName, category, date){
+  // ★ 숫자 0 입력은 "재고 0"이 아니라 "오늘 입력 취소"입니다.
+  // 따라서 해당 품목+부서의 그 날짜 재고확인 기록을 모두 제거하고,
+  // 그 기록에서 자동 생성된 사용/입고 변동도 함께 제거합니다.
+  const removedTimes=[];
+  records=records.filter(r=>{
+    if(r.type!=="재고확인" || r.name!==itemName || (r.category||"P/S")!==category || r.date!==date) return true;
+    if(r.seedSnapshot===true || r.initialSnapshot===true) return true;
+    removedTimes.push(String(r.time||""));
+    return false;
+  });
+
+  if(!removedTimes.length) return false;
+
+  records=records.filter(r=>{
+    if(r.date!==date || (r.type!=="사용" && r.type!=="입고")) return true;
+    if(r.name!==itemName || (r.category||"P/S")!==category) return true;
+    // 새 버전의 자동 변동 기록은 정확한 원본 재고확인 시간으로 연결합니다.
+    if(r.sourceInventoryTime && removedTimes.includes(String(r.sourceInventoryTime))) return false;
+    // 구버전 기록도 재고확인 직후 생성된 기록이면 함께 정리합니다.
+    return !removedTimes.some(t=>Math.abs(Number(r.time||0)-Number(t||0))<=2);
+  });
+  return true;
+}
+
 function saveBulkStock(){
   const date=document.getElementById("sdate").value;
   if(!date){alert("날짜를 입력해 주세요.");return}
@@ -983,42 +1008,61 @@ function saveBulkStock(){
     const noStockBtn=document.getElementById(`nostock-${i}`);
     const noStock=!!(noStockBtn && noStockBtn.classList.contains("active"));
     const raw=String(input.value??"").trim();
-    // 빈 칸 = 이번에는 입력하지 않음. 기존 재고와 날짜를 그대로 유지합니다.
-    // 숫자 0도 '입력 없음'으로 취급합니다. 실제 재고 0은 '재고없음 X'로 명시합니다.
+
+    // ★ 빈 칸 = 이번에는 입력하지 않음 → 기존 최신 재고/날짜 유지
     if(raw==="" && !noStock) return;
-    if(raw==="0" && !noStock) return;
+
+    const category=item[5]||"P/S";
+
+    // ★ 숫자 0 = 오늘 입력 취소
+    // 예: 8/27 재고 25 → 9/2에 100 입력 → 다시 0 입력
+    //     = 9/2 기록을 삭제하고 8/27 재고 25로 복귀
+    if(raw==="0" && !noStock){
+      const removed=removeSameDayInventoryInput(item[0],category,date);
+      const previous=getPreviousStockBefore(item[0],category,date);
+      if(!historical && removed){
+        item[1]=previous;
+      }
+      return;
+    }
+
     const q=noStock ? 0 : parseInt(raw,10);
     if(!Number.isInteger(q)||q<0){
       throw new Error(`${item[0]}의 재고를 0 이상의 숫자로 입력해 주세요.`);
     }
 
-    const category=item[5]||"P/S";
-    const previous=historical ? getPreviousStockBefore(item[0], item[5]||"P/S", date) : getLastKnownStock(item[0], item[5]||"P/S");
+    // 같은 날짜에 이미 입력한 기록이 있다면 새 입력으로 대체합니다.
+    // 그래야 20→10→30→10 같은 수정이 최종적으로 10 하나만 남습니다.
+    removeSameDayInventoryInput(item[0],category,date);
+
+    const previous=historical ? getPreviousStockBefore(item[0], category, date) : getLastKnownStock(item[0], category);
+    const inventoryTime=String(now+i*2);
+    const changeTime=String(now+i*2+1);
     const diff=q-previous;
 
     records.push({
-      date:date,time:String(now+i*2),name:item[0],category:category,
+      date:date,time:inventoryTime,name:item[0],category:category,
       type:"재고확인",stock:q,previous:previous,diff:diff,
       manual:historical,
       seedSnapshot:false,
-      inputSource:"user-v120",
+      inputSource:"user-v121",
       noStock:noStock
     });
 
     if(diff<0){
       records.push({
-        date:date,time:String(now+i*2+1),name:item[0],category:category,
+        date:date,time:changeTime,name:item[0],category:category,
         type:"사용",qty:Math.abs(diff),stock:q,previous:previous,
-        manual:historical
+        manual:historical,sourceInventoryTime:inventoryTime,inputSource:"inventory-check"
       });
-      changes.push(`${item[0]}: 사용 ${Math.abs(diff)} ${getUnit(item[0])}`);
+      changes.push(`${item[0]}: 사용 ${Math.abs(diff)} ${getUnit(item[0],category)}`);
     }else if(diff>0){
       records.push({
-        date:date,time:String(now+i*2+1),name:item[0],category:category,
+        date:date,time:changeTime,name:item[0],category:category,
         type:"입고",qty:diff,stock:q,previous:previous,
-        manual:historical
+        manual:historical,sourceInventoryTime:inventoryTime,inputSource:"inventory-check"
       });
-      changes.push(`${item[0]}: 입고 ${diff} ${getUnit(item[0])}`);
+      changes.push(`${item[0]}: 입고 ${diff} ${getUnit(item[0],category)}`);
     }
 
     // 일반 재고 입력일 때만 현재 재고를 변경합니다.
@@ -1491,32 +1535,6 @@ function showAdminItemDetail(index){
 function closeAdminItemDetail(){
   document.getElementById("adminItemDetailModal").style.display="none";
   openModal("admin");
-}
-function saveAdmin(){
-  items.forEach((x,i)=>{
-    x[5]=document.getElementById(`a-cat-${i}`).value;
-  });
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  render();
-  renderAdmin();
-  closeAll();
-  alert("관리자 설정이 저장되었습니다.");
-}
-
-function addItem(){
-  const name=prompt("추가할 품목명을 입력해 주세요.");
-  if(!name||!name.trim())return;
-  const category=prompt("대분류를 입력해 주세요. (입고장, 출하장, 수출장, 수동랙, DPS, P/S)","P/S");
-  if(!CATEGORIES.includes(category)){alert("대분류는 입고장, 출하장, 수출장, 수동랙, DPS, P/S 중 하나로 입력해 주세요.");return;}
-  items.push([name.trim(),0,0,0,0,category]);
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  renderAdmin();render();
-}
-function deleteItem(i){
-  if(!confirm(`'${items[i][0]}' 품목을 삭제하시겠습니까?`))return;
-  items.splice(i,1);
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  renderAdmin();render();
 }
 function changeAdminPassword(){
   const old=document.getElementById("oldpw").value;
