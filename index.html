@@ -194,7 +194,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const DATA_VERSION="2026-09-02-v3";
+const DATA_VERSION="2026-09-02-v4";
 const CATEGORIES=["P/S","수출작업장","입고장","출하장"];
 const DEFAULT_ITEMS=[
   ["오리콘(3호)",0,380,420,600,"P/S","파렛트",{}],
@@ -322,14 +322,10 @@ function getLastKnownStock(itemName){
 }
 
 function getUnit(itemName){
+  const item=items.find(x=>x[0]===itemName);
+  if(item && item[6]) return item[6];
   if(itemName.startsWith("오리콘")) return "파렛트";
-  if(itemName.includes("라벨")) return "장";
-  if(itemName.includes("OPP테이프")) return "개";
-  if(itemName.includes("밴딩끈")) return "개";
-  if(itemName.includes("Mini Air")) return "개";
-  if(itemName.includes("에어캡롤")) return "롤";
   if(itemName.includes("에어캡(봉투)")) return "봉지";
-  if(itemName.includes("끈")) return "개";
   if(itemName.includes("팔렛트 상단덮개")) return "포대";
   return "박스";
 }
@@ -339,6 +335,11 @@ function showCategoryHome(){
   document.getElementById("categoryHome").style.display="block";
   document.getElementById("categoryContent").style.display="none";
   document.querySelector('nav button').classList.add('active');
+
+  // 어떤 화면에서 홈을 눌러도 홈 화면의 최상단으로 이동
+  window.scrollTo(0,0);
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
 }
 
 function openCategory(category){
