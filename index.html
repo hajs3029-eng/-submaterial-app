@@ -266,8 +266,8 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.10"; // 사용자에게 표시되는 앱 버전. 이후 수정 시 1.09, 1.10...
-const DATA_VERSION="2026-09-02-v15";
+const APP_VERSION="1.11"; // 사용자에게 표시되는 앱 버전
+const DATA_VERSION="2026-09-02-v17";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
   ["라벨 감열(무지) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":3}],
@@ -384,7 +384,7 @@ function migrateSeedSnapshotV8(){
   if(localStorage.getItem(key)==="1") return;
   // 이전에 넣었던 2026-07-28 기준 재고 기록을 제거합니다.
   records=records.filter(r=>!(r.initialSnapshot && r.date==="2026-07-28"));
-  // 이번 버전에서는 2026-08-28 기준 재고만 초기 기준 기록으로 사용합니다.
+  // 초기 재고 기준 기록은 2026-08-28 값으로 유지합니다.
   records=records.filter(r=>!(r.initialSnapshot && r.date!=="2026-08-28"));
   localStorage.setItem("submaterial_records",JSON.stringify(records));
   localStorage.setItem(key,"1");
@@ -446,16 +446,15 @@ ensureInitialSnapshot();
 function migrateSnapshotOnlyStock(){
   const key="submaterial_snapshot_only_v8";
   if(localStorage.getItem(key)==="1") return;
-  // 2026-08-28 수량은 과거 기준 재고이므로 현재고에는 반영하지 않습니다.
+  // 2026-08-28 수량은 초기 재고값이며, 이후 기록이 없으면 현재 재고로 사용합니다.
   items.forEach(it=>{ if(it[7] && Object.keys(it[7]).length) it[1]=0; });
   localStorage.setItem("submaterial_items",JSON.stringify(items));
   localStorage.setItem(key,"1");
 }
 migrateSnapshotOnlyStock();
 
-// 1.05: 초기 8/28 스냅샷과 실제 재고 입력을 확실히 분리합니다.
-// 기존 브라우저 저장소에 8/28 값이 일반 재고확인으로 저장되어 있어도
-// 초기 데이터와 일치하는 값이면 현재 재고 계산에서 제외합니다.
+// 과거 버전 호환용: 초기 8/28 스냅샷 플래그는 사용량 계산에서만 구분하고,
+// 현재 재고 계산에서는 초기 8/28 값도 정상적인 최신 재고 기록으로 포함합니다.
 function isInitialAug28SeedRecord(r){
   // 날짜 자체로 판단하지 않고, 실제 초기 스냅샷 플래그만 사용합니다.
   // 직접 입력한 과거 재고(manual)는 항상 실제 입력입니다.
@@ -619,13 +618,13 @@ function getLastYearSameMonth(itemName, category, refDate){
 
 /* 현재 재고는 부서/품목별로 저장된 모든 재고확인 기록 중 가장 최근 날짜/시간의 수량입니다. */
 function isSeedSnapshotRecord(r){
-  // 앱이 처음 표시하기 위해 자동 생성한 기준 데이터만 제외합니다.
-  // 핵심: 날짜가 8/27인지 8/28인지로 판단하지 않습니다.
-  // 실제 사용자가 입력한 기록은 manual 여부와 관계없이 마지막 입력으로 인정합니다.
-  if(!r || r.type!=="재고확인") return false;
+  // 현재 재고 계산에서 제외할 것은 '앱이 자동으로 넣은 초기 기준값'뿐입니다.
+  // 8/27, 8/28 등 특정 날짜는 절대로 기준으로 사용하지 않습니다.
+  if(!r) return false;
   if(r.seedSnapshot===true) return true;
-  // 구버전 자동 생성 스냅샷 호환: 초기 스냅샷 플래그 + 자동생성 시간값.
-  if(r.initialSnapshot===true && r.manual!==true && String(r.time||"")==="000000") return true;
+  // 아주 오래된 형식의 초기 자동기록만 호환 처리합니다.
+  // 사용자가 실제로 저장한 기록은 seedSnapshot=false이므로 절대 제외하지 않습니다.
+  if(r.type==="재고확인" && r.initialSnapshot===true && r.manual!==true && String(r.time||"")==="000000" && r.seedSnapshot!==false) return true;
   return false;
 }
 
@@ -652,10 +651,14 @@ function migrateActualInventoryRecordsV110(){
 migrateActualInventoryRecordsV110();
 
 function getLastInventoryInput(itemName, category){
-  // 특정 날짜를 기준으로 하지 않습니다.
-  // 해당 품목/부서의 실제 재고확인 기록 중 가장 최근 날짜/시간의 수량을 사용합니다.
-  const rs=getInventorySnapshots(itemName,category)
-    .filter(r=>!isSeedSnapshotRecord(r))
+  // 핵심 규칙: 8/27, 8/28 등 특정 날짜를 기준으로 삼지 않습니다.
+  // 앱을 처음 만들 때 넣어둔 8/28 재고값도 실제 재고 기록으로 포함합니다.
+  // 해당 부서/품목의 모든 재고 관련 기록 중 가장 최근 날짜/시간의 stock을 현재 재고로 사용합니다.
+  // 따라서 8/28 값만 있는 품목은 8/28 값이 현재 재고이고, 이후 실제 입력이 있으면 그 값으로 자동 갱신됩니다.
+  const rs=records
+    .filter(r=>r.name===itemName && r.category===category && r.date &&
+      (r.type==="재고확인" || r.type==="사용" || r.type==="입고") &&
+      r.stock!==undefined)
     .slice()
     .sort((a,b)=>{
       const ad=a.date+String(a.time||"").padStart(14,"0");
