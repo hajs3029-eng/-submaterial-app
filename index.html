@@ -100,6 +100,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 .admin-dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.admin-dept-btn{border:0;background:#1769e0;color:#fff;border-radius:14px;min-height:58px;font-size:16px;font-weight:800;padding:12px}.admin-dept-manage-title{font-size:18px;font-weight:800;margin:18px 0 10px}.admin-dept-product{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 12px;border:1px solid #e2e7ee;border-radius:12px;margin:8px 0;background:#fff}.admin-dept-product-name{font-weight:800;min-width:0}.admin-dept-product .delete-btn{width:auto;min-width:72px;margin:0;padding:9px 10px}.admin-add-btn{width:100%;border:0;background:#eef5ff;color:#1769e0;border-radius:12px;padding:14px;font-size:16px;font-weight:800;margin-top:12px}.admin-dept-empty{padding:16px;border:1px solid #e2e7ee;border-radius:12px;color:#667085}.history-back-btn{width:100%;border:0;background:#eef4ff;color:#1769e0;border-radius:12px;padding:12px;font-size:15px;font-weight:800;margin:4px 0 12px}.history-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:12px;background:#fff}.history-table{width:100%;border-collapse:collapse;min-width:680px;font-size:13px}.history-table th{background:#f1f5fb;color:#667085;font-weight:800;padding:11px 8px;white-space:nowrap}.history-table td{padding:11px 8px;border-top:1px solid #edf0f4;vertical-align:middle}.history-item{font-weight:700}.history-in{color:#1769e0;font-weight:800}.history-out{color:#d64545;font-weight:800}.history-same{color:#667085}.history-empty{text-align:center;color:#667085;padding:24px!important}
 .admin-menu{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0 14px}.admin-menu .primary{margin:0 !important;min-height:60px;border-radius:14px}.admin-menu-sub{font-weight:700;font-size:13px;opacity:.9}
+.admin-usage-period{font-size:12px;color:#667085;background:#f6f8fb;border-radius:10px;padding:9px 10px;margin:10px 0}.usage-chart{border:1px solid #e2e7ee;border-radius:12px;background:#fff;padding:12px}.usage-bar-row{display:grid;grid-template-columns:62px 1fr 48px;gap:8px;align-items:center;margin:10px 0}.usage-bar-label{font-size:12px;font-weight:800}.usage-bar-track{height:18px;background:#eef2f6;border-radius:999px;overflow:hidden}.usage-bar-fill{height:100%;background:#1769e0;border-radius:999px}.usage-bar-value{text-align:right;font-size:12px;font-weight:800}.admin-usage-report{margin-top:10px}.admin-usage-section{margin:14px 0}.admin-usage-section-title{font-size:16px;font-weight:800;margin:0 0 8px}.admin-usage-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:12px;background:#fff}.admin-usage-table{width:100%;border-collapse:collapse;min-width:460px;font-size:13px}.admin-usage-table th{background:#f1f5fb;color:#667085;font-weight:800;padding:10px 8px;white-space:nowrap}.admin-usage-table td{padding:10px 8px;border-top:1px solid #edf0f4}.admin-usage-item{font-weight:700}.admin-usage-dept{text-align:left}.admin-usage-number{font-weight:800;text-align:right}.admin-usage-empty{padding:14px;color:#667085;background:#fff;border:1px solid #e2e7ee;border-radius:12px}.admin-usage-note{margin-top:12px;padding:11px 12px;border:1px solid #e2e7ee;border-radius:11px;background:#fff;color:#667085;font-size:12px;line-height:1.55}
 </style>
 </head>
 <body>
@@ -175,14 +176,6 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <div id="itemlist"></div>
 </div></div>
 
-<!-- 초기 재고 설정 -->
-<div class="modal" id="initialStock"><div class="sheet">
-  <button class="close" onclick="closeAll()">닫기</button>
-  <h3>📌 초기 재고 설정</h3>
-  <p class="muted">처음 앱을 시작할 때 실제 창고 재고를 입력해 주세요. 이 값은 <b>입고/사용으로 기록하지 않고</b> 시작 기준 재고로만 사용됩니다.</p>
-  <div id="initialStockList"></div>
-  <button class="primary" onclick="saveInitialStock()">초기 재고 저장</button>
-</div></div>
 
 <!-- 관리자 로그인 -->
 <div class="modal" id="login"><div class="sheet">
@@ -236,31 +229,41 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <div id="adminItemDetailContent"></div>
 </div></div>
 
-<!-- 관리자 과거 재고 부서 선택 -->
+<!-- 관리자 과거 재고 수정: 날짜 선택 -->
+<div class="modal" id="adminStockCalendar"><div class="sheet">
+  <button class="close" onclick="openModal('admin')">닫기</button>
+  <h3>📦 재고 수정 (관리자 권한)</h3>
+  <p class="muted">수정할 날짜를 선택해 주세요. 과거 날짜의 재고도 입력·수정할 수 있습니다.</p>
+  <div class="calendar-head">
+    <button onclick="changeAdminStockCalendarMonth(-1)">‹</button>
+    <div id="adminStockCalendarTitle" class="calendar-title"></div>
+    <button onclick="changeAdminStockCalendarMonth(1)">›</button>
+  </div>
+  <div class="calendar-week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+  <div id="adminStockCalendarGrid" class="calendar-grid"></div>
+</div></div>
+
 <div class="modal" id="adminHistoricalDepartment"><div class="sheet">
-  <button class="close" onclick="openModal('adminStats')">닫기</button>
+  <button class="close" onclick="openModal('adminStockCalendar')">닫기</button>
   <h3>🏢 과거 재고 입력 부서 선택</h3>
-  <p class="muted">입력할 부서를 선택해 주세요. 선택한 부서의 품목만 표시됩니다.</p>
+  <p class="muted">선택한 날짜에 입력할 부서를 선택해 주세요.</p>
   <div id="adminHistoricalDepartmentList" class="admin-dept-grid"></div>
 </div></div>
 
 <div class="modal" id="adminStats"><div class="sheet">
   <button class="close" onclick="openModal('admin')">닫기</button>
-  <h3>📅 통계 / 기록 관리</h3>
-  <p class="muted">날짜를 선택하면 해당 날짜의 전체 재고를 입력할 수 있습니다. 과거 날짜도 입력할 수 있으며, 이 기능은 관리자만 사용할 수 있습니다.</p>
-
+  <h3>📅 월별 사용량 통계</h3>
+  <p class="muted">재고확인 기록의 변동을 기준으로 부서별·품목별 사용량을 확인합니다. 당일 입력은 사용량 산정에서 제외됩니다.</p>
   <div class="calendar-head">
-    <button onclick="changeAdminCalendarMonth(-1)">‹</button>
-    <div id="adminCalendarTitle" class="calendar-title"></div>
-    <button onclick="changeAdminCalendarMonth(1)">›</button>
+    <button onclick="changeAdminUsageMonth(-1)">‹</button>
+    <div id="adminUsageMonthTitle" class="calendar-title"></div>
+    <button onclick="changeAdminUsageMonth(1)">›</button>
   </div>
-  <div class="calendar-week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
-  <div id="adminCalendarGrid" class="calendar-grid"></div>
-  <div id="adminCalendarDetail" class="calendar-detail" style="display:none"></div>
+  <div id="adminUsageReport"></div>
 </div></div>
 
 <script>
-const APP_VERSION="1.18"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.20"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -447,6 +450,27 @@ function migrateSnapshotOnlyStock(){
 }
 migrateSnapshotOnlyStock();
 
+// 1.19: '초기 재고' 개념을 폐지합니다.
+// 기존에 초기/기준 데이터로 저장되어 있던 재고도 실제 해당 날짜에 확인한 재고 데이터로 취급합니다.
+function migrateInitialSnapshotsToHistoricalRecordsV119(){
+  const key="submaterial_migrate_v119_initial_to_historical";
+  if(localStorage.getItem(key)==="1") return;
+  let changed=false;
+  records.forEach(r=>{
+    if(r.type!=="재고확인") return;
+    if(r.seedSnapshot===true || r.initialSnapshot===true){
+      r.seedSnapshot=false;
+      r.initialSnapshot=false;
+      r.manual=true;
+      r.inputSource="historical-seed-v119";
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
+  localStorage.setItem(key,"1");
+}
+migrateInitialSnapshotsToHistoricalRecordsV119();
+
 // 과거 버전 호환용: 초기 8/28 스냅샷 플래그는 사용량 계산에서만 구분하고,
 // 현재 재고 계산에서는 초기 8/28 값도 정상적인 최신 재고 기록으로 포함합니다.
 function isInitialAug28SeedRecord(r){
@@ -589,8 +613,6 @@ function getUsageFromInventoryChanges(itemName, category, startDate, endDate){
   for(let i=1;i<base.length;i++){
     const prev=base[i-1], cur=base[i];
     if(cur.date<startDate || prev.date>endDate) continue;
-    // 초기 기준 스냅샷 자체는 실제 사용량 변화가 아니므로 제외합니다.
-    if(cur.initialSnapshot) continue;
     const prevStock=Number(prev.stock||0), curStock=Number(cur.stock||0);
     if(curStock<prevStock){
       total += prevStock-curStock;
@@ -637,7 +659,6 @@ function getLastYearSameMonth(itemName, category, refDate){
   for(let i=1;i<rs.length;i++){
     const prev=rs[i-1],cur=rs[i];
     if(cur.date<start || prev.date>end) continue;
-    if(cur.initialSnapshot) continue;
     const a=Number(prev.stock||0),b=Number(cur.stock||0);
     if(b<a){total+=a-b;hasData=true;}else if(a!==b){hasData=true;}
   }
@@ -646,13 +667,8 @@ function getLastYearSameMonth(itemName, category, refDate){
 
 /* 현재 재고는 부서/품목별로 저장된 모든 재고확인 기록 중 가장 최근 날짜/시간의 수량입니다. */
 function isSeedSnapshotRecord(r){
-  // 현재 재고 계산에서 제외할 것은 '앱이 자동으로 넣은 초기 기준값'뿐입니다.
-  // 8/27, 8/28 등 특정 날짜는 절대로 기준으로 사용하지 않습니다.
-  if(!r) return false;
-  if(r.seedSnapshot===true) return true;
-  // 아주 오래된 형식의 초기 자동기록만 호환 처리합니다.
-  // 사용자가 실제로 저장한 기록은 seedSnapshot=false이므로 절대 제외하지 않습니다.
-  if(r.type==="재고확인" && r.initialSnapshot===true && r.manual!==true && String(r.time||"")==="000000" && r.seedSnapshot!==false) return true;
+  // 1.20부터 초기재고/시드재고는 존재하지 않습니다.
+  // 과거 데이터 호환을 위해 함수만 남기며 항상 일반 재고 기록으로 취급합니다.
   return false;
 }
 
@@ -766,6 +782,27 @@ function migrateRemoveLegacyZeroInputsV120(){
   localStorage.setItem(key,"1");
 }
 migrateRemoveLegacyZeroInputsV120();
+
+// 1.20: 초기 재고 개념을 완전히 폐지합니다.
+// 기존에 남아 있던 초기/시드 플래그도 모두 일반 날짜별 재고확인 기록으로 전환합니다.
+// 8/28 등의 기존 값도 실제 해당 날짜에 확인한 재고 데이터로 그대로 사용합니다.
+function migrateInitialStockConceptV120(){
+  const key="submaterial_migrate_v120_remove_initial_stock_concept";
+  if(localStorage.getItem(key)==="1") return;
+  let changed=false;
+  records.forEach(r=>{
+    if(r.type!=="재고확인") return;
+    if(r.initialSnapshot===true || r.seedSnapshot===true){
+      r.initialSnapshot=false;
+      r.seedSnapshot=false;
+      if(!r.inputSource) r.inputSource="historical-record";
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
+  localStorage.setItem(key,"1");
+}
+migrateInitialStockConceptV120();
 
 function getLastInventoryInput(itemName, category){
   // ★ 핵심 규칙: '품목 + 부서'별로 마지막으로 저장된 재고확인 1건만 사용합니다.
@@ -883,8 +920,22 @@ function openModal(id){
   document.getElementById(id).style.display="flex";
 
   if(id==="stock"){
-    document.getElementById("sdate").value=dateStr(new Date());
-    stockInputMode="normal";
+    const dateInput=document.getElementById("sdate");
+    const today=dateStr(new Date());
+    if(stockInputMode!=="historical"){
+      // 일반 사용자는 오늘 날짜만 입력할 수 있습니다.
+      stockInputMode="normal";
+      stockInputDate=today;
+      dateInput.value=today;
+      dateInput.min=today;
+      dateInput.max=today;
+    }else if(stockInputDate){
+      // 관리자는 달력에서 선택한 날짜만 수정합니다.
+      dateInput.value=stockInputDate;
+      dateInput.removeAttribute("min");
+      dateInput.removeAttribute("max");
+    }
+    dateInput.disabled=true;
     renderBulkStockInputs();
   }
   if(id==="cal"){
@@ -976,7 +1027,6 @@ function removeSameDayInventoryInput(itemName, category, date){
   const removedTimes=[];
   records=records.filter(r=>{
     if(r.type!=="재고확인" || r.name!==itemName || (r.category||"P/S")!==category || r.date!==date) return true;
-    if(r.seedSnapshot===true || r.initialSnapshot===true) return true;
     removedTimes.push(String(r.time||""));
     return false;
   });
@@ -1045,7 +1095,7 @@ function saveBulkStock(){
       type:"재고확인",stock:q,previous:previous,diff:diff,
       manual:historical,
       seedSnapshot:false,
-      inputSource:"user-v121",
+      inputSource:"user-v119",
       noStock:noStock
     });
 
@@ -1077,7 +1127,7 @@ function saveBulkStock(){
   stockInputMode="normal";
   render();
   renderCalendar();
-  renderAdminCalendar();
+  renderAdminStockCalendar();
   if(returnToHistorical){
     openModal("adminHistoricalDepartment");
     renderHistoricalDepartmentSelector();
@@ -1183,73 +1233,107 @@ function changeCalendarMonth(delta){
 }
 
 function showCalendarDetail(date,rows,adminMode){
-  const box=document.getElementById(adminMode?"adminCalendarDetail":"calendarDetail");
+  const box=document.getElementById("calendarDetail");
   const unitRows=rows.map(r=>{
     const unit=getUnit(r.name||"");
     const change=r.type==="사용"?`-${Number(r.qty).toLocaleString()}`:`+${Number(r.qty).toLocaleString()}`;
-    if(adminMode){
-      const realIndex=records.indexOf(r);
-      return `<div class="record-row">
-        <b>${esc(r.name)}</b> <span class="item-unit">${unit}</span><br>
-        ${r.type} ${change} <span class="muted">(${unit})</span>
-        <div class="record-meta">기록 후 재고: ${Number(r.stock??0).toLocaleString()} ${unit}</div>
-        <div class="admin-record-actions">
-          <button class="small-btn edit-btn" onclick="editAdminRecord(${realIndex})">수정</button>
-          <button class="small-btn delete-btn" onclick="deleteAdminRecord(${realIndex})">삭제</button>
-        </div>
-      </div>`;
-    }
     return `<div class="record-row">
       <b>${esc(r.name)}</b> <span class="item-unit">${unit}</span><br>
       ${r.type} ${change}
       <div class="record-meta">기록 후 재고: ${Number(r.stock??0).toLocaleString()} ${unit}</div>
     </div>`;
   }).join("");
-
   box.innerHTML=`<div class="calendar-detail-title">${date} 기록</div>${unitRows}`;
   box.style.display="block";
 }
 
 function openAdminStats(){
   openModal("adminStats");
-  renderAdminCalendar();
+  renderAdminUsageReport();
 }
 
-function renderAdminCalendar(){
-  const y=adminCalendarDate.getFullYear(),m=adminCalendarDate.getMonth();
-  document.getElementById("adminCalendarTitle").textContent=`${y}년 ${m+1}월`;
-  const grid=document.getElementById("adminCalendarGrid");
+let adminStockCalendarDate=new Date();
+let adminUsageMonthDate=new Date();
+
+function openAdminStockEdit(){
+  openModal("adminStockCalendar");
+  renderAdminStockCalendar();
+}
+
+function renderAdminStockCalendar(){
+  const y=adminStockCalendarDate.getFullYear(),m=adminStockCalendarDate.getMonth();
+  document.getElementById("adminStockCalendarTitle").textContent=`${y}년 ${m+1}월`;
+  const grid=document.getElementById("adminStockCalendarGrid");
   grid.innerHTML="";
   const first=new Date(y,m,1).getDay();
   const last=new Date(y,m+1,0).getDate();
-
   for(let i=0;i<first;i++) grid.insertAdjacentHTML("beforeend",`<div class="calendar-cell empty"></div>`);
-
   for(let day=1;day<=last;day++){
     const key=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-    const dayRecords=records.filter(r=>r.date===key&&(r.type==="사용"||r.type==="입고"||r.type==="재고확인"));
+    const dayRecords=records.some(r=>r.date===key && r.type==="재고확인");
     const cell=document.createElement("div");
-    cell.className="calendar-cell"+(dayRecords.length?" has-record":"");
-    cell.innerHTML=`<div class="calendar-num">${day}</div>${dayRecords.length?'<div class="calendar-dot"></div>':''}`;
-
-    // 관리자 화면에서는 날짜를 누르면 홈 화면과 동일한 전체 재고 입력 화면으로 이동합니다.
-    cell.onclick=()=>{stockInputDate=key; openModal("adminHistoricalDepartment"); renderHistoricalDepartmentSelector();};
+    cell.className="calendar-cell"+(dayRecords?" has-record":"");
+    cell.innerHTML=`<div class="calendar-num">${day}</div>${dayRecords?'<div class="calendar-dot"></div>':''}`;
+    cell.onclick=()=>openHistoricalStock(key);
     grid.appendChild(cell);
   }
 }
 
-function changeAdminCalendarMonth(delta){
-  adminCalendarDate.setMonth(adminCalendarDate.getMonth()+delta);
-  renderAdminCalendar();
-  document.getElementById("adminCalendarDetail").style.display="none";
+function changeAdminStockCalendarMonth(delta){
+  adminStockCalendarDate.setMonth(adminStockCalendarDate.getMonth()+delta);
+  renderAdminStockCalendar();
 }
 
 function openHistoricalStock(date){
   stockInputMode="historical";
   stockInputDate=date;
   document.getElementById("sdate").value=date;
+  document.getElementById("sdate").disabled=true;
   openModal("adminHistoricalDepartment");
   renderHistoricalDepartmentSelector();
+}
+
+function renderAdminUsageReport(){
+  const d=adminUsageMonthDate;
+  const y=d.getFullYear(),m=d.getMonth();
+  document.getElementById("adminUsageMonthTitle").textContent=`${y}년 ${m+1}월`;
+  const today=dateStr(new Date());
+  const monthStart=dateStr(new Date(y,m,1));
+  let monthEnd=dateStr(new Date(y,m+1,0));
+  const yesterday=getPreviousDate(today);
+  if(monthEnd>yesterday) monthEnd=yesterday;
+
+  const deptSummary=CATEGORIES.map(category=>{
+    const deptItems=items.filter(x=>(x[5]||"P/S")===category);
+    const total=deptItems.reduce((sum,item)=>{
+      if(monthEnd<monthStart) return sum;
+      return sum+getUsageFromInventoryChanges(item[0],category,monthStart,monthEnd).value;
+    },0);
+    return {category,total,items:deptItems};
+  });
+  const maxTotal=Math.max(1,...deptSummary.map(x=>x.total));
+  const graph=deptSummary.map(x=>`
+    <div class="usage-bar-row">
+      <div class="usage-bar-label">${esc(x.category)}</div>
+      <div class="usage-bar-track"><div class="usage-bar-fill" style="width:${Math.max(0,(x.total/maxTotal)*100)}%"></div></div>
+      <div class="usage-bar-value">${x.total.toLocaleString()}</div>
+    </div>`).join("");
+  const summaryRows=deptSummary.map(x=>`
+    <tr><td class="admin-usage-dept">${esc(x.category)}</td><td class="admin-usage-number">${x.total.toLocaleString()}</td><td>${esc(x.items.length ? getUnit(x.items[0][0],x.category) : "-")}</td></tr>`).join("");
+  const sections=deptSummary.map(x=>{
+    if(!x.items.length) return "";
+    const rows=x.items.map(item=>{
+      const usage=(monthEnd<monthStart)?0:getUsageFromInventoryChanges(item[0],x.category,monthStart,monthEnd).value;
+      return `<tr><td class="admin-usage-item">${esc(item[0])}</td><td class="admin-usage-number">${usage.toLocaleString()}</td><td>${esc(getUnit(item[0],x.category))}</td></tr>`;
+    }).join("");
+    return `<section class="admin-usage-section"><div class="admin-usage-section-title">${esc(x.category)} 품목별 사용량</div><div class="admin-usage-table-wrap"><table class="admin-usage-table"><thead><tr><th>품목명</th><th>사용량</th><th>단위</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+  }).join("");
+  document.getElementById("adminUsageReport").innerHTML=`
+    <div class="admin-usage-period">${monthStart} ~ ${monthEnd<monthStart?"집계 없음":monthEnd}</div>
+    <section class="admin-usage-section"><div class="admin-usage-section-title">부서별 월간 사용량</div><div class="admin-usage-table-wrap"><table class="admin-usage-table"><thead><tr><th>부서</th><th>총 사용량</th><th>단위</th></tr></thead><tbody>${summaryRows}</tbody></table></div></section>
+    <section class="admin-usage-section"><div class="admin-usage-section-title">부서별 사용량 그래프</div><div class="usage-chart">${graph}</div></section>
+    ${sections||'<div class="admin-usage-empty">등록된 품목이 없습니다.</div>'}
+    <div class="admin-usage-note">* 사용량은 해당 월의 재고확인 변동을 기준으로 산정합니다.<br>* 당일 입력분은 사용량 산정에서 제외합니다.<br>* 같은 날짜에 여러 번 수정한 경우 그 날짜의 마지막 재고확인 값만 사용합니다.</div>`;
 }
 
 function renderHistoricalDepartmentSelector(){
@@ -1274,62 +1358,17 @@ function closeStockModal(){
   const wasHistorical=stockInputMode==="historical";
   document.getElementById("stock").style.display="none";
   stockInputMode="normal";
+  stockInputDate="";
   if(wasHistorical){
-    openModal("adminHistoricalDepartment");
-    renderHistoricalDepartmentSelector();
+    // 관리자 과거 재고 수정 화면을 닫으면 관리자 달력으로 돌아갑니다.
+    openModal("adminStockCalendar");
+    renderAdminStockCalendar();
+  }else{
+    closeAll();
   }
 }
 
-function editAdminRecord(index){
-  const r=records[index];
-  if(!r || (r.type!=="사용"&&r.type!=="입고")) return;
-  const date=prompt("기록 날짜를 입력해 주세요. (YYYY-MM-DD)",r.date);
-  if(!date) return;
-  const qty=parseInt(prompt("수량을 입력해 주세요.",String(r.qty)),10);
-  if(!Number.isInteger(qty)||qty<=0){alert("수량은 1개 이상으로 입력해 주세요.");return}
-  r.date=date;
-  r.qty=qty;
-  r.manual=true;
-  localStorage.setItem("submaterial_records",JSON.stringify(records));
-  render();
-  renderAdminCalendar();
-  showCalendarDetail(date,records.filter(x=>x.date===date&&(x.type==="사용"||x.type==="입고")),true);
-}
 
-function deleteAdminRecord(index){
-  const r=records[index];
-  if(!r || (r.type!=="사용"&&r.type!=="입고")) return;
-  if(!confirm("이 기록을 삭제하시겠습니까?")) return;
-  records.splice(index,1);
-  localStorage.setItem("submaterial_records",JSON.stringify(records));
-  render();
-  renderAdminCalendar();
-  document.getElementById("adminCalendarDetail").style.display="none";
-}
-
-function openInitialStock(){
-  document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
-  document.getElementById("initialStock").style.display="flex";
-  document.getElementById("initialStockList").innerHTML=items.map((x,i)=>`
-    <div class="bulk-row">
-      <div class="bulk-name"><b>${i+1}. ${esc(x[0])}</b><span>현재 기준 ${Number(x[1]||0).toLocaleString()}${getUnit(x[0])}</span></div>
-      <input id="initial-${i}" class="bulk-input" type="number" min="0" step="1" inputmode="numeric" value="${Number(x[1]||0)}">
-    </div>
-  `).join("");
-}
-
-function saveInitialStock(){
-  if(!confirm("입력한 수량을 초기 기준 재고로 설정할까? 기존 재고 변동 기록은 삭제되지 않습니다.")) return;
-  items.forEach((x,i)=>{
-    const q=parseInt(document.getElementById(`initial-${i}`).value,10);
-    if(!Number.isInteger(q)||q<0) throw new Error(`${x[0]}의 재고를 0 이상의 숫자로 입력해 주세요.`);
-    x[1]=q;
-  });
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  closeAll();
-  render();
-  alert("초기 재고 설정 완료!");
-}
 
 function openAdminLogin(){
   openModal("login");
@@ -1480,8 +1519,11 @@ function addItem(){
 function deleteItem(i){
   deleteDepartmentItem(i);
 }
-function openAdminStockEdit(){
-  openInitialStock();
+
+
+function changeAdminUsageMonth(delta){
+  adminUsageMonthDate.setMonth(adminUsageMonthDate.getMonth()+delta);
+  renderAdminUsageReport();
 }
 
 function openAdminPasswordChange(){
