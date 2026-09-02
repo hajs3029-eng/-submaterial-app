@@ -17,13 +17,20 @@ main{padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9p
 h2{font-size:18px;margin:20px 2px 10px}.card{background:#fff;border-radius:14px;padding:14px;margin:9px 0;box-shadow:0 2px 8px #0000000b}.row{display:flex;justify-content:space-between;align-items:center}.name{font-weight:800}.muted{font-size:12px;color:#667085;margin-top:4px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.metric{background:#f3f6fa;border-radius:9px;padding:8px}.metric span{display:block;font-size:10px;color:#667085}.metric b{font-size:15px}.order{color:#d83a3a;font-weight:800}.ok{color:#16834b;font-weight:800}
 table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:12px;overflow:hidden}th,td{padding:10px 6px;border-bottom:1px solid #edf0f3;text-align:center}th{background:#eef3f9;color:#526071}
 nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;background:#fff;border-top:1px solid #e4e8ee;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 5px calc(8px + env(safe-area-inset-bottom));z-index:10}nav button{border:0;background:none;font-size:11px;color:#657080;padding:5px}nav .active{color:#1769e0;font-weight:800}nav .plus{color:#1769e0;font-size:24px;line-height:20px}
-.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.sheet{background:#fff;width:100%;max-width:680px;margin:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}.sheet h3{margin:0 0 15px;font-size:20px}label{font-size:12px;color:#667085;display:block;margin:12px 0 5px}input,select{width:100%;padding:13px;border:1px solid #d8dee8;border-radius:10px;font-size:16px}button.primary{width:100%;border:0;border-radius:11px;background:#1769e0;color:#fff;font-weight:800;padding:14px;margin-top:16px;font-size:16px}.close{float:right;border:0;background:#f0f2f5;border-radius:9px;padding:8px 11px}.day{border:1px solid #e1e6ed;border-radius:10px;padding:10px;margin:7px 0}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.sheet{background:#fff;width:100%;max-width:680px;margin:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.sheet h3{margin:0 0 15px;font-size:20px}label{font-size:12px;color:#667085;display:block;margin:12px 0 5px}input,select{width:100%;padding:13px;border:1px solid #d8dee8;border-radius:10px;font-size:16px}button.primary{width:100%;border:0;border-radius:11px;background:#1769e0;color:#fff;font-weight:800;padding:14px;margin-top:16px;font-size:16px}.close{float:right;border:0;background:#f0f2f5;border-radius:9px;padding:8px 11px}.day{border:1px solid #e1e6ed;border-radius:10px;padding:10px;margin:7px 0}
+.admin-item{border:1px solid #e2e7ee;border-radius:12px;padding:12px;margin:10px 0}.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.admin-grid label{margin-top:8px}.danger{background:#fff1f1;border:1px solid #ffd0d0;color:#c62828;width:100%;border-radius:11px;padding:12px;font-weight:700;margin-top:10px}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div class="head"><button class="icon" onclick="alert('메뉴')">☰</button><div><div class="title">부자재 관리</div><div class="sub">창고 발주 관리 시스템</div></div><button class="icon" onclick="openModal('out')">＋</button></div>
-<div class="date">기준일 : <span id="today"></span><button class="icon" onclick="render()">↻</button></div></header>
+<header>
+  <div class="head">
+    <button class="icon" onclick="openAdminLogin()">☰</button>
+    <div><div class="title">부자재 관리</div><div class="sub">창고 발주 관리 시스템</div></div>
+    <button class="icon" onclick="openModal('out')">＋</button>
+  </div>
+  <div class="date">기준일 : <span id="today"></span><button class="icon" onclick="render()">↻</button></div>
+</header>
 <main>
 <div class="stats"><div class="stat"><b id="need">0</b><span>발주 필요</span></div><div class="stat"><b id="check">0</b><span>확인 필요</span></div><div class="stat"><b id="good">0</b><span>재고 적정</span></div></div>
 <h2>발주 필요 품목</h2><div id="items"></div>
@@ -34,25 +41,149 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 <div class="modal" id="out"><div class="sheet"><button class="close" onclick="closeAll()">닫기</button><h3>출고 등록</h3><label>날짜</label><input id="odate" type="date"><label>품목</label><select id="item"></select><label>출고 수량</label><input id="qty" type="number" min="0" step="1" inputmode="numeric" placeholder="숫자만 입력"><label>비고 (선택)</label><input id="note" maxlength="30" placeholder="예: 긴급 출고"><button class="primary" onclick="saveOut()">저장</button></div></div>
 <div class="modal" id="cal"><div class="sheet"><button class="close" onclick="closeAll()">닫기</button><h3>출고 기록</h3><div id="calbody"></div></div></div>
-<div class="modal" id="itemsModal"><div class="sheet"><button class="close" onclick="closeAll()">닫기</button><h3>품목 관리</h3><p class="muted">현재 등록 품목 7개</p><div id="itemlist"></div></div></div>
+<div class="modal" id="itemsModal"><div class="sheet"><button class="close" onclick="closeAll()">닫기</button><h3>품목 관리</h3><p class="muted">등록된 품목을 확인할 수 있어.</p><div id="itemlist"></div></div></div>
+
+<div class="modal" id="login"><div class="sheet"><button class="close" onclick="closeAll()">닫기</button><h3>🔐 관리자 모드</h3><p class="muted">관리자 비밀번호를 입력해줘.</p><label>비밀번호</label><input id="adminpw" type="password" inputmode="numeric" placeholder="비밀번호"><button class="primary" onclick="loginAdmin()">관리자 모드 들어가기</button></div></div>
+
+<div class="modal" id="admin"><div class="sheet"><button class="close" onclick="closeAll()">닫기</button><h3>⚙️ 관리자 모드</h3>
+<p class="muted">재고와 발주 기준을 이 화면에서 바로 수정할 수 있어. 저장하면 이 휴대폰의 앱에 즉시 반영돼.</p>
+<div id="adminlist"></div>
+<button class="primary" onclick="saveAdmin()">전체 설정 저장</button>
+<button class="primary" onclick="addItem()">＋ 품목 추가</button>
+<hr style="border:0;border-top:1px solid #e5e9ef;margin:20px 0">
+<h3 style="font-size:17px;margin:0 0 6px">🔑 관리자 비밀번호 변경</h3>
+<p class="muted">현재 비밀번호를 확인한 뒤 새 비밀번호로 변경해.</p>
+<label>현재 비밀번호</label><input id="oldpw" type="password" inputmode="numeric" placeholder="현재 비밀번호">
+<label>새 비밀번호</label><input id="newpw" type="password" inputmode="numeric" placeholder="새 비밀번호">
+<label>새 비밀번호 확인</label><input id="newpw2" type="password" inputmode="numeric" placeholder="새 비밀번호 다시 입력">
+<button class="primary" onclick="changeAdminPassword()">비밀번호 변경</button>
+<button class="danger" onclick="resetData()">⚠️ 출고기록·설정을 모두 초기화</button>
+</div></div>
 
 <script>
-const items=[
-["오리콘(3호)",120,380,420,600],["오리콘(4호)",80,250,310,520],["오리콘(5호)",200,300,280,450],
-["테이프(미색)",150,180,200,230],["테이프(적색)",60,120,110,180],["위생백",300,250,240,150],["지퍼백",500,420,430,0]
+const DEFAULT_ITEMS=[
+["오리콘(3호)",0,380,420,600],["오리콘(4호)",0,250,310,520],["오리콘(5호)",0,300,280,450],
+["테이프(미색)",0,180,200,230],["테이프(적색)",0,120,110,180],["위생백",0,250,240,150],["지퍼백",0,420,430,0]
 ];
+
+let items=JSON.parse(localStorage.getItem("submaterial_items")||"null");
+if(!Array.isArray(items)||!items.length){items=DEFAULT_ITEMS.map(x=>x.slice());localStorage.setItem("submaterial_items",JSON.stringify(items));}
 let records=JSON.parse(localStorage.getItem("submaterial_records")||"[]");
-const d=new Date(); const iso=x=>new Date(x).toISOString().slice(0,10);
-function render(){document.getElementById("today").textContent=d.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",weekday:"short"}).replaceAll(". ","-").replace(".","").replace(" "," ");
-let need=0,check=0,good=0; const box=document.getElementById("items"); box.innerHTML="";
-items.forEach((it,i)=>{let status=it[1]<it[2]*.5?"발주 필요":it[1]<it[2]?"확인 필요":"재고 적정";if(status==="발주 필요")need++;else if(status==="확인 필요")check++;else good++;
-box.innerHTML+=`<div class="card"><div class="row"><div><div class="name">${it[0]}</div><div class="muted">현재 재고 ${it[1].toLocaleString()}개</div></div><div class="${status==='재고 적정'?'ok':'order'}">${status}</div></div><div class="grid"><div class="metric"><span>최근 3개월 평균</span><b>${it[2]}</b></div><div class="metric"><span>전년 동월 출고</span><b>${it[3]}</b></div><div class="metric"><span>추천 발주량</span><b>${it[4]}</b></div></div></div>`});
-document.getElementById("need").textContent=need;document.getElementById("check").textContent=check;document.getElementById("good").textContent=good;
-document.getElementById("history").innerHTML=records.slice().reverse().slice(0,12).map(r=>`<tr><td>${r.date}</td><td>${r.name}</td><td>${r.qty}</td><td>${r.stock}</td><td>${r.note||""}</td></tr>`).join("");
+let adminPassword=localStorage.getItem("submaterial_admin_pw")||"1234";
+
+const iso=x=>{const d=new Date(x);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+
+function render(){
+  const now=new Date();
+  document.getElementById("today").textContent=now.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",weekday:"short"}).replaceAll(". ","-").replace("."," ").trim();
+  let need=0,check=0,good=0; const box=document.getElementById("items"); box.innerHTML="";
+  items.forEach((it,i)=>{
+    let status=it[1]<it[2]*.5?"발주 필요":it[1]<it[2]?"확인 필요":"재고 적정";
+    if(status==="발주 필요")need++;else if(status==="확인 필요")check++;else good++;
+    box.innerHTML+=`<div class="card"><div class="row"><div><div class="name">${it[0]}</div><div class="muted">현재 재고 ${Number(it[1]).toLocaleString()}개</div></div><div class="${status==='재고 적정'?'ok':'order'}">${status}</div></div><div class="grid"><div class="metric"><span>최근 3개월 평균</span><b>${Number(it[2]).toLocaleString()}</b></div><div class="metric"><span>전년 동월 출고</span><b>${Number(it[3]).toLocaleString()}</b></div><div class="metric"><span>추천 발주량</span><b>${Number(it[4]).toLocaleString()}</b></div></div></div>`;
+  });
+  document.getElementById("need").textContent=need;document.getElementById("check").textContent=check;document.getElementById("good").textContent=good;
+  document.getElementById("history").innerHTML=records.slice().reverse().slice(0,12).map(r=>`<tr><td>${r.date}</td><td>${r.name}</td><td>${r.qty}</td><td>${r.stock}</td><td>${r.note||""}</td></tr>`).join("");
 }
-function openModal(id){document.querySelectorAll(".modal").forEach(x=>x.style.display="none");document.getElementById(id).style.display="flex";if(id==="out"){document.getElementById("odate").value=iso(new Date());document.getElementById("item").innerHTML=items.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join("");document.getElementById("qty").value="";document.getElementById("note").value=""}if(id==="cal"){document.getElementById("calbody").innerHTML=records.length?records.slice().reverse().map(r=>`<div class="day"><b>${r.date}</b><br>${r.name} — <b>${r.qty}</b>개<br><span class="muted">재고 ${r.stock}개 ${r.note?"· "+r.note:""}</span></div>`).join(""):"<p>아직 출고 기록이 없습니다.</p>"}if(id==="itemsModal"){document.getElementById("itemlist").innerHTML=items.map((x,i)=>`<div class="card"><b>${i+1}. ${x[0]}</b><div class="muted">현재 재고 ${x[1]}개</div></div>`).join("")}}
+
+function openModal(id){
+  document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
+  document.getElementById(id).style.display="flex";
+  if(id==="out"){
+    document.getElementById("odate").value=iso(new Date());
+    document.getElementById("item").innerHTML=items.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join("");
+    document.getElementById("qty").value="";document.getElementById("note").value="";
+  }
+  if(id==="cal"){
+    document.getElementById("calbody").innerHTML=records.length?records.slice().reverse().map(r=>`<div class="day"><b>${r.date}</b><br>${r.name} — <b>${r.qty}</b>개<br><span class="muted">재고 ${r.stock}개 ${r.note?"· "+r.note:""}</span></div>`).join(""):"<p>아직 출고 기록이 없습니다.</p>";
+  }
+  if(id==="itemsModal"){
+    document.getElementById("itemlist").innerHTML=items.map((x,i)=>`<div class="card"><b>${i+1}. ${x[0]}</b><div class="muted">현재 재고 ${Number(x[1]).toLocaleString()}개</div></div>`).join("");
+  }
+  if(id==="admin")renderAdmin();
+}
+
 function closeAll(){document.querySelectorAll(".modal").forEach(x=>x.style.display="none")}
-function saveOut(){let i=+document.getElementById("item").value,q=parseInt(document.getElementById("qty").value,10);if(!Number.isInteger(q)||q<0){alert("출고 수량은 숫자로 입력해줘.");return}let r={date:document.getElementById("odate").value,name:items[i][0],qty:q,stock:Math.max(0,items[i][1]-q),note:document.getElementById("note").value.trim()};records.push(r);localStorage.setItem("submaterial_records",JSON.stringify(records));closeAll();render();alert("출고 내역이 저장됐어.");}
+
+function saveOut(){
+  let i=+document.getElementById("item").value,q=parseInt(document.getElementById("qty").value,10);
+  if(!Number.isInteger(q)||q<0){alert("출고 수량은 숫자로 입력해줘.");return}
+  let stock=Math.max(0,Number(items[i][1])-q);
+  items[i][1]=stock;
+  localStorage.setItem("submaterial_items",JSON.stringify(items));
+  let r={date:document.getElementById("odate").value,name:items[i][0],qty:q,stock:stock,note:document.getElementById("note").value.trim()};
+  records.push(r);localStorage.setItem("submaterial_records",JSON.stringify(records));
+  closeAll();render();alert("출고 내역이 저장됐어.");
+}
+
+function openAdminLogin(){openModal("login");document.getElementById("adminpw").value=""}
+function loginAdmin(){
+  if(document.getElementById("adminpw").value!==adminPassword){alert("비밀번호가 맞지 않아.");return}
+  openModal("admin");
+}
+
+function renderAdmin(){
+  document.getElementById("adminlist").innerHTML=items.map((x,i)=>`
+    <div class="admin-item">
+      <b>${i+1}. ${x[0]}</b>
+      <div class="admin-grid">
+        <div><label>현재 재고</label><input id="a-stock-${i}" type="number" min="0" inputmode="numeric" value="${x[1]}"></div>
+        <div><label>최근 3개월 평균</label><input id="a-avg-${i}" type="number" min="0" inputmode="numeric" value="${x[2]}"></div>
+        <div><label>전년 동월 출고</label><input id="a-last-${i}" type="number" min="0" inputmode="numeric" value="${x[3]}"></div>
+        <div><label>추천 발주량</label><input id="a-order-${i}" type="number" min="0" inputmode="numeric" value="${x[4]}"></div>
+      </div>
+      <button class="danger" onclick="deleteItem(${i})">이 품목 삭제</button>
+    </div>`).join("");
+}
+
+function saveAdmin(){
+  items.forEach((x,i)=>{
+    x[1]=Math.max(0,parseInt(document.getElementById(`a-stock-${i}`).value,10)||0);
+    x[2]=Math.max(0,parseInt(document.getElementById(`a-avg-${i}`).value,10)||0);
+    x[3]=Math.max(0,parseInt(document.getElementById(`a-last-${i}`).value,10)||0);
+    x[4]=Math.max(0,parseInt(document.getElementById(`a-order-${i}`).value,10)||0);
+  });
+  localStorage.setItem("submaterial_items",JSON.stringify(items));
+  render();closeAll();alert("관리자 설정이 저장됐어.");
+}
+
+function addItem(){
+  const name=prompt("추가할 품목명을 입력해줘.");
+  if(!name||!name.trim())return;
+  items.push([name.trim(),0,0,0,0]);
+  localStorage.setItem("submaterial_items",JSON.stringify(items));
+  renderAdmin();render();
+}
+
+function deleteItem(i){
+  if(!confirm(`'${items[i][0]}' 품목을 삭제할까?`))return;
+  items.splice(i,1);localStorage.setItem("submaterial_items",JSON.stringify(items));renderAdmin();render();
+}
+
+function changeAdminPassword(){
+  const old=document.getElementById("oldpw").value;
+  const nw=document.getElementById("newpw").value;
+  const nw2=document.getElementById("newpw2").value;
+  if(old!==adminPassword){alert("현재 비밀번호가 맞지 않아.");return}
+  if(nw.length<4){alert("새 비밀번호는 4자리 이상으로 입력해줘.");return}
+  if(nw!==nw2){alert("새 비밀번호가 서로 달라.");return}
+  adminPassword=nw;
+  localStorage.setItem("submaterial_admin_pw",adminPassword);
+  document.getElementById("oldpw").value="";
+  document.getElementById("newpw").value="";
+  document.getElementById("newpw2").value="";
+  alert("관리자 비밀번호가 변경됐어.");
+}
+
+function resetData(){
+  if(!confirm("출고 기록과 품목 설정을 모두 초기화할까? 모든 재고도 0개로 돌아가."))return;
+  items=DEFAULT_ITEMS.map(x=>x.slice());
+  records=[];
+  localStorage.setItem("submaterial_items",JSON.stringify(items));
+  localStorage.setItem("submaterial_records","[]");
+  render();renderAdmin();alert("전체 초기화 완료!");
+}
+
 render();
 </script>
 </body></html>
