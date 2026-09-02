@@ -266,8 +266,8 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.09"; // 사용자에게 표시되는 앱 버전. 이후 수정 시 1.09, 1.10...
-const DATA_VERSION="2026-09-02-v14";
+const APP_VERSION="1.10"; // 사용자에게 표시되는 앱 버전. 이후 수정 시 1.09, 1.10...
+const DATA_VERSION="2026-09-02-v15";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
   ["라벨 감열(무지) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":3}],
@@ -367,7 +367,8 @@ function ensureInitialSnapshot(){
         records.push({
           date:date,time:"000000",name:it[0],category:it[5]||"P/S",type:"재고확인",
           stock:Number(snapshots[date]||0),previous:0,diff:0,
-          initialSnapshot:(date==="2026-08-28")
+          initialSnapshot:(date==="2026-08-28"),
+          seedSnapshot:true
         });
         changed=true;
       }
@@ -557,10 +558,9 @@ function getInventorySnapshots(itemName, category){
     .sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
 }
 function getActualInventoryInputs(itemName, category){
-  // 현재 재고의 기준은 "실제로 저장되어 있는 가장 최근 재고확인 기록"입니다.
-  // 초기 스냅샷 여부와 관계없이 날짜/시간이 가장 최신인 기록을 사용합니다.
-  // 따라서 8/28에 입력된 품목은 8/28 기준으로, 8/27이 마지막인 오리콘은 8/27 기준으로 표시됩니다.
-  return getInventorySnapshots(itemName,category);
+  // 날짜(8/27, 8/28 등)를 기준으로 삼지 않습니다.
+  // 자동 생성된 초기 스냅샷만 제외하고, 실제 재고확인 기록 전체를 반환합니다.
+  return getInventorySnapshots(itemName,category).filter(r=>!isSeedSnapshotRecord(r));
 }
 
 // 사용량은 별도 사용량 입력이 아니라, 연속된 재고확인 수량의 감소분으로 추정합니다.
@@ -618,11 +618,44 @@ function getLastYearSameMonth(itemName, category, refDate){
 }
 
 /* 현재 재고는 부서/품목별로 저장된 모든 재고확인 기록 중 가장 최근 날짜/시간의 수량입니다. */
+function isSeedSnapshotRecord(r){
+  // 앱이 처음 표시하기 위해 자동 생성한 기준 데이터만 제외합니다.
+  // 핵심: 날짜가 8/27인지 8/28인지로 판단하지 않습니다.
+  // 실제 사용자가 입력한 기록은 manual 여부와 관계없이 마지막 입력으로 인정합니다.
+  if(!r || r.type!=="재고확인") return false;
+  if(r.seedSnapshot===true) return true;
+  // 구버전 자동 생성 스냅샷 호환: 초기 스냅샷 플래그 + 자동생성 시간값.
+  if(r.initialSnapshot===true && r.manual!==true && String(r.time||"")==="000000") return true;
+  return false;
+}
+
+function migrateActualInventoryRecordsV110(){
+  let changed=false;
+  records.forEach(r=>{
+    if(r.type!=="재고확인") return;
+    // 실제 입력 기록은 절대로 초기 스냅샷으로 남기지 않습니다.
+    // 특히 8/28에 사용자가 입력한 기록은 날짜와 상관없이 실제 입력입니다.
+    if(r.manual===true && r.initialSnapshot===true){
+      r.initialSnapshot=false;
+      r.seedSnapshot=false;
+      changed=true;
+      return;
+    }
+    if(r.initialSnapshot===true && String(r.time||"")!=="000000"){
+      r.initialSnapshot=false;
+      r.seedSnapshot=false;
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
+}
+migrateActualInventoryRecordsV110();
+
 function getLastInventoryInput(itemName, category){
   // 특정 날짜를 기준으로 하지 않습니다.
-  // 해당 품목/부서의 실제 재고확인 기록 전체에서 가장 최근 날짜/시간의 수량을 사용합니다.
+  // 해당 품목/부서의 실제 재고확인 기록 중 가장 최근 날짜/시간의 수량을 사용합니다.
   const rs=getInventorySnapshots(itemName,category)
-    .filter(r=>!isInitialAug28SeedRecord(r))
+    .filter(r=>!isSeedSnapshotRecord(r))
     .slice()
     .sort((a,b)=>{
       const ad=a.date+String(a.time||"").padStart(14,"0");
@@ -825,7 +858,8 @@ function saveBulkStock(){
     records.push({
       date:date,time:String(now+i*2),name:item[0],category:category,
       type:"재고확인",stock:q,previous:previous,diff:diff,
-      manual:historical
+      manual:historical,
+      seedSnapshot:false
     });
 
     if(diff<0){
