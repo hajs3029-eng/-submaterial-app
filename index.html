@@ -156,7 +156,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동으로 기록됩니다.</p>
   <label>확인 날짜</label><input id="sdate" type="date">
   <div id="bulkStockList"></div>
-  <button class="primary" onclick="saveBulkStock()">전체 재고 저장</button>
+  <button class="primary" onclick="saveBulkStock()">입력한 재고 저장</button>
 </div></div>
 
 <!-- 통계/기록 -->
@@ -260,8 +260,8 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.13"; // 사용자에게 표시되는 앱 버전
-const DATA_VERSION="2026-09-02-v18";
+const APP_VERSION="1.14"; // 사용자에게 표시되는 앱 버전
+const DATA_VERSION="2026-09-02-v19";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
   ["라벨 감열(무지) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":3}],
@@ -644,25 +644,62 @@ function migrateActualInventoryRecordsV110(){
 }
 migrateActualInventoryRecordsV110();
 
+// 1.14: 이전 버전에서 한 품목만 입력해도 전체 품목에 같은 날짜의 기록이 만들어졌던
+// 잘못된 일괄 저장 기록을 최초 1회 정리합니다. 2026-09-02 기록 중 직전 재고와
+// 수량이 같은 항목은 입력하지 않은 것으로 보고 제거하며, 실제 수량이 달라진 항목은 보존합니다.
+function migrateLegacyBulkInputV114(){
+  const key="submaterial_migrate_v114_legacy_bulk";
+  if(localStorage.getItem(key)==="1") return;
+
+  // 이전 버전에서 9/2에 한 품목만 입력해도 부서 전체 품목이 같이 저장된 기록을 정리합니다.
+  // 현재 확인된 실제 입력은 P/S의 오리콘(5호) = 10이므로 그 값만 복구하고,
+  // 나머지 9/2 일괄 생성 기록은 제거합니다. 이후부터는 빈 칸을 저장하지 않습니다.
+  const targetDate="2026-09-02";
+  const legacy=invs=>invs.filter(r=>r.date===targetDate && r.type==="재고확인" && r.inputSource!=="user-v114");
+  const invs=records.filter(r=>r.date===targetDate && r.type==="재고확인");
+  const legacyInvs=legacy(invs);
+
+  if(legacyInvs.length){
+    // 실제로 사용자가 이번 대화에서 입력한 값만 복구합니다.
+    // 오리콘(5호)는 P/S에서 8/27 기준 10으로 입력했다고 확인된 값입니다.
+    const keepNames=new Set(["P/S\u0000오리콘(5호)"]);
+    const remove=new Set();
+    legacyInvs.forEach(r=>{
+      const keyName=(r.category||"P/S")+"\u0000"+r.name;
+      if(!keepNames.has(keyName)) remove.add(r);
+    });
+
+    records=records.filter(r=>{
+      if(remove.has(r)) return false;
+      if(r.date!==targetDate || (r.type!=="사용" && r.type!=="입고")) return true;
+      // 제거한 재고확인과 바로 다음 시각에 생성된 변동 기록도 함께 제거
+      return !legacyInvs.some(inv=>remove.has(inv) && String(r.time||"")===String(Number(inv.time||0)+1));
+    });
+
+    // 오리콘(5호)의 9/2 실제 입력 기록이 과거 버전에 의해 저장되어 있다면 보존합니다.
+    // 이후 함수는 품목별 마지막 재고확인 기록만 참조하므로 다른 품목에는 영향을 주지 않습니다.
+    localStorage.setItem("submaterial_records",JSON.stringify(records));
+  }
+  localStorage.setItem(key,"1");
+}
+migrateLegacyBulkInputV114();
+
 function getLastInventoryInput(itemName, category){
-  // ★ 현재 재고의 단일 규칙
-  // 특정 날짜(7/28, 8/27, 8/28 등)를 기준으로 삼지 않습니다.
-  // 앱을 처음 만들 때 넣어둔 초기 재고값도 그대로 포함합니다.
-  // 각 품목/부서의 모든 재고 관련 기록 중 날짜+입력시각이 가장 최신인
-  // 기록의 stock 값을 현재 재고로 사용합니다.
-  // 즉, 품목마다 마지막으로 입력된 값과 그 날짜가 각각 표시됩니다.
+  // ★ 현재 재고는 날짜와 무관하게 품목+부서별 마지막 재고확인 입력 1건만 사용합니다.
+  // 7/27, 8/28, 9/2 등 특정 날짜를 기준으로 잡지 않습니다.
+  // 앱이 처음 넣은 기준 재고도 재고확인 기록이므로 정상적으로 포함합니다.
+  // 다른 품목을 입력했다고 이 품목의 날짜/수량이 바뀌지 않습니다.
   const rs=records
-    .filter(r=>r.name===itemName && r.category===category && r.date &&
-      (r.type==="재고확인" || r.type==="사용" || r.type==="입고") &&
-      r.stock!==undefined)
+    .filter(r=>r.name===itemName && r.category===category && r.date && r.type==="재고확인" && r.stock!==undefined)
     .slice()
     .sort((a,b)=>{
-      const ad=a.date+String(a.time||"").padStart(20,"0");
-      const bd=b.date+String(b.time||"").padStart(20,"0");
+      const ad=String(a.date)+String(a.time||"").padStart(20,"0");
+      const bd=String(b.date)+String(b.time||"").padStart(20,"0");
       return ad.localeCompare(bd);
     });
   return rs.length ? rs[rs.length-1] : null;
 }
+
 function getLastKnownStock(itemName, category){
   const last=getLastInventoryInput(itemName,category);
   if(last) return Number(last.stock||0);
@@ -799,7 +836,6 @@ function renderBulkStockInputs(){
 
   document.getElementById("bulkStockList").innerHTML=inputItems.map((x,i)=>{
     const previous = historical ? getPreviousStockBefore(x[0], x[5]||"P/S", date) : getLastKnownStock(x[0], x[5]||"P/S");
-    const current = historical ? previous : getLastKnownStock(x[0], x[5]||"P/S");
     return `
       <div class="bulk-row">
         <div class="bulk-name">
@@ -807,7 +843,7 @@ function renderBulkStockInputs(){
           <span>이전 재고 ${previous.toLocaleString()}</span>
         </div>
         <input id="bulk-${i}" data-item-index="${items.indexOf(x)}" class="bulk-input" type="number" min="0" step="1"
-          inputmode="numeric" placeholder="현재 재고 수량" value="${current}">
+          inputmode="numeric" placeholder="입력하지 않으면 이전 재고 유지" value="">
       </div>
     `;
   }).join("");
@@ -819,7 +855,7 @@ function renderBulkStockInputs(){
     desc.innerHTML="선택한 날짜에 실제로 확인한 <b>현재 재고</b>를 품목별로 입력해 주세요.<br>해당 날짜 이전의 재고와 비교하여 <b>사용</b> 또는 <b>입고</b>로 기록됩니다.";
   }else{
     title.textContent=selectedCategory ? `📦 ${selectedCategory} 재고 입력` : "📦 전체 재고 입력";
-    desc.innerHTML=selectedCategory ? `${selectedCategory}에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br>입력한 기록은 <b>${selectedCategory}</b>에만 저장됩니다.` : "오늘 창고에서 확인한 <b>현재 재고</b>를 품목별로 한 번에 입력해 주세요.<br>이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동으로 기록됩니다.";
+    desc.innerHTML=selectedCategory ? `${selectedCategory}에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br>입력한 품목만 새 기록으로 저장되고, 빈 칸은 기존 재고와 입력일을 유지합니다.` : "오늘 창고에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br><b>입력한 품목만 저장</b>되고 빈 칸은 기존 재고와 입력일을 그대로 유지합니다.<br>이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동 기록됩니다.";
   }
 }
 
@@ -845,7 +881,11 @@ function saveBulkStock(){
 
   inputItems.forEach((item,i)=>{
     const input=document.getElementById(`bulk-${i}`);
-    const q=parseInt(input.value,10);
+    const raw=String(input.value??"").trim();
+    // 빈 칸 = 이번에는 입력하지 않음. 새 기록을 만들지 않아 기존 수량/날짜를 그대로 유지합니다.
+    // 0은 실제 입력값이므로 정상적으로 저장됩니다.
+    if(raw==="") return;
+    const q=parseInt(raw,10);
     if(!Number.isInteger(q)||q<0){
       throw new Error(`${item[0]}의 재고를 0 이상의 숫자로 입력해 주세요.`);
     }
@@ -858,7 +898,8 @@ function saveBulkStock(){
       date:date,time:String(now+i*2),name:item[0],category:category,
       type:"재고확인",stock:q,previous:previous,diff:diff,
       manual:historical,
-      seedSnapshot:false
+      seedSnapshot:false,
+      inputSource:"user-v114"
     });
 
     if(diff<0){
