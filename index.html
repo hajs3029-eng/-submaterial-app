@@ -98,7 +98,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 .stock-safety.safe{color:#18864b}.stock-safety.safe .safety-dot{background:#20a464}
 .stock-safety.danger{color:#d63b3b}.stock-safety.danger .safety-dot{background:#e43d3d}
 
-.admin-dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.admin-dept-btn{border:0;background:#1769e0;color:#fff;border-radius:14px;min-height:58px;font-size:16px;font-weight:800;padding:12px}.admin-dept-empty{padding:16px;border:1px solid #e2e7ee;border-radius:12px;color:#667085}
+.admin-dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.admin-dept-btn{border:0;background:#1769e0;color:#fff;border-radius:14px;min-height:58px;font-size:16px;font-weight:800;padding:12px}.admin-dept-empty{padding:16px;border:1px solid #e2e7ee;border-radius:12px;color:#667085}.history-back-btn{width:100%;border:0;background:#eef4ff;color:#1769e0;border-radius:12px;padding:12px;font-size:15px;font-weight:800;margin:4px 0 12px}.history-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:12px;background:#fff}.history-table{width:100%;border-collapse:collapse;min-width:680px;font-size:13px}.history-table th{background:#f1f5fb;color:#667085;font-weight:800;padding:11px 8px;white-space:nowrap}.history-table td{padding:11px 8px;border-top:1px solid #edf0f4;vertical-align:middle}.history-item{font-weight:700}.history-in{color:#1769e0;font-weight:800}.history-out{color:#d64545;font-weight:800}.history-same{color:#667085}.history-empty{text-align:center;color:#667085;padding:24px!important}
 .admin-menu{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0 14px}.admin-menu .primary{margin:0 !important;min-height:60px;border-radius:14px}.admin-menu-sub{font-weight:700;font-size:13px;opacity:.9}
 </style>
 </head>
@@ -162,16 +162,10 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <!-- 통계/기록 -->
 <div class="modal" id="cal"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
-  <h3>📅 통계 / 기록</h3>
-  <p class="muted">재고 변동이 있는 날짜에 점이 표시됩니다. 날짜를 선택하면 상세 기록을 확인할 수 있습니다.</p>
-  <div class="calendar-head">
-    <button onclick="changeCalendarMonth(-1)">‹</button>
-    <div id="calendarTitle" class="calendar-title"></div>
-    <button onclick="changeCalendarMonth(1)">›</button>
-  </div>
-  <div class="calendar-week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
-  <div id="calendarGrid" class="calendar-grid"></div>
-  <div id="calendarDetail" class="calendar-detail" style="display:none"></div>
+  <h3 id="historyTitle">📋 재고 입력 기록</h3>
+  <p id="historyDesc" class="muted">확인할 부서를 선택해 주세요. 선택하면 해당 부서에서 입력한 재고 기록을 표로 확인할 수 있습니다.</p>
+  <div id="historyDepartmentList" class="admin-dept-grid"></div>
+  <div id="historyRecordView" style="display:none"></div>
 </div></div>
 
 <div class="modal" id="itemsModal"><div class="sheet">
@@ -266,8 +260,8 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.11"; // 사용자에게 표시되는 앱 버전
-const DATA_VERSION="2026-09-02-v17";
+const APP_VERSION="1.13"; // 사용자에게 표시되는 앱 버전
+const DATA_VERSION="2026-09-02-v18";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
   ["라벨 감열(무지) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":3}],
@@ -557,9 +551,9 @@ function getInventorySnapshots(itemName, category){
     .sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
 }
 function getActualInventoryInputs(itemName, category){
-  // 날짜(8/27, 8/28 등)를 기준으로 삼지 않습니다.
-  // 자동 생성된 초기 스냅샷만 제외하고, 실제 재고확인 기록 전체를 반환합니다.
-  return getInventorySnapshots(itemName,category).filter(r=>!isSeedSnapshotRecord(r));
+  // 현재 재고와 동일하게, 날짜를 가리지 않고 모든 재고확인 기록을 사용합니다.
+  // 초기 8/28 데이터도 실제 최신 기준 재고로 포함합니다.
+  return getInventorySnapshots(itemName,category);
 }
 
 // 사용량은 별도 사용량 입력이 아니라, 연속된 재고확인 수량의 감소분으로 추정합니다.
@@ -651,18 +645,20 @@ function migrateActualInventoryRecordsV110(){
 migrateActualInventoryRecordsV110();
 
 function getLastInventoryInput(itemName, category){
-  // 핵심 규칙: 8/27, 8/28 등 특정 날짜를 기준으로 삼지 않습니다.
-  // 앱을 처음 만들 때 넣어둔 8/28 재고값도 실제 재고 기록으로 포함합니다.
-  // 해당 부서/품목의 모든 재고 관련 기록 중 가장 최근 날짜/시간의 stock을 현재 재고로 사용합니다.
-  // 따라서 8/28 값만 있는 품목은 8/28 값이 현재 재고이고, 이후 실제 입력이 있으면 그 값으로 자동 갱신됩니다.
+  // ★ 현재 재고의 단일 규칙
+  // 특정 날짜(7/28, 8/27, 8/28 등)를 기준으로 삼지 않습니다.
+  // 앱을 처음 만들 때 넣어둔 초기 재고값도 그대로 포함합니다.
+  // 각 품목/부서의 모든 재고 관련 기록 중 날짜+입력시각이 가장 최신인
+  // 기록의 stock 값을 현재 재고로 사용합니다.
+  // 즉, 품목마다 마지막으로 입력된 값과 그 날짜가 각각 표시됩니다.
   const rs=records
     .filter(r=>r.name===itemName && r.category===category && r.date &&
       (r.type==="재고확인" || r.type==="사용" || r.type==="입고") &&
       r.stock!==undefined)
     .slice()
     .sort((a,b)=>{
-      const ad=a.date+String(a.time||"").padStart(14,"0");
-      const bd=b.date+String(b.time||"").padStart(14,"0");
+      const ad=a.date+String(a.time||"").padStart(20,"0");
+      const bd=b.date+String(b.time||"").padStart(20,"0");
       return ad.localeCompare(bd);
     });
   return rs.length ? rs[rs.length-1] : null;
@@ -773,7 +769,7 @@ function openModal(id){
     renderBulkStockInputs();
   }
   if(id==="cal"){
-    renderCalendar();
+    showHistoryDepartmentSelector();
   }
   if(id==="itemsModal"){
     document.getElementById("itemlist").innerHTML=items.map((x,i)=>`
@@ -906,6 +902,68 @@ function saveBulkStock(){
   }
 
   stockInputMode="normal";
+}
+
+function showHistoryDepartmentSelector(){
+  const title=document.getElementById("historyTitle");
+  const desc=document.getElementById("historyDesc");
+  const list=document.getElementById("historyDepartmentList");
+  const view=document.getElementById("historyRecordView");
+  title.textContent="📋 재고 입력 기록";
+  desc.textContent="확인할 부서를 선택해 주세요. 선택하면 해당 부서에서 입력한 재고 기록을 표로 확인할 수 있습니다.";
+  view.style.display="none";
+  list.style.display="grid";
+
+  const allCount=records.filter(r=>r.type==="재고확인" && r.date).length;
+  const buttons=[`<button class="admin-dept-btn" onclick="showHistoryRecords('전체')">전체<br><span style="font-size:12px;font-weight:500;opacity:.9">${allCount}건</span></button>`];
+  CATEGORIES.forEach(c=>{
+    const count=records.filter(r=>r.type==="재고확인" && r.date && r.category===c).length;
+    buttons.push(`<button class="admin-dept-btn" onclick="showHistoryRecords('${c}')">${esc(c)}<br><span style="font-size:12px;font-weight:500;opacity:.9">${count}건</span></button>`);
+  });
+  list.innerHTML=buttons.join("");
+}
+
+function showHistoryRecords(category){
+  const title=document.getElementById("historyTitle");
+  const desc=document.getElementById("historyDesc");
+  const list=document.getElementById("historyDepartmentList");
+  const view=document.getElementById("historyRecordView");
+  const scoped=records
+    .filter(r=>r.type==="재고확인" && r.date && (category==="전체" || r.category===category))
+    .slice()
+    .sort((a,b)=>{
+      const ad=a.date+String(a.time||"").padStart(20,"0");
+      const bd=b.date+String(b.time||"").padStart(20,"0");
+      return bd.localeCompare(ad);
+    });
+
+  title.textContent=`📋 ${category} 재고 입력 기록`;
+  desc.textContent="실제로 입력된 재고확인 기록입니다. 날짜별로 어떤 품목을 몇 개로 입력했는지 확인할 수 있습니다.";
+  list.style.display="none";
+  view.style.display="block";
+
+  const rows=scoped.map(r=>{
+    const unit=getUnit(r.name,r.category);
+    const diff=Number(r.diff||0);
+    const change=diff>0?`+${diff.toLocaleString()}`:diff<0?`${diff.toLocaleString()}`:"-";
+    const changeClass=diff>0?"history-in":diff<0?"history-out":"history-same";
+    return `<tr>
+      <td>${esc(r.date)}</td>
+      <td>${esc(r.category||"P/S")}</td>
+      <td class="history-item">${esc(r.name)}</td>
+      <td><b>${Number(r.stock??0).toLocaleString()}</b> ${esc(unit)}</td>
+      <td class="${changeClass}">${change}</td>
+    </tr>`;
+  }).join("");
+
+  view.innerHTML=`
+    <button class="history-back-btn" onclick="showHistoryDepartmentSelector()">‹ 부서 선택으로 돌아가기</button>
+    <div class="history-table-wrap">
+      <table class="history-table">
+        <thead><tr><th>날짜</th><th>부서</th><th>품목명</th><th>입력 재고</th><th>변동</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="5" class="history-empty">입력된 재고 기록이 없습니다.</td></tr>`}</tbody>
+      </table>
+    </div>`;
 }
 
 function renderCalendar(){
