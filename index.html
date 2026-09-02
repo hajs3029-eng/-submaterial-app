@@ -109,7 +109,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
     <div><div class="title">부자재 관리</div><div class="sub">창고 발주 관리 시스템</div></div>
     <div class="version">버전 <span id="appVersion">1.01</span></div>
   </div>
-  <div class="date">기준일 : <span id="today"></span><button class="icon" onclick="render()">↻</button></div>
+  <div class="date">기준일 : <span id="today"></span><button class="icon" onclick="refreshApp()">↻</button></div>
 </header>
 
 <main>
@@ -266,7 +266,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.03"; // 사용자에게 표시되는 앱 버전. 이후 수정 시 1.03, 1.04...
+const APP_VERSION="1.05"; // 사용자에게 표시되는 앱 버전. 이후 수정 시 1.06, 1.07...
 const DATA_VERSION="2026-09-02-v13";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -408,6 +408,28 @@ function migrateAug28SeedRecords(){
   if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
 }
 migrateAug28SeedRecords();
+
+// 8/28 수량이 예시/초기 기준값으로 잘못 저장된 구버전 기록을 보정합니다.
+// 특히 8/27 등 8/28 이전의 실제 재고 기록이 있는 품목에서
+// 8/28에 0으로 자동/초기 저장된 기록은 현재 재고 입력으로 취급하지 않습니다.
+function migrateLegacyAug28Placeholders(){
+  let changed=false;
+  records.forEach(r=>{
+    if(r.type!=="재고확인" || r.date!=="2026-08-28" || r.manual===true || r.initialSnapshot) return;
+    const item=getItemByName(r.name,r.category);
+    const snapshots=item && item[7] ? item[7] : null;
+    if(!snapshots) return;
+    const earlierDates=Object.keys(snapshots).filter(d=>d<"2026-08-28").sort();
+    // 8/28 이전 실제 기준 데이터가 있고 8/28 기록이 0이면
+    // 구버전에서 생성된 placeholder로 보고 현재 재고 계산에서 제외합니다.
+    if(earlierDates.length && Number(r.stock||0)===0){
+      r.initialSnapshot=true;
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
+}
+migrateLegacyAug28Placeholders();
 function migrateHistoricalSnapshotFlags(){
   let changed=false;
   records.forEach(r=>{
@@ -430,6 +452,50 @@ function migrateSnapshotOnlyStock(){
 }
 migrateSnapshotOnlyStock();
 
+// 1.05: 초기 8/28 스냅샷과 실제 재고 입력을 확실히 분리합니다.
+// 기존 브라우저 저장소에 8/28 값이 일반 재고확인으로 저장되어 있어도
+// 초기 데이터와 일치하는 값이면 현재 재고 계산에서 제외합니다.
+function isInitialAug28SeedRecord(r){
+  if(!r || r.type!=="재고확인" || r.date!=="2026-08-28") return false;
+  if(r.initialSnapshot===true) return true;
+  // 8/28은 이 앱의 초기/예시 기준일입니다. 과거 버전에서 자동 생성된
+  // 8/28 재고확인 기록은 현재 재고의 실제 마지막 입력으로 사용하지 않습니다.
+  // 관리자가 과거 재고를 명시적으로 입력한 manual 기록은 실제 입력으로 유지합니다.
+  if(r.manual===true) return false;
+  return true;
+}
+
+function migrateCurrentStockDataV105(){
+  let changed=false;
+
+  // 최신 기본 품목 정의에 있는 과거 실제 재고확인 이력을
+  // 기존 localStorage 품목에도 누락된 날짜만 보강합니다.
+  items.forEach(it=>{
+    const def=DEFAULT_ITEMS.find(x=>x[0]===it[0] && (x[5]||"P/S")===(it[5]||"P/S"));
+    if(!def || !def[7]) return;
+    if(!it[7] || typeof it[7]!=="object") it[7]={};
+    Object.keys(def[7]).forEach(d=>{
+      if(!Object.prototype.hasOwnProperty.call(it[7],d)){
+        it[7][d]=def[7][d];
+        changed=true;
+      }
+    });
+  });
+
+  // 8/28 초기값과 일치하는 구버전 일반 재고확인 기록을 초기 스냅샷으로 보정합니다.
+  records.forEach(r=>{
+    if(isInitialAug28SeedRecord(r) && r.initialSnapshot!==true){
+      r.initialSnapshot=true;
+      changed=true;
+    }
+  });
+
+  if(changed){
+    localStorage.setItem("submaterial_items",JSON.stringify(items));
+    localStorage.setItem("submaterial_records",JSON.stringify(records));
+  }
+}
+migrateCurrentStockDataV105();
 
 function dateStr(d){
   const x=new Date(d);
@@ -462,8 +528,8 @@ function getInventorySnapshots(itemName, category){
 }
 function getActualInventoryInputs(itemName, category){
   // 초기 기준 스냅샷은 현재 재고의 "마지막 입력"으로 취급하지 않습니다.
-  // 실제 사용자가 입력한 재고확인 기록만 현재 재고/기준일에 사용합니다.
-  return getInventorySnapshots(itemName,category).filter(r=>!r.initialSnapshot);
+  // 구버전에서 initialSnapshot 플래그가 빠진 8/28 초기값도 함께 제외합니다.
+  return getInventorySnapshots(itemName,category).filter(r=>!r.initialSnapshot && !isInitialAug28SeedRecord(r));
 }
 
 // 사용량은 별도 사용량 입력이 아니라, 연속된 재고확인 수량의 감소분으로 추정합니다.
@@ -520,7 +586,7 @@ function getLastYearSameMonth(itemName, category, refDate){
   return hasData?total:null;
 }
 
-/* 같은 날짜에 여러 번 재고 입력하면 마지막 입력을 기준으로 차이를 계산 */
+/* 현재 재고는 부서/품목별 실제 재고확인 입력 중 가장 최근 날짜의 수량입니다. */
 function getLastInventoryInput(itemName, category){
   // 1) 실제 사용자가 입력한 재고확인 기록을 최우선으로 사용합니다.
   //    초기 8/28 기준 스냅샷은 절대 현재 재고로 사용하지 않습니다.
@@ -531,13 +597,12 @@ function getLastInventoryInput(itemName, category){
   });
   if(rs.length) return rs[rs.length-1];
 
-  // 2) 실제 입력 기록이 아직 없는 경우, 품목에 저장된 과거 재고 중
-  //    8/28 초기 기준을 제외한 가장 최근 날짜를 표시합니다.
-  //    (오리콘처럼 8/27이 마지막 입력 데이터로 등록된 품목 대응)
+  // 2) 실제 입력 기록이 아직 없는 경우에만 품목에 저장된 과거 기준값을 사용합니다.
+  //    단, 2026-08-28은 초기/예시 기준값이므로 현재 재고로 사용하지 않습니다.
   const item=getItemByName(itemName,category);
   const snapshots=item && item[7] ? item[7] : null;
   if(snapshots){
-    const dates=Object.keys(snapshots).filter(d=>d!=="2026-08-28").sort();
+    const dates=Object.keys(snapshots).filter(d=>d<"2026-08-28").sort();
     if(dates.length){
       const d=dates[dates.length-1];
       return {date:d,time:"000000",name:itemName,category:category,stock:Number(snapshots[d]||0),fallbackSnapshot:true};
@@ -585,6 +650,24 @@ function openCategory(category){
 }
 
 let selectedCategory=null;
+
+// 우측 상단 ↻: 브라우저를 홈으로 이동시키지 않고 저장된 최신 데이터를 다시 읽어옵니다.
+function refreshApp(){
+  const currentScroll=window.scrollY;
+  const savedItems=JSON.parse(localStorage.getItem("submaterial_items")||"null");
+  const savedRecords=JSON.parse(localStorage.getItem("submaterial_records")||"[]");
+  if(Array.isArray(savedItems)) items=savedItems;
+  items=items.map(x=>{if(x.length<6)x[5]="P/S"; return x;});
+  records=Array.isArray(savedRecords)?savedRecords:[];
+  migrateRecordCategories();
+  migrateCurrentStockDataV105();
+  render();
+  if(document.getElementById("admin")?.style.display==="flex") renderAdmin();
+  if(document.getElementById("adminHistoricalDepartment")?.style.display==="flex") renderHistoricalDepartmentSelector();
+  if(document.getElementById("stock")?.style.display==="flex") renderBulkStockInputs();
+  if(document.getElementById("cal")?.style.display==="flex") renderCalendar();
+  window.scrollTo(0,currentScroll);
+}
 
 function render(){
   const versionEl=document.getElementById("appVersion");
