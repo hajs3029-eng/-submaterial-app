@@ -11,7 +11,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#f5f7fa;color:#18212f}
 .app{max-width:680px;margin:auto;min-height:100vh;background:#f5f7fa;padding-bottom:86px}
 header{background:#1769e0;color:#fff;padding:18px 18px 20px;position:sticky;top:0;z-index:5}
-.head{display:flex;align-items:center;justify-content:space-between}.title{font-size:23px;font-weight:800}.sub{font-size:12px;opacity:.9;margin-top:3px}
+.head{display:flex;align-items:center;justify-content:center;position:relative}.version{position:absolute;right:2px;top:0;font-size:11px;font-weight:700;opacity:.9;background:#fff2;padding:5px 8px;border-radius:8px}.title{font-size:23px;font-weight:800}.sub{font-size:12px;opacity:.9;margin-top:3px}
 .icon{border:0;background:#fff2;color:#fff;font-size:25px;width:40px;height:40px;border-radius:12px}.date{margin-top:16px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
 main{padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#fff;border-radius:14px;padding:12px;box-shadow:0 2px 8px #0000000b}.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:#667085}
 h2{font-size:18px;margin:20px 2px 10px}.card{background:#fff;border-radius:14px;padding:14px;margin:9px 0;box-shadow:0 2px 8px #0000000b}.row{display:flex;justify-content:space-between;align-items:center}.name{font-weight:800}.muted{font-size:12px;color:#667085;margin-top:4px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.metric{background:#f3f6fa;border-radius:9px;padding:8px}.metric span{display:block;font-size:10px;color:#667085}.metric b{font-size:15px}.order{color:#d83a3a;font-weight:800}.ok{color:#16834b;font-weight:800}
@@ -106,9 +106,8 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <div class="app">
 <header>
   <div class="head">
-    <button class="icon" onclick="openAdminLogin()">☰</button>
     <div><div class="title">부자재 관리</div><div class="sub">창고 발주 관리 시스템</div></div>
-    <button class="icon" onclick="openModal('stock')">＋</button>
+    <div class="version">버전 <span id="appVersion">1.01</span></div>
   </div>
   <div class="date">기준일 : <span id="today"></span><button class="icon" onclick="render()">↻</button></div>
 </header>
@@ -138,13 +137,6 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
     <h2>발주 필요 품목</h2>
     <div id="items"></div>
 
-    <h2>최근 재고 변동</h2>
-    <div style="overflow:auto">
-      <table>
-        <thead><tr><th>날짜</th><th>품목명</th><th>변동</th><th>현재 재고</th><th>구분</th></tr></thead>
-        <tbody id="history"></tbody>
-      </table>
-    </div>
   </div>
 </main>
 
@@ -274,6 +266,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
+const APP_VERSION="1.01"; // 사용자에게 표시되는 앱 버전. 다음 수정부터 1.02, 1.03...
 const DATA_VERSION="2026-09-02-v13";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -374,7 +367,7 @@ function ensureInitialSnapshot(){
         records.push({
           date:date,time:"000000",name:it[0],category:it[5]||"P/S",type:"재고확인",
           stock:Number(snapshots[date]||0),previous:0,diff:0,
-          initialSnapshot:true
+          initialSnapshot:(date==="2026-08-28")
         });
         changed=true;
       }
@@ -398,6 +391,17 @@ function migrateSeedSnapshotV8(){
 
 migrateRecordCategories();
 migrateSeedSnapshotV8();
+function migrateHistoricalSnapshotFlags(){
+  let changed=false;
+  records.forEach(r=>{
+    if(r.type==="재고확인" && r.initialSnapshot && r.date!=="2026-08-28"){
+      r.initialSnapshot=false;
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
+}
+migrateHistoricalSnapshotFlags();
 ensureInitialSnapshot();
 function migrateSnapshotOnlyStock(){
   const key="submaterial_snapshot_only_v8";
@@ -497,8 +501,10 @@ function getLastYearSameMonth(itemName, category, refDate){
 /* 같은 날짜에 여러 번 재고 입력하면 마지막 입력을 기준으로 차이를 계산 */
 function getLastInventoryInput(itemName, category){
   const rs=getActualInventoryInputs(itemName,category);
-  if(rs.length) return rs[rs.length-1];
-  return null;
+  if(!rs.length) return null;
+  // 날짜가 가장 최신인 실제 재고확인 기록을 현재 재고로 사용합니다.
+  // 같은 날짜에 여러 번 입력된 경우 마지막 입력을 사용합니다.
+  return rs.slice().sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")))[rs.length-1];
 }
 function getLastKnownStock(itemName, category){
   const last=getLastInventoryInput(itemName,category);
@@ -538,6 +544,8 @@ function openCategory(category){
 let selectedCategory=null;
 
 function render(){
+  const versionEl=document.getElementById("appVersion");
+  if(versionEl) versionEl.textContent=APP_VERSION;
   const now=new Date();
   const today=dateStr(now);
   document.getElementById("today").textContent=fmtDate(today);
@@ -589,9 +597,6 @@ function render(){
   document.getElementById("check").textContent=check;
   document.getElementById("good").textContent=good;
 
-  const changes=records.filter(r=>(r.type==="사용"||r.type==="입고"||r.type==="재고확인") && r.category===selectedCategory && categoryItems.some(it=>it[0]===r.name)).slice().reverse().slice(0,15);
-  document.getElementById("history").innerHTML=changes.length ? changes.map(r=>`
-    <tr><td>${r.date}</td><td>${esc(r.name)}</td><td>${r.type==="사용"?"-":"+"}${Number(r.qty).toLocaleString()}${getUnit(r.name)}</td><td>${Number(r.stock).toLocaleString()}${getUnit(r.name)}</td><td>${r.type}</td></tr>`).join("") : `<tr><td colspan="5">아직 재고 변동 기록이 없습니다.</td></tr>`;
 }
 function openModal(id){
   document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
