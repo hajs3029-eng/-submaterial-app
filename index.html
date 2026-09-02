@@ -8,96 +8,75 @@
 <meta name="theme-color" content="#1769e0">
 <title>부자재 관리</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#f5f7fa;color:#18212f}
-.app{max-width:680px;margin:auto;min-height:100vh;background:#f5f7fa;padding-bottom:86px}
-header{background:#1769e0;color:#fff;padding:18px 18px 20px;position:sticky;top:0;z-index:5}
-.head{display:flex;align-items:center;justify-content:space-between}.title{font-size:23px;font-weight:800}.sub{font-size:12px;opacity:.9;margin-top:3px}
-.icon{border:0;background:#fff2;color:#fff;font-size:25px;width:40px;height:40px;border-radius:12px}.date{margin-top:16px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
-main{padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#fff;border-radius:14px;padding:12px;box-shadow:0 2px 8px #0000000b}.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:#667085}
-h2{font-size:18px;margin:20px 2px 10px}.card{background:#fff;border-radius:14px;padding:14px;margin:9px 0;box-shadow:0 2px 8px #0000000b}.row{display:flex;justify-content:space-between;align-items:center}.name{font-weight:800}.muted{font-size:12px;color:#667085;margin-top:4px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.metric{background:#f3f6fa;border-radius:9px;padding:8px}.metric span{display:block;font-size:10px;color:#667085}.metric b{font-size:15px}.order{color:#d83a3a;font-weight:800}.ok{color:#16834b;font-weight:800}
-table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;border-radius:12px;overflow:hidden}th,td{padding:10px 6px;border-bottom:1px solid #edf0f3;text-align:center}th{background:#eef3f9;color:#526071}
-nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;background:#fff;border-top:1px solid #e4e8ee;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 5px calc(8px + env(safe-area-inset-bottom));z-index:10}nav button{border:0;background:none;font-size:11px;color:#657080;padding:5px}nav .active{color:#1769e0;font-weight:800}nav .plus{color:#1769e0;font-size:24px;line-height:20px}
-#adminItemDetailModal{z-index:30}.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}.sheet{background:#fff;width:100%;max-width:680px;margin:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}.sheet h3{margin:0 0 15px;font-size:20px}label{font-size:12px;color:#667085;display:block;margin:12px 0 5px}input,select{width:100%;padding:13px;border:1px solid #d8dee8;border-radius:10px;font-size:16px}button.primary{width:100%;border:0;border-radius:11px;background:#1769e0;color:#fff;font-weight:800;padding:14px;margin-top:16px;font-size:16px}.close{float:right;border:0;background:#f0f2f5;border-radius:9px;padding:8px 11px}.day{border:1px solid #e1e6ed;border-radius:10px;padding:10px;margin:7px 0}
-.admin-item{border:1px solid #e2e7ee;border-radius:12px;padding:12px;margin:10px 0}.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.admin-grid label{margin-top:8px}.danger{background:#fff1f1;border:1px solid #ffd0d0;color:#c62828;width:100%;border-radius:11px;padding:12px;font-weight:700;margin-top:10px}
-
-.bulk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #edf0f4}
-.bulk-name{display:flex;flex-direction:column;gap:4px;min-width:0}
-.bulk-name b{font-size:16px}
-.bulk-name span{font-size:12px;color:#7b8492}
-.bulk-input{width:120px;min-width:100px;text-align:right;font-size:18px;font-weight:700;padding:12px;border:1px solid #dfe4eb;border-radius:12px;background:#f8f9fb}
-.item-unit{font-size:11px;color:#8a94a3;font-weight:500;margin-left:5px;white-space:nowrap;}
-.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 14px}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;background:#f5f7fa;color:#18212f}
+button,input,select{font:inherit}
+.app{max-width:680px;margin:auto;min-height:100vh;background:#f5f7fa;padding-bottom:88px}
+header{background:#1769e0;color:#fff;padding:16px 16px 18px;position:sticky;top:0;z-index:5}
+.head{display:flex;align-items:center;justify-content:space-between}
+.title{font-size:23px;font-weight:800}.sub{font-size:12px;opacity:.9;margin-top:3px}
+.icon{border:0;background:#fff2;color:#fff;font-size:25px;width:40px;height:40px;border-radius:12px}
+.datebar{margin-top:14px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.refresh{border:0;background:#fff2;color:#fff;border-radius:10px;padding:7px 10px}
+main{padding:14px}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.summary .box{background:#fff;border-radius:13px;padding:12px;box-shadow:0 2px 8px #0000000b}
+.summary span{display:block;color:#667085;font-size:11px}.summary b{font-size:20px}
+h2{font-size:18px;margin:20px 2px 10px}
+.card{background:#fff;border-radius:15px;padding:14px;margin:9px 0;box-shadow:0 2px 8px #0000000b}
+.card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.name{font-weight:800;font-size:17px}.unit{font-size:11px;color:#8a94a3;font-weight:500;margin-left:4px}
+.status{font-size:12px;font-weight:800;text-align:right;white-space:nowrap}
+.status.ok{color:#16834b}.status.danger{color:#d63b3b}
+.status-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;background:currentColor}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.metric{background:#f3f6fa;border-radius:9px;padding:8px 6px;min-width:0}
+.metric span{display:block;font-size:9px;color:#667085;line-height:1.25}
+.metric b{display:block;font-size:15px;margin-top:3px}
+.metric.danger b{color:#d63b3b}
+.depts{margin-top:9px;padding-top:8px;border-top:1px solid #edf0f4;font-size:11px;color:#667085}
+.dept-chip{display:inline-block;background:#f0f5fb;color:#245d9d;border-radius:10px;padding:3px 7px;margin:2px 3px 0 0;font-weight:700}
+.tap{cursor:pointer}.empty{background:#fff;border-radius:14px;padding:20px;color:#667085;text-align:center}
+nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;background:#fff;border-top:1px solid #e4e8ee;display:grid;grid-template-columns:repeat(4,1fr);padding:7px 5px calc(7px + env(safe-area-inset-bottom));z-index:10}
+nav button{border:0;background:none;font-size:11px;color:#657080;padding:4px}
+nav button.active{color:#1769e0;font-weight:800}nav .plus{color:#1769e0;font-size:24px;line-height:18px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20;align-items:flex-end}
+.sheet{background:#fff;width:100%;max-width:680px;margin:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+.sheet h3{margin:0 0 12px;font-size:20px}.close{float:right;border:0;background:#f0f2f5;border-radius:9px;padding:8px 11px}
+.muted{font-size:12px;color:#667085;line-height:1.55}
+label{font-size:12px;color:#667085;display:block;margin:12px 0 5px}
+input,select{width:100%;padding:12px;border:1px solid #d8dee8;border-radius:10px;background:#fff}
+.primary{width:100%;border:0;border-radius:11px;background:#1769e0;color:#fff;font-weight:800;padding:14px;margin-top:14px}
+.danger-btn{width:100%;border:0;border-radius:11px;background:#fff0f0;color:#c62828;font-weight:800;padding:13px;margin-top:10px}
+.bulk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f4}
+.bulk-name{min-width:0}.bulk-name b{font-size:15px}.bulk-name span{display:block;color:#7b8492;font-size:11px;margin-top:3px}
+.bulk-input{width:115px;min-width:95px;text-align:right;font-size:17px;font-weight:700;background:#f8f9fb}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;margin:10px 0 12px}
 .calendar-head button{border:0;background:#f1f4f8;border-radius:10px;width:40px;height:38px;font-size:22px}
 .calendar-title{font-weight:800;font-size:17px}
 .calendar-week,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .calendar-week div{text-align:center;font-size:11px;color:#7b8492;padding:4px 0}
-.calendar-cell{min-height:55px;border:1px solid #e7ebf0;border-radius:9px;background:#fff;padding:5px;position:relative}
+.calendar-cell{min-height:50px;border:1px solid #e7ebf0;border-radius:9px;background:#fff;padding:5px;position:relative}
 .calendar-cell.empty{border:0;background:transparent}
 .calendar-cell.has-record{cursor:pointer;background:#f7faff}
+.calendar-cell.selected{border:2px solid #1769e0}
 .calendar-num{font-size:11px;color:#596575}
-.calendar-dot{width:6px;height:6px;border-radius:50%;background:#1769e0;margin:9px auto 0}
-.calendar-detail{margin-top:12px;border:1px solid #e4e9ef;border-radius:12px;padding:12px;background:#fff}
-.calendar-detail-title{font-weight:800;margin-bottom:8px}
-.admin-record-form{border:1px solid #e2e7ee;border-radius:12px;padding:12px;margin-top:12px}
-
-.admin-stock-total{font-weight:900;font-size:17px}
-.admin-stock-unit{font-size:12px;color:#7b8494;font-weight:700}
-.admin-status-light{display:inline-flex;align-items:center;gap:7px;font-weight:800;white-space:nowrap}
-.admin-status-dot{width:13px;height:13px;border-radius:50%;display:inline-block;box-shadow:0 0 8px currentColor}
-.admin-status-light.green{color:#2e9b61}
-.admin-status-light.yellow{color:#d6a500}
-.admin-status-detail{margin-top:12px;border:1px solid #e2e7ee;border-radius:14px;overflow:hidden}
-.admin-status-detail-head{padding:13px;background:#f6f8fb;font-weight:800}
-.admin-status-detail-row{display:grid;grid-template-columns:1fr .8fr .9fr;gap:8px;padding:11px 12px;border-top:1px solid #eef1f5;align-items:center}
-.admin-status-detail-head{background:#f6f8fb;color:#667085;font-size:12px}
-.admin-detail-table{overflow:hidden;border:1px solid #e2e7ee;border-radius:12px}
-.admin-detail-table .admin-status-detail-row{grid-template-columns:1.05fr .9fr 1fr .8fr}
-.admin-detail-status{display:inline-flex;align-items:center;gap:6px;font-weight:800;white-space:nowrap}
-.admin-detail-status.green{color:#2e9b61}
-.admin-detail-status.yellow{color:#d6a500}
-.admin-detail-notice{margin-top:12px;padding:12px;border:1px solid #cfe0ff;background:#f5f9ff;border-radius:11px;color:#1769e0;font-size:13px;line-height:1.55}
-.admin-detail-notice-title{font-weight:800;margin-bottom:2px}
-.admin-detail-legend{margin-top:10px;padding:12px;border:1px solid #e6eaf0;border-radius:11px;background:#fff;font-size:12px;line-height:1.8;color:#5f6978}
-.legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
-.legend-dot.green{background:#20a464}
-.legend-dot.yellow{background:#f2ad00}
-.admin-detail-footnote{margin-top:4px;color:#7b8492}
-.admin-status-detail-row.warn{background:#fffbea}
-.admin-clickable{cursor:pointer}
-@media(max-width:520px){
-  .admin-overview-row{grid-template-columns:minmax(0,1fr) .9fr}
-  .admin-overview-head{grid-template-columns:minmax(0,1fr) .9fr}
-}
-.admin-overview{border:1px solid #e2e7ee;border-radius:14px;overflow:hidden;margin:12px 0}
-.admin-overview-row{display:grid;grid-template-columns:minmax(0,1fr) .9fr;gap:8px;align-items:center;padding:13px 10px;border-bottom:1px solid #eef1f5}
-.admin-overview-row:last-child{border-bottom:0}
-.admin-overview-head{background:#f6f8fb;font-size:12px;color:#7b8494;font-weight:700}
-.admin-overview-name{font-weight:800;line-height:1.25}
-.admin-overview-category{font-size:12px;color:#7b8494;margin-top:3px}
-.admin-overview-num{font-weight:800;font-size:16px}
-.admin-light{display:inline-flex;align-items:center;gap:6px;font-weight:800;white-space:nowrap}
-.admin-light-dot{width:12px;height:12px;border-radius:50%;display:inline-block;box-shadow:0 0 7px currentColor}
-.admin-light.safe{color:#2e9b61}
-.admin-light.order{color:#d94343}
-.admin-category-select{width:100%;margin-top:8px}
-.admin-manage-title{font-size:15px;font-weight:800;margin:16px 0 6px}
-@media(max-width:520px){
-  .admin-overview-row{grid-template-columns:minmax(0,1fr) .9fr;font-size:13px}
-  .admin-overview-num{font-size:15px}
-}
-
-.admin-record-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.small-btn{border:0;border-radius:9px;padding:9px;font-weight:700}
-.edit-btn{background:#eef5ff;color:#1769e0}
-.delete-btn{background:#fff1f1;color:#c62828}
-.four-metrics{grid-template-columns:repeat(2,1fr)}
-.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}.category-btn{border:0;background:#fff;border-radius:18px;min-height:135px;box-shadow:0 3px 12px #0000000d;font-size:20px;font-weight:800;color:#18212f}.category-btn:active{transform:scale(.98)}.category-icon{font-size:34px;display:block;margin-bottom:10px}.back-btn{border:0;background:#fff;border-radius:10px;padding:9px 12px;font-weight:700;color:#1769e0;margin-bottom:8px}.category-title{font-size:22px;font-weight:800;margin:6px 2px 12px} .status-area{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.stock-safety{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700}
-.safety-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
-.stock-safety.safe{color:#18864b}.stock-safety.safe .safety-dot{background:#20a464}
-.stock-safety.danger{color:#d63b3b}.stock-safety.danger .safety-dot{background:#e43d3d}
-
-.admin-menu{display:grid;grid-template-columns:1fr;gap:10px;margin:18px 0 14px}.admin-menu .primary{margin-top:0}.admin-menu-sub{font-weight:700;font-size:13px;opacity:.9}
+.calendar-dot{width:6px;height:6px;border-radius:50%;background:#1769e0;margin:8px auto 0}
+.filter-label{font-size:12px;color:#667085;margin:2px 0 5px}
+.history-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border:1px solid #e3e8ef;border-radius:12px;overflow:hidden}
+.history-table th,.history-table td{padding:9px 5px;border-bottom:1px solid #edf0f4;text-align:center}
+.history-table th{background:#eef3f9;color:#526071;font-weight:800}
+.history-table tr:last-child td{border-bottom:0}
+.history-title{background:#1769e0;color:#fff;border-radius:10px 10px 0 0;padding:10px;font-weight:800;margin-top:12px}
+.notice{margin-top:12px;padding:12px;border:1px solid #cfe0ff;background:#f5f9ff;border-radius:11px;color:#1769e0;font-size:12px;line-height:1.55}
+.notice.red{border-color:#ffd0d0;background:#fff5f5;color:#c62828}
+.admin-row{display:grid;grid-template-columns:1.1fr .8fr .9fr .8fr;gap:6px;padding:10px;border-top:1px solid #eef1f5;align-items:center;font-size:12px}
+.admin-head{background:#f6f8fb;color:#667085;font-weight:800}
+.admin-detail{border:1px solid #e2e7ee;border-radius:12px;overflow:hidden;margin-top:10px}
+.admin-item{border:1px solid #e2e7ee;border-radius:12px;padding:12px;margin:9px 0}
+.small-btn{border:0;border-radius:8px;padding:8px;font-weight:700}.edit-btn{background:#eef5ff;color:#1769e0}.delete-btn{background:#fff1f1;color:#c62828}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+@media(max-width:430px){.metrics{gap:5px}.metric{padding:7px 4px}.metric span{font-size:8px}.metric b{font-size:14px}.admin-row{grid-template-columns:1.1fr .8fr .9fr .75fr;font-size:11px}}
 </style>
 </head>
 <body>
@@ -108,61 +87,40 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
     <div><div class="title">부자재 관리</div><div class="sub">창고 발주 관리 시스템</div></div>
     <button class="icon" onclick="openModal('stock')">＋</button>
   </div>
-  <div class="date">기준일 : <span id="today"></span><button class="icon" onclick="render()">↻</button></div>
+  <div class="datebar"><span>기준일 : <b id="today"></b></span><button class="refresh" onclick="render()">↻</button></div>
 </header>
 
 <main>
-  <div id="categoryHome">
-    <h2 style="margin-top:8px">창고를 선택해 주세요</h2>
-    <div class="category-grid">
-      <button class="category-btn" onclick="openCategory('입고장')"><span class="category-icon">📥</span>입고장</button>
-      <button class="category-btn" onclick="openCategory('출하장')"><span class="category-icon">📤</span>출하장</button>
-      <button class="category-btn" onclick="openCategory('수출장')"><span class="category-icon">🚚</span>수출장</button>
-      <button class="category-btn" onclick="openCategory('수동랙')"><span class="category-icon">🗄️</span>수동랙</button>
-      <button class="category-btn" onclick="openCategory('DPS')"><span class="category-icon">📋</span>DPS</button>
-      <button class="category-btn" onclick="openCategory('P/S')"><span class="category-icon">📦</span>P/S</button>
-    </div>
+  <div class="summary">
+    <div class="box"><span>전체 품목 수</span><b id="itemCount">0</b></div>
+    <div class="box"><span>전체 현재 재고(합계)</span><b id="stockTotal">0</b></div>
   </div>
-
-  <div id="categoryContent" style="display:none">
-    <button class="back-btn" onclick="showCategoryHome()">‹ 대분류로 돌아가기</button>
-    <div id="categoryTitle" class="category-title"></div>
-    <div class="stats">
-      <div class="stat"><b id="need">0</b><span>발주 필요</span></div>
-      <div class="stat"><b id="check">0</b><span>확인 필요</span></div>
-      <div class="stat"><b id="good">0</b><span>재고 적정</span></div>
-    </div>
-
-    <h2>발주 필요 품목</h2>
-    <div id="items"></div>
-
-  </div>
+  <h2>품목별 현황</h2>
+  <div id="items"></div>
 </main>
 
 <nav>
-  <button class="active" onclick="showCategoryHome()">⌂<br>홈</button>
-  <button onclick="openModal('itemsModal')">▣<br>품목 관리</button>
+  <button class="active" onclick="showHome()">⌂<br>홈</button>
+  <button onclick="openItems()">▣<br>품목 관리</button>
   <button class="plus" onclick="openModal('stock')">＋<br><span style="font-size:11px">재고 입력</span></button>
-  <button onclick="openModal('cal')">▦<br>통계/기록</button>
+  <button onclick="openHistory()">▦<br>재고 이력</button>
 </nav>
 </div>
 
-<!-- 전체 재고 입력 -->
 <div class="modal" id="stock"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
   <h3>📦 전체 재고 입력</h3>
-  <p class="muted">오늘 창고에서 확인한 <b>현재 재고</b>를 품목별로 한 번에 입력해 주세요.<br>
-  이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동으로 기록됩니다.</p>
-  <label>확인 날짜</label><input id="sdate" type="date">
+  <p class="muted">부서별로 확인한 <b>현재 재고</b>를 입력합니다. 이전 재고보다 줄면 사용, 늘면 입고로 판단하지만 <b>사용량 표시는 재고확인 기록의 감소 구간을 기준으로 다시 추정</b>합니다.</p>
+  <label>확인 날짜</label><input id="sdate" type="date" onchange="renderBulkStockInputs()">
   <div id="bulkStockList"></div>
   <button class="primary" onclick="saveBulkStock()">전체 재고 저장</button>
 </div></div>
 
-<!-- 통계/기록 -->
-<div class="modal" id="cal"><div class="sheet">
+<div class="modal" id="history"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
-  <h3>📅 통계 / 기록</h3>
-  <p class="muted">재고 변동이 있는 날짜에 점이 표시됩니다. 날짜를 선택하면 상세 기록을 확인할 수 있습니다.</p>
+  <h3>📅 재고 이력</h3>
+  <div class="filter-label">부서 선택</div>
+  <select id="historyDept" onchange="renderCalendar()"></select>
   <div class="calendar-head">
     <button onclick="changeCalendarMonth(-1)">‹</button>
     <div id="calendarTitle" class="calendar-title"></div>
@@ -170,857 +128,402 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   </div>
   <div class="calendar-week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
   <div id="calendarGrid" class="calendar-grid"></div>
-  <div id="calendarDetail" class="calendar-detail" style="display:none"></div>
+  <div id="calendarDetail" style="display:none"></div>
 </div></div>
 
 <div class="modal" id="itemsModal"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
   <h3>품목 관리</h3>
-  <p class="muted">등록된 품목과 현재 재고를 확인할 수 있습니다.</p>
+  <p class="muted">등록된 품목과 소속 부서를 관리합니다.</p>
   <div id="itemlist"></div>
+  <button class="primary" onclick="addItem()">＋ 품목 추가</button>
 </div></div>
 
-<!-- 초기 재고 설정 -->
-<div class="modal" id="initialStock"><div class="sheet">
-  <button class="close" onclick="closeAll()">닫기</button>
-  <h3>📌 초기 재고 설정</h3>
-  <p class="muted">처음 앱을 시작할 때 실제 창고 재고를 입력해 주세요. 이 값은 <b>입고/사용으로 기록하지 않고</b> 시작 기준 재고로만 사용됩니다.</p>
-  <div id="initialStockList"></div>
-  <button class="primary" onclick="saveInitialStock()">초기 재고 저장</button>
-</div></div>
-
-<!-- 관리자 로그인 -->
 <div class="modal" id="login"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
   <h3>🔐 관리자 모드</h3>
   <p class="muted">관리자 비밀번호를 입력해 주세요.</p>
-  <label>비밀번호</label><input id="adminpw" type="password" inputmode="numeric" placeholder="비밀번호">
+  <label>비밀번호</label><input id="adminpw" type="password" inputmode="numeric">
   <button class="primary" onclick="loginAdmin()">관리자 모드 들어가기</button>
 </div></div>
 
-<!-- 관리자 메인 -->
 <div class="modal" id="admin"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
   <h3>⚙️ 관리자 모드</h3>
-  <p class="muted">전체 부서의 재고 상태를 한눈에 확인합니다. 품목을 누르면 부서별 상세 현황이 바로 표시됩니다.</p>
-  <div class="admin-menu">
-    <button class="primary" onclick="openAdminDepartmentItems()">🏷️ 부서별 품목 관리</button>
-    <button class="primary" onclick="openAdminStockEdit()">📦 재고 수정 <span class="admin-menu-sub">(관리자 권한)</span></button>
-    <button class="primary" onclick="openAdminStats()">📅 통계 / 기록 관리</button>
-    <button class="primary" onclick="openAdminPasswordChange()">🔑 관리자 비밀번호 변경</button>
-  </div>
+  <p class="muted">품목을 누르면 해당 품목을 사용하는 부서만 표시합니다.</p>
   <div id="adminlist"></div>
+  <button class="primary" onclick="openAdminDepartmentItems()">🏷️ 부서별 품목 관리</button>
+  <button class="primary" onclick="openAdminStockEdit()">📦 재고 수정</button>
+  <button class="primary" onclick="openAdminPasswordChange()">🔑 관리자 비밀번호 변경</button>
 </div></div>
 
-<!-- 부서별 품목 관리 -->
 <div class="modal" id="adminDepartmentItems"><div class="sheet">
   <button class="close" onclick="openModal('admin')">닫기</button>
   <h3>🏷️ 부서별 품목 관리</h3>
-  <p class="muted">품목별 대분류를 변경하고, 품목을 추가·삭제할 수 있습니다.</p>
   <div id="adminDepartmentItemsList"></div>
   <button class="primary" onclick="saveAdmin()">전체 설정 저장</button>
-  <button class="primary" onclick="addItem()">＋ 품목 추가</button>
-  <button class="danger" onclick="resetData()">⚠️ 재고 기록·설정을 모두 초기화</button>
+  <button class="danger-btn" onclick="resetData()">⚠️ 재고 기록·설정을 모두 초기화</button>
 </div></div>
 
-<!-- 관리자 비밀번호 변경 -->
 <div class="modal" id="adminPasswordChange"><div class="sheet">
   <button class="close" onclick="openModal('admin')">닫기</button>
   <h3>🔑 관리자 비밀번호 변경</h3>
-  <p class="muted">현재 비밀번호를 확인한 뒤 새 비밀번호로 변경할 수 있습니다.</p>
-  <label>현재 비밀번호</label><input id="oldpw" type="password" inputmode="numeric" placeholder="현재 비밀번호">
-  <label>새 비밀번호</label><input id="newpw" type="password" inputmode="numeric" placeholder="새 비밀번호">
-  <label>새 비밀번호 확인</label><input id="newpw2" type="password" inputmode="numeric" placeholder="새 비밀번호 다시 입력">
+  <label>현재 비밀번호</label><input id="oldpw" type="password" inputmode="numeric">
+  <label>새 비밀번호</label><input id="newpw" type="password" inputmode="numeric">
+  <label>새 비밀번호 확인</label><input id="newpw2" type="password" inputmode="numeric">
   <button class="primary" onclick="changeAdminPassword()">비밀번호 변경</button>
 </div></div>
 
-<!-- 관리자 통계 / 기록 관리 -->
 <div class="modal" id="adminItemDetailModal"><div class="sheet">
-  <button class="close" onclick="closeAdminItemDetail()">닫기</button>
-  <h3>📦 품목 상세 현황</h3>
+  <button class="close" onclick="openModal('admin')">닫기</button>
+  <h3>📦 부서별 재고</h3>
   <div id="adminItemDetailContent"></div>
 </div></div>
 
-<div class="modal" id="adminStats"><div class="sheet">
-  <button class="close" onclick="openModal('admin')">닫기</button>
-  <h3>📅 통계 / 기록 관리</h3>
-  <p class="muted">날짜를 선택하면 해당 날짜의 전체 재고를 입력할 수 있습니다. 과거 날짜도 입력할 수 있으며, 이 기능은 관리자만 사용할 수 있습니다.</p>
-
-  <div class="calendar-head">
-    <button onclick="changeAdminCalendarMonth(-1)">‹</button>
-    <div id="adminCalendarTitle" class="calendar-title"></div>
-    <button onclick="changeAdminCalendarMonth(1)">›</button>
-  </div>
-  <div class="calendar-week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
-  <div id="adminCalendarGrid" class="calendar-grid"></div>
-  <div id="adminCalendarDetail" class="calendar-detail" style="display:none"></div>
-</div></div>
-
 <script>
-const DATA_VERSION="2026-09-02-v13";
+const DATA_VERSION="2026-09-02-v14";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
-const DEFAULT_ITEMS=[
-  ["라벨 감열(무지) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":3}],
-  ["라벨 감열(황색) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":99}],
-  ["라벨 감열(무지) 100*165",0,0,0,0,"입고장","박스",{"2026-08-28":5}],
-  ["라벨 감열(청색) 100*100",0,0,0,0,"입고장","박스",{"2026-08-28":34}],
-  ["OPP테이프(적색)",0,0,0,0,"입고장","박스",{"2026-08-28":1}],
-  ["라벨 감열(무지) 100*165",0,0,0,0,"출하장","박스",{"2026-08-28":4}],
-  ["라벨 감열(황색) 100*165",0,0,0,0,"출하장","박스",{"2026-08-28":1}],
-  ["라벨 감열(청색) 100*165",0,0,0,0,"출하장","박스",{"2026-08-28":16}],
-  ["랩(자동)",0,0,0,0,"출하장","박스",{"2026-08-28":60}],
-  ["랩(수동)",0,0,0,0,"출하장","박스",{"2026-08-28":235}],
-  ["파렛트 덮개 비닐(일반)",0,0,0,0,"출하장","박스",{"2026-08-28":21}],
-  ["라벨 감열(무지) 70*80",0,0,0,0,"수동랙","박스",{"2026-08-28":205}],
-  ["라벨 감열(황색) 70*80",0,0,0,0,"수동랙","박스",{"2026-08-28":47}],
-  ["라벨 감열(무지) 100*165",0,0,0,0,"수동랙","박스",{"2026-08-28":110}],
-  ["라벨 감열(올리브영) 80*100",0,0,0,0,"수동랙","박스",{"2026-08-28":92}],
-  ["라벨 감열(무지) 70*80",0,0,0,0,"수출장","박스",{"2026-08-28":1}],
-  ["라벨 감열(분홍) 70*80",0,0,0,0,"수출장","박스",{"2026-08-28":1}],
-  ["라벨 감열(노랑) 70*80",0,0,0,0,"수출장","박스",{"2026-08-28":7}],
-  ["라벨 감열(무지) 100*165",0,0,0,0,"수출장","박스",{"2026-08-28":5}],
-  ["라벨 감열(무지)수출 105*143",0,0,0,0,"수출장","박스",{"2026-08-28":2}],
-  ["OPP테이프(투명)",0,0,0,0,"수출장","박스",{"2026-08-28":27}],
-  ["Mini Air 130",0,0,0,0,"수출장","박스",{"2026-08-28":0}],
-  ["각대 900mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],
-  ["각대 1,100mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],
-  ["각대 1,200mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],
-  ["각대 1,300mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":4}],
-  ["각대 1,400mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],
-  ["랩(자동)",0,0,0,0,"수출장","박스",{"2026-08-28":96}],
-  ["랩(수동)",0,0,0,0,"수출장","박스",{"2026-08-28":48}],
-  ["파렛트 덮개 비닐(일반)",0,0,0,0,"수출장","박스",{"2026-08-28":46}],
-  ["파렛트 덮개 비닐(검정)",0,0,0,0,"수출장","박스",{"2026-08-28":7}],
-  ["파렛트 덮개 비닐(분홍)",0,0,0,0,"수출장","박스",{"2026-08-28":7}],
-  ["라벨 감열(분홍) 70*80",0,0,0,0,"P/S","박스",{"2026-08-28":28}],
-  ["라벨 감열(올리브영) 80*100",0,0,0,0,"P/S","박스",{"2026-08-28":0}],
-  ["OPP테이프(적색)",0,0,0,0,"P/S","박스",{"2026-08-28":146}],
-  ["OPP테이프(투명)",0,0,0,0,"P/S","박스",{"2026-08-28":66}],
-  ["Mini Air 130",0,0,0,0,"P/S","박스",{"2026-08-28":295}],
-  ["에어캡(롤)",0,0,0,0,"P/S","봉지",{"2026-08-28":70}],
-  ["에어캡(봉투)",0,0,0,0,"P/S","봉지",{"2026-08-28":61}],
-  ["랩(수동)",0,0,0,0,"P/S","박스",{"2026-08-28":18}],
-  ["파렛트 덮개 비닐(일반)",0,0,0,0,"P/S","박스",{"2026-08-28":2}],
-  ["라벨 감열(황색) 70*80",0,0,0,0,"DPS","박스",{"2026-08-28":50}],
-  ["아트 라벨(무지) 40*35",0,0,0,0,"DPS","박스",{"2026-08-28":5}],
-  ["오리콘(3호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":38,"2026-08-13":38,"2026-08-27":34,"2026-08-28":0}],
-  ["오리콘(4호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":31,"2026-08-13":28,"2026-08-27":25,"2026-08-28":0}],
-  ["오리콘(5호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":17,"2026-08-13":14,"2026-08-27":10,"2026-08-28":0}],
-  ["오리콘(특대)",0,0,0,0,"P/S","파렛트",{"2026-07-30":16,"2026-08-13":13,"2026-08-27":11,"2026-08-28":0}]
-];
+const DEFAULT_ITEMS=[["라벨 감열(무지) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":3}],["라벨 감열(황색) 70*80",0,0,0,0,"입고장","박스",{"2026-08-28":99}],["라벨 감열(무지) 100*165",0,0,0,0,"입고장","박스",{"2026-08-28":5}],["라벨 감열(청색) 100*100",0,0,0,0,"입고장","박스",{"2026-08-28":34}],["OPP테이프(적색)",0,0,0,0,"입고장","박스",{"2026-08-28":1}],["라벨 감열(무지) 100*165",0,0,0,0,"출하장","박스",{"2026-08-28":4}],["라벨 감열(황색) 100*165",0,0,0,0,"출하장","박스",{"2026-08-28":1}],["라벨 감열(청색) 100*165",0,0,0,0,"출하장","박스",{"2026-08-28":16}],["랩(자동)",0,0,0,0,"출하장","박스",{"2026-08-28":60}],["랩(수동)",0,0,0,0,"출하장","박스",{"2026-08-28":235}],["파렛트 덮개 비닐(일반)",0,0,0,0,"출하장","박스",{"2026-08-28":21}],["라벨 감열(무지) 70*80",0,0,0,0,"수동랙","박스",{"2026-08-28":205}],["라벨 감열(황색) 70*80",0,0,0,0,"수동랙","박스",{"2026-08-28":47}],["라벨 감열(무지) 100*165",0,0,0,0,"수동랙","박스",{"2026-08-28":110}],["라벨 감열(올리브영) 80*100",0,0,0,0,"수동랙","박스",{"2026-08-28":92}],["라벨 감열(무지) 70*80",0,0,0,0,"수출장","박스",{"2026-08-28":1}],["라벨 감열(분홍) 70*80",0,0,0,0,"수출장","박스",{"2026-08-28":1}],["라벨 감열(노랑) 70*80",0,0,0,0,"수출장","박스",{"2026-08-28":7}],["라벨 감열(무지) 100*165",0,0,0,0,"수출장","박스",{"2026-08-28":5}],["라벨 감열(무지)수출 105*143",0,0,0,0,"수출장","박스",{"2026-08-28":2}],["OPP테이프(투명)",0,0,0,0,"수출장","박스",{"2026-08-28":27}],["Mini Air 130",0,0,0,0,"수출장","박스",{"2026-08-28":0}],["각대 900mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],["각대 1,100mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],["각대 1,200mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],["각대 1,300mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":4}],["각대 1,400mm",0,0,0,0,"수출장","파렛트",{"2026-08-28":3}],["랩(자동)",0,0,0,0,"수출장","박스",{"2026-08-28":96}],["랩(수동)",0,0,0,0,"수출장","박스",{"2026-08-28":48}],["파렛트 덮개 비닐(일반)",0,0,0,0,"수출장","박스",{"2026-08-28":46}],["파렛트 덮개 비닐(검정)",0,0,0,0,"수출장","박스",{"2026-08-28":7}],["파렛트 덮개 비닐(분홍)",0,0,0,0,"수출장","박스",{"2026-08-28":7}],["라벨 감열(분홍) 70*80",0,0,0,0,"P/S","박스",{"2026-08-28":28}],["라벨 감열(올리브영) 80*100",0,0,0,0,"P/S","박스",{"2026-08-28":0}],["OPP테이프(적색)",0,0,0,0,"P/S","박스",{"2026-08-28":146}],["OPP테이프(투명)",0,0,0,0,"P/S","박스",{"2026-08-28":66}],["Mini Air 130",0,0,0,0,"P/S","박스",{"2026-08-28":295}],["에어캡(롤)",0,0,0,0,"P/S","봉지",{"2026-08-28":70}],["에어캡(봉투)",0,0,0,0,"P/S","봉지",{"2026-08-28":61}],["랩(수동)",0,0,0,0,"P/S","박스",{"2026-08-28":18}],["파렛트 덮개 비닐(일반)",0,0,0,0,"P/S","박스",{"2026-08-28":2}],["라벨 감열(황색) 70*80",0,0,0,0,"DPS","박스",{"2026-08-28":50}],["아트 라벨(무지) 40*35",0,0,0,0,"DPS","박스",{"2026-08-28":5}],["오리콘(3호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":38,"2026-08-13":38,"2026-08-27":34}],["오리콘(4호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":31,"2026-08-13":28,"2026-08-27":25}],["오리콘(5호)",0,0,0,0,"P/S","파렛트",{"2026-07-30":17,"2026-08-13":14,"2026-08-27":10}],["오리콘(특대)",0,0,0,0,"P/S","파렛트",{"2026-07-30":16,"2026-08-13":13,"2026-08-27":11}]];
 
 let items=JSON.parse(localStorage.getItem("submaterial_items")||"null");
-const savedVersion=localStorage.getItem("submaterial_data_version");
-if(savedVersion!==DATA_VERSION){
-  items=DEFAULT_ITEMS.map(x=>x.slice());
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  localStorage.setItem("submaterial_data_version",DATA_VERSION);
-}else if(!Array.isArray(items)||!items.length){
+if(!Array.isArray(items)||!items.length){
   items=DEFAULT_ITEMS.map(x=>x.slice());
   localStorage.setItem("submaterial_items",JSON.stringify(items));
 }
-// 기존 데이터 형식과의 호환: 카테고리가 없으면 P/S로 지정
-items=items.map(x=>{if(x.length<6)x[5]="P/S"; return x;});
-
+items=items.map(x=>{
+  if(x.length<6)x[5]="P/S";
+  if(!x[6])x[6]=x[0].startsWith("오리콘")?"파렛트":"박스";
+  if(!x[7])x[7]={};
+  return x;
+});
 let records=JSON.parse(localStorage.getItem("submaterial_records")||"[]");
-
-function getItemByName(itemName, category){
-  if(category) return items.find(x=>x[0]===itemName && (x[5]||"P/S")===category)||null;
-  return items.find(x=>x[0]===itemName)||null;
-}
-function getItemCategory(itemName, category){
-  const item=getItemByName(itemName, category);
-  return item ? (item[5]||"P/S") : null;
-}
-
-// 기존 기록에 부서(대분류)를 붙여 부서별 기록을 완전히 분리합니다.
-// 이미 저장된 기록은 해당 품목의 현재 카테고리를 기준으로 1회 보정합니다.
-function migrateRecordCategories(){
-  let changed=false;
-  records.forEach(r=>{
-    if(!r.category){
-      const category=getItemCategory(r.name);
-      if(category){r.category=category; changed=true;}
-    }
-  });
-  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
-}
-
-// 2026-07-28 재고 현황은 현재고가 아니라 해당 날짜의 기준 재고로 기록합니다.
-function ensureInitialSnapshot(){
-  let changed=false;
-  items.forEach(it=>{
-    const snapshots=it[7]||{};
-    Object.keys(snapshots).forEach(date=>{
-      const exists=records.some(r=>r.name===it[0] && r.category===(it[5]||"P/S") && r.date===date && r.type==="재고확인" && r.initialSnapshot);
-      if(!exists){
-        records.push({
-          date:date,time:"000000",name:it[0],category:it[5]||"P/S",type:"재고확인",
-          stock:Number(snapshots[date]||0),previous:0,diff:0,
-          initialSnapshot:true
-        });
-        changed=true;
-      }
-    });
-  });
-  if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
-}
-
 let adminPassword=localStorage.getItem("submaterial_admin_pw")||"1234";
-
-function migrateSeedSnapshotV8(){
-  const key="submaterial_seed_snapshot_v8";
-  if(localStorage.getItem(key)==="1") return;
-  // 이전에 넣었던 2026-07-28 기준 재고 기록을 제거합니다.
-  records=records.filter(r=>!(r.initialSnapshot && r.date==="2026-07-28"));
-  // 이번 버전에서는 2026-08-28 기준 재고만 초기 기준 기록으로 사용합니다.
-  records=records.filter(r=>!(r.initialSnapshot && r.date!=="2026-08-28"));
-  localStorage.setItem("submaterial_records",JSON.stringify(records));
-  localStorage.setItem(key,"1");
-}
-
-migrateRecordCategories();
-migrateSeedSnapshotV8();
-function migrateOriconHistoryV13(){
-  const key="submaterial_oricon_history_v13";
-  if(localStorage.getItem(key)==="1") return;
-  const targets={
-    "오리콘(3호)":{"2026-07-30":38,"2026-08-13":38,"2026-08-27":34},
-    "오리콘(4호)":{"2026-07-30":31,"2026-08-13":28,"2026-08-27":25},
-    "오리콘(5호)":{"2026-07-30":17,"2026-08-13":14,"2026-08-27":10},
-    "오리콘(특대)":{"2026-07-30":16,"2026-08-13":13,"2026-08-27":11}
-  };
-  // 동일 날짜의 기존 초기기록이 있다면 오리콘 데이터만 최신 입력값으로 맞춥니다.
-  Object.keys(targets).forEach(name=>{
-    Object.keys(targets[name]).forEach(date=>{
-      records=records.filter(r=>!(r.initialSnapshot && r.name===name && r.category==="P/S" && r.date===date));
-      records.push({date,time:"000000",name,category:"P/S",type:"재고확인",stock:targets[name][date],previous:0,diff:0,initialSnapshot:true});
-    });
-  });
-  localStorage.setItem("submaterial_records",JSON.stringify(records));
-  localStorage.setItem(key,"1");
-}
-migrateOriconHistoryV13();
-ensureInitialSnapshot();
-function migrateSnapshotOnlyStock(){
-  const key="submaterial_snapshot_only_v8";
-  if(localStorage.getItem(key)==="1") return;
-  // 2026-08-28 수량은 과거 기준 재고이므로 현재고에는 반영하지 않습니다.
-  items.forEach(it=>{ if(it[7] && Object.keys(it[7]).length) it[1]=0; });
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  localStorage.setItem(key,"1");
-}
-migrateSnapshotOnlyStock();
-
+let calendarDate=new Date();
 
 function dateStr(d){
   const x=new Date(d);
   return new Date(x.getTime()-x.getTimezoneOffset()*60000).toISOString().slice(0,10);
 }
 function fmtDate(s){
-  const d=new Date(s+"T00:00:00");
-  return d.toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",weekday:"short"});
+  return new Date(s+"T00:00:00").toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",weekday:"short"});
 }
-function esc(s){
-  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function getUnit(name,cat){
+  const x=items.find(i=>i[0]===name && (!cat || (i[5]||"P/S")===cat));
+  return x?.[6] || (name.startsWith("오리콘")?"파렛트":"박스");
 }
+function getKey(name,cat){return name+"||"+(cat||"P/S");}
+function migrateRecords(){
+  let changed=false;
+  records.forEach(r=>{
+    if(!r.category){
+      const x=items.find(i=>i[0]===r.name);
+      if(x){r.category=x[5]||"P/S";changed=true;}
+    }
+  });
+  if(changed)localStorage.setItem("submaterial_records",JSON.stringify(records));
+}
+function ensureSeedSnapshots(){
+  let changed=false;
+  items.forEach(x=>{
+    const cat=x[5]||"P/S";
+    const snaps=x[7]||{};
+    Object.entries(snaps).forEach(([date,stock])=>{
+      const exists=records.some(r=>r.name===x[0]&&r.category===cat&&r.date===date&&r.type==="재고확인"&&r.seed===true);
+      if(!exists){
+        records.push({date,time:"000000",name:x[0],category:cat,type:"재고확인",stock:Number(stock||0),previous:0,diff:0,seed:true});
+        changed=true;
+      }
+    });
+  });
+  if(changed)localStorage.setItem("submaterial_records",JSON.stringify(records));
+}
+migrateRecords();
+ensureSeedSnapshots();
 
-/* 재고 변동 기록은 품목의 부서(category)별로 분리해서 계산 */
-function outboundRecordsForItem(itemName, category, startDate, endDate){
-  return records.filter(r=>r.name===itemName && r.category===category && r.type==="사용" && r.date>=startDate && r.date<=endDate);
+function latestSnapshot(name,cat,beforeOrEqual=null){
+  let rs=records.filter(r=>r.name===name&&(r.category||"P/S")===cat&&r.type==="재고확인"&&r.date);
+  if(beforeOrEqual)rs=rs.filter(r=>r.date<=beforeOrEqual);
+  rs.sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
+  return rs.length?Number(rs[rs.length-1].stock||0):Number((items.find(x=>x[0]===name&&(x[5]||"P/S")===cat)||[])[1]||0);
 }
-function sumOutbound(itemName, category, startDate, endDate){
-  return outboundRecordsForItem(itemName,category,startDate,endDate).reduce((a,r)=>a+Number(r.qty||0),0);
+function snapshotsFor(name,cat){
+  const map={};
+  records.filter(r=>r.name===name&&(r.category||"P/S")===cat&&r.type==="재고확인"&&r.date)
+    .sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")))
+    .forEach(r=>{map[r.date]=Number(r.stock||0);});
+  return Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0])).map(([date,stock])=>({date,stock}));
 }
-function getTwoWeekUsage(itemName, category, refDate){
-  const ref = new Date(refDate);
-  ref.setHours(23,59,59,999);
-  const start = new Date(ref);
-  start.setDate(start.getDate()-13);
-  start.setHours(0,0,0,0);
-  return records
-    .filter(r=>r.name===itemName && r.category===category && r.type==="사용" && r.date)
-    .reduce((sum,r)=>{
-      const d=new Date(r.date+"T00:00:00");
-      return d>=start && d<=ref ? sum+Number(r.qty||0) : sum;
-    },0);
-}
-
-function getThreeMonthAverage(itemName, category, refDate){
-  const d=new Date(refDate+"T00:00:00");
+function estimateUsage(name,cat,startDate,endDate){
+  const all=snapshotsFor(name,cat);
+  if(!all.length)return 0;
+  const prior=all.filter(s=>s.date<startDate).slice(-1)[0];
+  const inside=all.filter(s=>s.date>=startDate&&s.date<=endDate);
+  const seq=[];
+  if(prior)seq.push(prior);
+  seq.push(...inside);
+  if(seq.length<2)return 0;
   let total=0;
-  for(let i=1;i<=3;i++){
-    const end=new Date(d.getFullYear(),d.getMonth()-i+1,0);
-    const start=new Date(d.getFullYear(),d.getMonth()-i,1);
-    total+=sumOutbound(itemName,category,dateStr(start),dateStr(end));
+  for(let i=1;i<seq.length;i++){
+    const diff=seq[i-1].stock-seq[i].stock;
+    if(diff>0)total+=diff;
   }
+  return total;
+}
+function shiftMonths(date,months){
+  const d=new Date(date+"T00:00:00");
+  d.setMonth(d.getMonth()+months);
+  return d;
+}
+function rollingStart(ref,months){
+  const d=shiftMonths(ref,-months);
+  d.setDate(d.getDate()+1);
+  return dateStr(d);
+}
+function getOneMonthUsage(name,cat,ref){
+  return estimateUsage(name,cat,rollingStart(ref,1),ref);
+}
+function getThreeMonthAverage(name,cat,ref){
+  const total=estimateUsage(name,cat,rollingStart(ref,3),ref);
   return Math.round((total/3)*10)/10;
 }
-function getLastYearSameMonth(itemName, category, refDate){
-  const d=new Date(refDate+"T00:00:00");
+function getTwoWeekUsage(name,cat,ref){
+  const d=new Date(ref+"T00:00:00");d.setDate(d.getDate()-13);
+  return estimateUsage(name,cat,dateStr(d),ref);
+}
+function getLastYearSameMonth(name,cat,ref){
+  const d=new Date(ref+"T00:00:00");
   const y=d.getFullYear()-1,m=d.getMonth();
-  const start=dateStr(new Date(y,m,1));
-  const end=dateStr(new Date(y,m+1,0));
-  return sumOutbound(itemName,category,start,end);
+  const start=dateStr(new Date(y,m,1)),end=dateStr(new Date(y,m+1,0));
+  return estimateUsage(name,cat,start,end);
 }
-
-/* 같은 날짜에 여러 번 재고 입력하면 마지막 입력을 기준으로 차이를 계산 */
-function getLastKnownStock(itemName, category){
-  const rs=records.filter(r=>r.name===itemName && r.category===category && r.type==="재고확인").sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-  if(rs.length) return Number(rs[rs.length-1].stock);
-  const item=items.find(x=>x[0]===itemName && (!category || (x[5]||"P/S")===category));
-  return item ? Number(item[1]) : 0;
+function currentStock(name,cat){
+  return latestSnapshot(name,cat,dateStr(new Date()));
 }
-
-function getUnit(itemName, category){
-  const item=getItemByName(itemName, category);
-  if(item && item[6]) return item[6];
-  if(itemName.startsWith("오리콘")) return "파렛트";
-  return "박스";
-}
-
-function showCategoryHome(){
-  selectedCategory=null;
-  document.getElementById("categoryHome").style.display="block";
-  document.getElementById("categoryContent").style.display="none";
-  document.querySelector('nav button').classList.add('active');
-
-  // 어떤 화면에서 홈을 눌러도 홈 화면의 최상단으로 이동
-  window.scrollTo(0,0);
-  document.documentElement.scrollTop=0;
-  document.body.scrollTop=0;
-}
-
-function openCategory(category){
-  selectedCategory=category;
-  document.getElementById("categoryHome").style.display="none";
-  document.getElementById("categoryContent").style.display="block";
-  document.getElementById("categoryTitle").textContent=category;
-  render();
-}
-
-let selectedCategory=null;
-
-function render(){
-  const now=new Date();
-  const today=dateStr(now);
-  document.getElementById("today").textContent=fmtDate(today);
-  if(!selectedCategory){
-    document.getElementById("categoryHome").style.display="block";
-    document.getElementById("categoryContent").style.display="none";
-    return;
-  }
-  document.getElementById("categoryHome").style.display="none";
-  document.getElementById("categoryContent").style.display="block";
-  document.getElementById("categoryTitle").textContent=selectedCategory;
-
-  let need=0,check=0,good=0;
-  const box=document.getElementById("items");
-  box.innerHTML="";
-  const categoryItems=items.filter(it=>it[5]===selectedCategory);
-
-  categoryItems.forEach((it)=>{
-    const avg=getThreeMonthAverage(it[0],it[5]||"P/S",today);
-    const last=getLastYearSameMonth(it[0],it[5]||"P/S",today);
-    const twoWeek=getTwoWeekUsage(it[0],it[5]||"P/S",today);
-    const safetyOk=Number(it[1])>=twoWeek;
-    let status;
-    if(avg===0) status=it[1]===0?"확인 필요":"재고 적정";
-    else status=it[1]<avg*.5?"발주 필요":it[1]<avg?"확인 필요":"재고 적정";
-    if(status==="발주 필요")need++;
-    else if(status==="확인 필요")check++;
-    else good++;
-    box.innerHTML+=`
-      <div class="card">
-        <div class="row">
-          <div><div class="name">${esc(it[0])} <span class="item-unit">${getUnit(it[0])}</span></div></div>
-          <div class="status-area"><div class="${status==="재고 적정"?"ok":"order"}">${status}</div><div class="stock-safety ${safetyOk?"safe":"danger"}"><span class="safety-dot"></span>${safetyOk?"여유":"부족"}</div></div>
-        </div>
-        <div class="grid four-metrics">
-          <div class="metric"><span>현재 재고</span><b>${Number(it[1]).toLocaleString()}</b></div>
-          <div class="metric"><span>최근 2주 사용량</span><b>${twoWeek.toLocaleString()}</b></div>
-          <div class="metric"><span>최근 3개월 평균 사용량</span><b>${avg.toLocaleString()}</b></div>
-          <div class="metric"><span>전년 동월</span><b>${last.toLocaleString()}</b></div>
-        </div>
-      </div>`;
+function groupedItems(){
+  const map=new Map();
+  items.forEach((x,i)=>{
+    const name=x[0],cat=x[5]||"P/S",unit=getUnit(name,cat),key=name+"||"+unit;
+    if(!map.has(key))map.set(key,{name,unit,departments:{},indices:[]});
+    const g=map.get(key);
+    g.departments[cat]=currentStock(name,cat);
+    g.indices.push(i);
   });
-  if(!categoryItems.length) box.innerHTML='<div class="card"><div class="muted">등록된 품목이 없습니다.</div></div>';
-  document.getElementById("need").textContent=need;
-  document.getElementById("check").textContent=check;
-  document.getElementById("good").textContent=good;
-
+  return [...map.values()];
 }
+function render(){
+  const today=dateStr(new Date());
+  document.getElementById("today").textContent=fmtDate(today);
+  const groups=groupedItems();
+  document.getElementById("itemCount").textContent=groups.length;
+  document.getElementById("stockTotal").textContent=groups.reduce((sum,g)=>sum+Object.values(g.departments).reduce((a,b)=>a+b,0),0).toLocaleString();
+  const box=document.getElementById("items");
+  if(!groups.length){box.innerHTML='<div class="empty">등록된 품목이 없습니다.</div>';return;}
+  box.innerHTML=groups.map((g,idx)=>{
+    const one=Object.keys(g.departments).reduce((s,c)=>s+getOneMonthUsage(g.name,c,today),0);
+    const avg=Object.keys(g.departments).reduce((s,c)=>s+getThreeMonthAverage(g.name,c,today),0);
+    const last=Object.keys(g.departments).reduce((s,c)=>s+getLastYearSameMonth(g.name,c,today),0);
+    const stock=Object.values(g.departments).reduce((s,v)=>s+v,0);
+    const low=stock<one;
+    const depts=Object.keys(g.departments);
+    return `<div class="card tap" onclick="showItemDetail(${idx})">
+      <div class="card-head">
+        <div class="name">${esc(g.name)} <span class="unit">${esc(g.unit)}</span></div>
+        <div class="status ${low?"danger":"ok"}"><span class="status-dot"></span>${low?"부족":"여유"}</div>
+      </div>
+      <div class="metrics">
+        <div class="metric ${low?"danger":""}"><span>현재 재고</span><b>${stock.toLocaleString()}</b></div>
+        <div class="metric ${low?"danger":""}"><span>최근 1개월 사용량</span><b>${one.toLocaleString()}</b></div>
+        <div class="metric"><span>최근 3개월 평균 사용량</span><b>${avg.toLocaleString()}</b></div>
+        <div class="metric"><span>전년 동월 사용량</span><b>${last.toLocaleString()}</b></div>
+      </div>
+      <div class="depts">사용 중인 부서 ${depts.map(d=>`<span class="dept-chip">${esc(d)}</span>`).join("")}</div>
+    </div>`;
+  }).join("");
+}
+function showHome(){closeAll();render();document.querySelectorAll("nav button").forEach((b,i)=>b.classList.toggle("active",i===0));window.scrollTo(0,0);}
 function openModal(id){
   document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
   document.getElementById(id).style.display="flex";
-
   if(id==="stock"){
     document.getElementById("sdate").value=dateStr(new Date());
-    stockInputMode="normal";
     renderBulkStockInputs();
   }
-  if(id==="cal"){
+  if(id==="history"){
+    fillHistoryDept();
     renderCalendar();
   }
-  if(id==="itemsModal"){
-    document.getElementById("itemlist").innerHTML=items.map((x,i)=>`
-      <div class="card">
-        <b>${i+1}. ${esc(x[0])} <span class="item-unit">${getUnit(x[0])}</span></b>
-        <div class="muted">${esc(x[5]||"P/S")} · 현재 재고 ${Number(x[1]).toLocaleString()}${getUnit(x[0])}</div>
-      </div>
-    `).join("");
-  }
+  if(id==="itemsModal")renderItems();
   if(id==="admin")renderAdmin();
   if(id==="adminDepartmentItems")renderAdminDepartmentItems();
 }
-
-function closeAll(){
-  document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
-}
-
-let stockInputMode="normal";
-let stockInputDate="";
-let calendarDate=new Date();
-let adminCalendarDate=new Date();
-
-function renderBulkStockInputs(){
-  const date = document.getElementById("sdate").value;
-  const historical = stockInputMode==="historical";
-  const inputItems = selectedCategory ? items.filter(x=>x[5]===selectedCategory) : items;
-
-  document.getElementById("bulkStockList").innerHTML=inputItems.map((x,i)=>{
-    const previous = historical ? getPreviousStockBefore(x[0], x[5]||"P/S", date) : Number(x[1]||0);
-    const current = historical ? previous : Number(x[1]||0);
-    return `
-      <div class="bulk-row">
-        <div class="bulk-name">
-          <b>${i+1}. ${esc(x[0])} <span class="item-unit">${getUnit(x[0])}</span></b>
-          <span>이전 재고 ${previous.toLocaleString()}</span>
-        </div>
-        <input id="bulk-${i}" data-item-index="${items.indexOf(x)}" class="bulk-input" type="number" min="0" step="1"
-          inputmode="numeric" placeholder="현재 재고 수량" value="${current}">
+function closeAll(){document.querySelectorAll(".modal").forEach(x=>x.style.display="none");}
+function showItemDetail(index){
+  const g=groupedItems()[index];if(!g)return;
+  const today=dateStr(new Date()),depts=Object.keys(g.departments);
+  const rows=depts.map(c=>{
+    const stock=g.departments[c],one=getOneMonthUsage(g.name,c,today),avg=getThreeMonthAverage(g.name,c,today),last=getLastYearSameMonth(g.name,c,today);
+    const low=stock<one;
+    return `<div class="card" style="box-shadow:none;border:1px solid #e3e8ef">
+      <div class="name">${esc(c)}</div>
+      <div class="metrics">
+        <div class="metric ${low?"danger":""}"><span>현재 재고</span><b>${stock.toLocaleString()}</b></div>
+        <div class="metric ${low?"danger":""}"><span>최근 1개월 사용량</span><b>${one.toLocaleString()}</b></div>
+        <div class="metric"><span>최근 3개월 평균 사용량</span><b>${avg.toLocaleString()}</b></div>
+        <div class="metric"><span>전년 동월 사용량</span><b>${last.toLocaleString()}</b></div>
       </div>
-    `;
-  }).join("");
-
-  const title=document.querySelector("#stock h3");
-  const desc=document.querySelector("#stock .muted");
-  if(historical){
-    title.textContent="📦 과거 재고 입력";
-    desc.innerHTML="선택한 날짜에 실제로 확인한 <b>현재 재고</b>를 품목별로 입력해 주세요.<br>해당 날짜 이전의 재고와 비교하여 <b>사용</b> 또는 <b>입고</b>로 기록됩니다.";
-  }else{
-    title.textContent=selectedCategory ? `📦 ${selectedCategory} 재고 입력` : "📦 전체 재고 입력";
-    desc.innerHTML=selectedCategory ? `${selectedCategory}에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br>입력한 기록은 <b>${selectedCategory}</b>에만 저장됩니다.` : "오늘 창고에서 확인한 <b>현재 재고</b>를 품목별로 한 번에 입력해 주세요.<br>이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동으로 기록됩니다.";
-  }
-}
-
-function getPreviousStockBefore(itemName, category, date){
-  const relevant=records
-    .filter(r=>r.name===itemName && r.category===category && r.date && r.date<date && (r.type==="재고확인"||r.type==="사용"||r.type==="입고"))
-    .slice()
-    .sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-
-  if(!relevant.length) return 0;
-  const last=relevant[relevant.length-1];
-  return Number(last.stock||0);
-}
-
-function saveBulkStock(){
-  const date=document.getElementById("sdate").value;
-  if(!date){alert("날짜를 입력해 주세요.");return}
-
-  const historical=stockInputMode==="historical";
-  const inputItems = selectedCategory && !historical ? items.filter(x=>x[5]===selectedCategory) : items;
-  const changes=[];
-  const now=Date.now();
-
-  inputItems.forEach((item,i)=>{
-    const input=document.getElementById(`bulk-${i}`);
-    const q=parseInt(input.value,10);
-    if(!Number.isInteger(q)||q<0){
-      throw new Error(`${item[0]}의 재고를 0 이상의 숫자로 입력해 주세요.`);
-    }
-
-    const category=item[5]||"P/S";
-    const previous=historical ? getPreviousStockBefore(item[0], item[5]||"P/S", date) : Number(item[1]||0);
-    const diff=q-previous;
-
-    records.push({
-      date:date,time:String(now+i*2),name:item[0],category:category,
-      type:"재고확인",stock:q,previous:previous,diff:diff,
-      manual:historical
-    });
-
-    if(diff<0){
-      records.push({
-        date:date,time:String(now+i*2+1),name:item[0],category:category,
-        type:"사용",qty:Math.abs(diff),stock:q,previous:previous,
-        manual:historical
-      });
-      changes.push(`${item[0]}: 사용 ${Math.abs(diff)} ${getUnit(item[0])}`);
-    }else if(diff>0){
-      records.push({
-        date:date,time:String(now+i*2+1),name:item[0],category:category,
-        type:"입고",qty:diff,stock:q,previous:previous,
-        manual:historical
-      });
-      changes.push(`${item[0]}: 입고 ${diff} ${getUnit(item[0])}`);
-    }
-
-    // 일반 재고 입력일 때만 현재 재고를 변경합니다.
-    if(!historical) item[1]=q;
-  });
-
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  localStorage.setItem("submaterial_records",JSON.stringify(records));
-
-  closeAll();
-  render();
-  renderCalendar();
-  renderAdminCalendar();
-
-  if(changes.length){
-    alert((historical?"과거 재고 입력이 완료되었습니다.":"전체 재고 저장이 완료되었습니다.")+"\n\n"+changes.join("\n"));
-  }else{
-    alert((historical?"과거 재고 입력이 완료되었습니다.":"전체 재고 저장이 완료되었습니다.")+"\n변동된 품목은 없습니다.");
-  }
-
-  stockInputMode="normal";
-}
-
-function renderCalendar(){
-  const y=calendarDate.getFullYear(),m=calendarDate.getMonth();
-  document.getElementById("calendarTitle").textContent=`${y}년 ${m+1}월`;
-  const grid=document.getElementById("calendarGrid");
-  grid.innerHTML="";
-  const first=new Date(y,m,1).getDay();
-  const last=new Date(y,m+1,0).getDate();
-  const scopedRecords=selectedCategory ? records.filter(r=>r.category===selectedCategory) : records;
-
-  for(let i=0;i<first;i++) grid.insertAdjacentHTML("beforeend",`<div class="calendar-cell empty"></div>`);
-
-  for(let day=1;day<=last;day++){
-    const key=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-    const dayRecords=scopedRecords.filter(r=>r.date===key&&(r.type==="사용"||r.type==="입고"||r.type==="재고확인"));
-    const cell=document.createElement("div");
-    cell.className="calendar-cell"+(dayRecords.length?" has-record":"");
-    cell.innerHTML=`<div class="calendar-num">${day}</div>${dayRecords.length?'<div class="calendar-dot"></div>':''}`;
-    if(dayRecords.length) cell.onclick=()=>showCalendarDetail(key,dayRecords,false);
-    grid.appendChild(cell);
-  }
-}
-
-function changeCalendarMonth(delta){
-  calendarDate.setMonth(calendarDate.getMonth()+delta);
-  renderCalendar();
-  document.getElementById("calendarDetail").style.display="none";
-}
-
-function showCalendarDetail(date,rows,adminMode){
-  const box=document.getElementById(adminMode?"adminCalendarDetail":"calendarDetail");
-  const unitRows=rows.map(r=>{
-    const unit=getUnit(r.name||"");
-    const change=r.type==="사용"?`-${Number(r.qty).toLocaleString()}`:`+${Number(r.qty).toLocaleString()}`;
-    if(adminMode){
-      const realIndex=records.indexOf(r);
-      return `<div class="record-row">
-        <b>${esc(r.name)}</b> <span class="item-unit">${unit}</span><br>
-        ${r.type} ${change} <span class="muted">(${unit})</span>
-        <div class="record-meta">기록 후 재고: ${Number(r.stock??0).toLocaleString()} ${unit}</div>
-        <div class="admin-record-actions">
-          <button class="small-btn edit-btn" onclick="editAdminRecord(${realIndex})">수정</button>
-          <button class="small-btn delete-btn" onclick="deleteAdminRecord(${realIndex})">삭제</button>
-        </div>
-      </div>`;
-    }
-    return `<div class="record-row">
-      <b>${esc(r.name)}</b> <span class="item-unit">${unit}</span><br>
-      ${r.type} ${change}
-      <div class="record-meta">기록 후 재고: ${Number(r.stock??0).toLocaleString()} ${unit}</div>
+      <div class="status ${low?"danger":"ok"}" style="margin-top:8px">${low?"● 부족":"● 여유"}</div>
     </div>`;
   }).join("");
-
-  box.innerHTML=`<div class="calendar-detail-title">${date} 기록</div>${unitRows}`;
-  box.style.display="block";
-}
-
-function openAdminStats(){
-  openModal("adminStats");
-  renderAdminCalendar();
-}
-
-function renderAdminCalendar(){
-  const y=adminCalendarDate.getFullYear(),m=adminCalendarDate.getMonth();
-  document.getElementById("adminCalendarTitle").textContent=`${y}년 ${m+1}월`;
-  const grid=document.getElementById("adminCalendarGrid");
-  grid.innerHTML="";
-  const first=new Date(y,m,1).getDay();
-  const last=new Date(y,m+1,0).getDate();
-
-  for(let i=0;i<first;i++) grid.insertAdjacentHTML("beforeend",`<div class="calendar-cell empty"></div>`);
-
-  for(let day=1;day<=last;day++){
-    const key=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-    const dayRecords=records.filter(r=>r.date===key&&(r.type==="사용"||r.type==="입고"||r.type==="재고확인"));
-    const cell=document.createElement("div");
-    cell.className="calendar-cell"+(dayRecords.length?" has-record":"");
-    cell.innerHTML=`<div class="calendar-num">${day}</div>${dayRecords.length?'<div class="calendar-dot"></div>':''}`;
-
-    // 관리자 화면에서는 날짜를 누르면 홈 화면과 동일한 전체 재고 입력 화면으로 이동합니다.
-    cell.onclick=()=>openHistoricalStock(key);
-    grid.appendChild(cell);
-  }
-}
-
-function changeAdminCalendarMonth(delta){
-  adminCalendarDate.setMonth(adminCalendarDate.getMonth()+delta);
-  renderAdminCalendar();
-  document.getElementById("adminCalendarDetail").style.display="none";
-}
-
-function openHistoricalStock(date){
-  stockInputMode="historical";
-  stockInputDate=date;
-  document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
-  document.getElementById("stock").style.display="flex";
-  document.getElementById("sdate").value=date;
-  renderBulkStockInputs();
-}
-
-function editAdminRecord(index){
-  const r=records[index];
-  if(!r || (r.type!=="사용"&&r.type!=="입고")) return;
-  const date=prompt("기록 날짜를 입력해 주세요. (YYYY-MM-DD)",r.date);
-  if(!date) return;
-  const qty=parseInt(prompt("수량을 입력해 주세요.",String(r.qty)),10);
-  if(!Number.isInteger(qty)||qty<=0){alert("수량은 1개 이상으로 입력해 주세요.");return}
-  r.date=date;
-  r.qty=qty;
-  r.manual=true;
-  localStorage.setItem("submaterial_records",JSON.stringify(records));
-  render();
-  renderAdminCalendar();
-  showCalendarDetail(date,records.filter(x=>x.date===date&&(x.type==="사용"||x.type==="입고")),true);
-}
-
-function deleteAdminRecord(index){
-  const r=records[index];
-  if(!r || (r.type!=="사용"&&r.type!=="입고")) return;
-  if(!confirm("이 기록을 삭제하시겠습니까?")) return;
-  records.splice(index,1);
-  localStorage.setItem("submaterial_records",JSON.stringify(records));
-  render();
-  renderAdminCalendar();
-  document.getElementById("adminCalendarDetail").style.display="none";
-}
-
-function openInitialStock(){
-  document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
-  document.getElementById("initialStock").style.display="flex";
-  document.getElementById("initialStockList").innerHTML=items.map((x,i)=>`
-    <div class="bulk-row">
-      <div class="bulk-name"><b>${i+1}. ${esc(x[0])}</b><span>현재 기준 ${Number(x[1]||0).toLocaleString()}${getUnit(x[0])}</span></div>
-      <input id="initial-${i}" class="bulk-input" type="number" min="0" step="1" inputmode="numeric" value="${Number(x[1]||0)}">
-    </div>
-  `).join("");
-}
-
-function saveInitialStock(){
-  if(!confirm("입력한 수량을 초기 기준 재고로 설정할까? 기존 재고 변동 기록은 삭제되지 않습니다.")) return;
-  items.forEach((x,i)=>{
-    const q=parseInt(document.getElementById(`initial-${i}`).value,10);
-    if(!Number.isInteger(q)||q<0) throw new Error(`${x[0]}의 재고를 0 이상의 숫자로 입력해 주세요.`);
-    x[1]=q;
-  });
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  closeAll();
-  render();
-  alert("초기 재고 설정 완료!");
-}
-
-function openAdminLogin(){
-  openModal("login");
-  document.getElementById("adminpw").value="";
-}
-function loginAdmin(){
-  if(document.getElementById("adminpw").value!==adminPassword){alert("비밀번호가 맞지 않습니다.");return}
-  openModal("admin");
-}
-
-function getAdminGroupedItems(){
-  const grouped={};
-  items.forEach((x,i)=>{
-    const name=x[0], unit=getUnit(name);
-    const category=x[5]||"P/S";
-    const key=name+"||"+unit;
-    if(!grouped[key]) grouped[key]={name,unit,total:0,departments:{}};
-    grouped[key].departments[category]=Number(x[1]||0);
-    grouped[key].total+=Number(x[1]||0);
-  });
-  return Object.values(grouped);
-}
-
-function adminItemNeedsTransfer(g){
-  const activeDepartments=CATEGORIES.filter(c=>Object.prototype.hasOwnProperty.call(g.departments,c));
-  const hasStockElsewhere=activeDepartments.some(c=>Number(g.departments[c]||0)>0);
-  const hasZeroDepartment=activeDepartments.some(c=>Number(g.departments[c]||0)===0);
-  const hasUsageShortage=activeDepartments.some(c=>{
-    const qty=Number(g.departments[c]||0);
-    const usage=getTwoWeekUsage(g.name,c,dateStr(new Date()));
-    return qty<usage;
-  });
-  return (hasStockElsewhere && hasZeroDepartment) || hasUsageShortage;
-}
-
-function renderAdmin(){
-  const grouped=getAdminGroupedItems();
-  const overview=grouped.map((g,idx)=>{
-    const warn=adminItemNeedsTransfer(g);
-    return `
-      <div class="admin-overview-row admin-clickable" onclick="showAdminItemDetail(${idx})">
-        <div>
-          <div class="admin-overview-name">${esc(g.name)}</div>
-          <div class="admin-overview-category">${esc(g.unit)}</div>
-        </div>
-        <div class="admin-status-light ${warn?"yellow":"green"}">
-          <span class="admin-status-dot"></span>${warn?"부족 주의":"여유"}
-        </div>
-      </div>`;
-  }).join("");
-
-  document.getElementById("adminlist").innerHTML=`
-    <div class="admin-overview">
-      <div class="admin-overview-row admin-overview-head">
-        <div>품목</div><div>상태</div>
-      </div>
-      ${overview}
-    </div>
-    <div class="muted">품목을 누르면 해당 품목을 사용하는 부서별 현황을 확인할 수 있습니다.</div>`;
-}
-
-function renderAdminDepartmentItems(){
-  const manage=items.map((x,i)=>`
-    <div class="admin-item">
-      <b>${i+1}. ${esc(x[0])} <span class="item-unit">${getUnit(x[0])}</span></b>
-      <label>대분류</label>
-      <select class="admin-category-select" id="a-cat-${i}">
-        ${CATEGORIES.map(c=>`<option value="${esc(c)}" ${x[5]===c?"selected":""}>${esc(c)}</option>`).join("")}
-      </select>
-      <button class="danger" onclick="deleteItem(${i})">이 품목 삭제</button>
-    </div>`).join("");
-  document.getElementById("adminDepartmentItemsList").innerHTML=manage;
-}
-
-function openAdminDepartmentItems(){
-  openModal("adminDepartmentItems");
-  renderAdminDepartmentItems();
-}
-
-function openAdminStockEdit(){
-  openInitialStock();
-}
-
-function openAdminPasswordChange(){
-  openModal("adminPasswordChange");
-  document.getElementById("oldpw").value="";
-  document.getElementById("newpw").value="";
-  document.getElementById("newpw2").value="";
-}
-
-function showAdminItemDetail(index){
-  const grouped=getAdminGroupedItems()[index];
-  if(!grouped) return;
-
-  // 실제로 해당 품목이 등록된(사용하는) 부서만 표시합니다.
-  const activeDepartments=CATEGORIES.filter(c=>Object.prototype.hasOwnProperty.call(grouped.departments,c));
-  const rows=activeDepartments.map(c=>{
-    const qty=Number(grouped.departments[c]||0);
-    const usage=getTwoWeekUsage(grouped.name,c,dateStr(new Date()));
-    const deptWarn=qty < usage;
-    return `<div class="admin-status-detail-row ${deptWarn?"warn":""}">
-      <div><b>${esc(c)}</b></div>
-      <div><b>${qty.toLocaleString()}</b> ${esc(grouped.unit)}</div>
-      <div><b>${usage.toLocaleString()}</b> ${esc(grouped.unit)}</div>
-      <div class="admin-detail-status ${deptWarn?"yellow":"green"}">
-        <span class="admin-status-dot"></span>${deptWarn?"부족 주의":"여유"}
-      </div>
-    </div>`;
-  }).join("");
-
-  const content=document.getElementById("adminItemDetailContent");
-  content.innerHTML=`
-    <div class="admin-status-detail-head">${esc(grouped.name)}</div>
-    <div class="admin-detail-table">
-      <div class="admin-status-detail-row admin-status-detail-head">
-        <div>부서명</div><div>보유수량</div><div>평균 사용량<br>(최근 2주)</div><div>상태</div>
-      </div>
-      ${rows}
-    </div>
-    <div class="admin-detail-notice">
-      <div class="admin-detail-notice-title">ⓘ 일부 부서에서 재고가 부족할 수 있습니다.</div>
-      <div>필요 부서로 재고 이동 또는 발주를 검토하세요.</div>
-    </div>
-    <div class="admin-detail-legend">
-      <div><span class="legend-dot green"></span><b>여유</b> : 해당 부서의 재고가 충분합니다.</div>
-      <div><span class="legend-dot yellow"></span><b>부족 주의</b> : 현재 재고가 사용량 대비 부족할 수 있습니다.</div>
-      <div class="admin-detail-footnote">* 평균 사용량은 최근 2주분 산정</div>
-    </div>`;
+  document.getElementById("adminItemDetailContent").innerHTML=`
+    <div class="name">${esc(g.name)} <span class="unit">${esc(g.unit)}</span></div>
+    <p class="muted">사용 중인 부서만 표시합니다. 사용하지 않는 부서는 표시하지 않습니다.</p>
+    ${rows||'<div class="empty">사용 중인 부서가 없습니다.</div>'}
+    <div class="notice">사용량은 직접 입력값이 아니라 재고확인 기록의 감소 구간을 기반으로 추정합니다. 재고가 증가한 구간은 입고로 판단하여 사용량에서 제외합니다.</div>`;
   openModal("adminItemDetailModal");
 }
-
-function closeAdminItemDetail(){
-  document.getElementById("adminItemDetailModal").style.display="none";
+function renderBulkStockInputs(){
+  const list=document.getElementById("bulkStockList");
+  list.innerHTML=items.map((x,i)=>{
+    const cat=x[5]||"P/S",stock=currentStock(x[0],cat);
+    return `<div class="bulk-row">
+      <div class="bulk-name"><b>${i+1}. ${esc(x[0])} <span class="unit">${esc(getUnit(x[0],cat))}</span></b><span>${esc(cat)} · 현재 ${stock.toLocaleString()}</span></div>
+      <input id="bulk-${i}" class="bulk-input" type="number" min="0" step="1" inputmode="numeric" value="${stock}">
+    </div>`;
+  }).join("");
 }
-function saveAdmin(){
-  items.forEach((x,i)=>{
-    x[5]=document.getElementById(`a-cat-${i}`).value;
+function saveBulkStock(){
+  const date=document.getElementById("sdate").value;if(!date){alert("날짜를 입력해 주세요.");return;}
+  const now=Date.now();let changes=[];
+  items.forEach((item,i)=>{
+    const q=parseInt(document.getElementById("bulk-"+i).value,10);
+    if(!Number.isInteger(q)||q<0){alert(item[0]+"의 재고를 0 이상의 숫자로 입력해 주세요.");return;}
+    const cat=item[5]||"P/S",prev=latestSnapshot(item[0],cat,date);
+    records.push({date,time:String(now+i*2),name:item[0],category:cat,type:"재고확인",stock:q,previous:prev,diff:q-prev});
+    if(q<prev)changes.push(`${item[0]} / ${cat}: 사용 추정 ${prev-q}`);
+    else if(q>prev)changes.push(`${item[0]} / ${cat}: 입고 추정 ${q-prev}`);
+    item[1]=q;
   });
   localStorage.setItem("submaterial_items",JSON.stringify(items));
-  render();
-  renderAdmin();
-  closeAll();
-  alert("관리자 설정이 저장되었습니다.");
+  localStorage.setItem("submaterial_records",JSON.stringify(records));
+  closeAll();render();alert("재고 저장 완료!"+(changes.length?"\n\n"+changes.slice(0,20).join("\n"):"\n변동된 품목이 없습니다."));
 }
-
+function openHistory(){
+  closeAll();document.querySelectorAll("nav button").forEach((b,i)=>b.classList.toggle("active",i===3));openModal("history");
+}
+function fillHistoryDept(){
+  const s=document.getElementById("historyDept"),old=s.value||"전체";
+  s.innerHTML=["전체",...CATEGORIES].map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join("");
+  s.value=["전체",...CATEGORIES].includes(old)?old:"전체";
+}
+function renderCalendar(){
+  const y=calendarDate.getFullYear(),m=calendarDate.getMonth(),dept=document.getElementById("historyDept").value||"전체";
+  document.getElementById("calendarTitle").textContent=`${y}년 ${m+1}월`;
+  const grid=document.getElementById("calendarGrid");grid.innerHTML="";
+  const first=new Date(y,m,1).getDay(),last=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++)grid.insertAdjacentHTML("beforeend",'<div class="calendar-cell empty"></div>');
+  for(let day=1;day<=last;day++){
+    const key=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const has=records.some(r=>r.date===key&&r.type==="재고확인"&&(dept==="전체"||(r.category||"P/S")===dept));
+    const cell=document.createElement("div");cell.className="calendar-cell"+(has?" has-record":"");
+    cell.innerHTML=`<div class="calendar-num">${day}</div>${has?'<div class="calendar-dot"></div>':''}`;
+    if(has)cell.onclick=()=>showHistoryDate(key);
+    grid.appendChild(cell);
+  }
+}
+function changeCalendarMonth(delta){calendarDate.setMonth(calendarDate.getMonth()+delta);renderCalendar();document.getElementById("calendarDetail").style.display="none";}
+function showHistoryDate(date){
+  const dept=document.getElementById("historyDept").value||"전체";
+  let rs=records.filter(r=>r.date===date&&r.type==="재고확인"&&(dept==="전체"||(r.category||"P/S")===dept));
+  const map=new Map();
+  rs.sort((a,b)=>(a.time||"").localeCompare(b.time||"")).forEach(r=>map.set(getKey(r.name,r.category||"P/S"),r));
+  rs=[...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"ko")||(a.category||"").localeCompare(b.category||""));
+  const rows=rs.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.category||"P/S")}</td><td><b>${Number(r.stock||0).toLocaleString()}</b></td><td>${r.note?esc(r.note):"-"}</td></tr>`).join("");
+  const title=dept==="전체"?`${date} 전체 재고확인 기록`:`${date} ${dept} 재고확인 기록`;
+  document.getElementById("calendarDetail").innerHTML=`<div class="history-title">${title}</div>
+    <table class="history-table"><thead><tr><th>품목</th><th>부서</th><th>수량(개)</th><th>비고</th></tr></thead><tbody>${rows||'<tr><td colspan="4">기록 없음</td></tr>'}</tbody></table>
+    <div class="muted" style="margin-top:8px">전체 선택 시 품목별로 어느 부서에서 몇 개를 입력했는지 함께 표시합니다.</div>`;
+  document.getElementById("calendarDetail").style.display="block";
+}
+function openItems(){openModal("itemsModal");}
+function renderItems(){
+  document.getElementById("itemlist").innerHTML=items.map((x,i)=>`<div class="admin-item">
+    <b>${i+1}. ${esc(x[0])}</b> <span class="unit">${esc(getUnit(x[0],x[5]||"P/S"))}</span>
+    <div class="muted">${esc(x[5]||"P/S")} · 현재 재고 ${currentStock(x[0],x[5]||"P/S").toLocaleString()}</div>
+    <div class="actions"><button class="small-btn edit-btn" onclick="moveItemDept(${i})">부서 변경</button><button class="small-btn delete-btn" onclick="deleteItem(${i})">삭제</button></div>
+  </div>`).join("");
+}
+function moveItemDept(i){
+  const x=items[i],cat=prompt("부서를 입력하세요.\n입고장 / 출하장 / 수출장 / 수동랙 / DPS / P/S",x[5]||"P/S");
+  if(!CATEGORIES.includes(cat))return alert("올바른 부서를 입력해 주세요.");
+  x[5]=cat;localStorage.setItem("submaterial_items",JSON.stringify(items));renderItems();render();
+}
 function addItem(){
-  const name=prompt("추가할 품목명을 입력해 주세요.");
-  if(!name||!name.trim())return;
-  const category=prompt("대분류를 입력해 주세요. (입고장, 출하장, 수출장, 수동랙, DPS, P/S)","P/S");
-  if(!CATEGORIES.includes(category)){alert("대분류는 입고장, 출하장, 수출장, 수동랙, DPS, P/S 중 하나로 입력해 주세요.");return;}
-  items.push([name.trim(),0,0,0,0,category]);
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  renderAdmin();render();
+  const name=prompt("추가할 품목명을 입력해 주세요.");if(!name?.trim())return;
+  const cat=prompt("부서를 입력하세요.\n입고장 / 출하장 / 수출장 / 수동랙 / DPS / P/S","P/S");
+  if(!CATEGORIES.includes(cat))return alert("올바른 부서를 입력해 주세요.");
+  items.push([name.trim(),0,0,0,0,cat,name.trim().startsWith("오리콘")?"파렛트":"박스",{}]);
+  localStorage.setItem("submaterial_items",JSON.stringify(items));renderItems();render();
 }
 function deleteItem(i){
   if(!confirm(`'${items[i][0]}' 품목을 삭제하시겠습니까?`))return;
-  items.splice(i,1);
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  renderAdmin();render();
+  items.splice(i,1);localStorage.setItem("submaterial_items",JSON.stringify(items));renderItems();render();
 }
+function openAdminLogin(){openModal("login");document.getElementById("adminpw").value="";}
+function loginAdmin(){if(document.getElementById("adminpw").value!==adminPassword)return alert("비밀번호가 맞지 않습니다.");openModal("admin");}
+function adminGroups(){return groupedItems();}
+function renderAdmin(){
+  const groups=adminGroups(),today=dateStr(new Date());
+  document.getElementById("adminlist").innerHTML=`<div class="admin-detail">
+    <div class="admin-row admin-head"><div>품목</div><div>현재고</div><div>사용량</div><div>상태</div></div>
+    ${groups.map((g,i)=>{
+      const stock=Object.values(g.departments).reduce((a,b)=>a+b,0);
+      const usage=Object.keys(g.departments).reduce((s,c)=>s+getTwoWeekUsage(g.name,c,today),0);
+      const low=stock<usage;
+      return `<div class="admin-row tap" onclick="showAdminItemDetail(${i})"><div><b>${esc(g.name)}</b><br><span class="unit">${esc(g.unit)}</span></div><div>${stock.toLocaleString()}</div><div>${usage.toLocaleString()}</div><div class="${low?"status danger":"status ok"}">${low?"부족":"여유"}</div></div>`;
+    }).join("")}</div><div class="muted" style="margin-top:8px">품목을 누르면 사용하는 부서만 상세 표시합니다.</div>`;
+}
+function showAdminItemDetail(i){
+  const g=adminGroups()[i];if(!g)return;
+  const today=dateStr(new Date());
+  const rows=Object.keys(g.departments).map(c=>{
+    const stock=g.departments[c],usage=getTwoWeekUsage(g.name,c,today),low=stock<usage;
+    return `<div class="admin-row"><div><b>${esc(c)}</b></div><div>${stock.toLocaleString()}</div><div>${usage.toLocaleString()}</div><div class="${low?"status danger":"status ok"}">${low?"● 부족":"● 여유"}</div></div>`;
+  }).join("");
+  document.getElementById("adminItemDetailContent").innerHTML=`<div class="name">${esc(g.name)} <span class="unit">${esc(g.unit)}</span></div>
+    <p class="muted">사용 중인 부서만 표시합니다.</p>
+    <div class="admin-detail"><div class="admin-row admin-head"><div>부서명</div><div>보유수량</div><div>평균 사용량</div><div>상태</div></div>${rows}</div>
+    <div class="notice">평균 사용량은 최근 2주분을 재고확인 기록의 감소 구간으로 추정하여 산정합니다.</div>`;
+  openModal("adminItemDetailModal");
+}
+function openAdminDepartmentItems(){openModal("adminDepartmentItems");}
+function renderAdminDepartmentItems(){
+  document.getElementById("adminDepartmentItemsList").innerHTML=items.map((x,i)=>`<div class="admin-item">
+    <b>${i+1}. ${esc(x[0])}</b>
+    <label>부서</label>
+    <select id="a-cat-${i}">${CATEGORIES.map(c=>`<option value="${esc(c)}" ${x[5]===c?"selected":""}>${esc(c)}</option>`).join("")}</select>
+  </div>`).join("");
+}
+function saveAdmin(){
+  items.forEach((x,i)=>x[5]=document.getElementById("a-cat-"+i).value);
+  localStorage.setItem("submaterial_items",JSON.stringify(items));render();renderAdmin();openModal("admin");alert("설정이 저장되었습니다.");
+}
+function openAdminStockEdit(){openModal("stock");}
+function openAdminPasswordChange(){openModal("adminPasswordChange");}
 function changeAdminPassword(){
-  const old=document.getElementById("oldpw").value;
-  const nw=document.getElementById("newpw").value;
-  const nw2=document.getElementById("newpw2").value;
-  if(old!==adminPassword){alert("현재 비밀번호가 맞지 않습니다.");return}
-  if(nw.length<4){alert("새 비밀번호는 4자리 이상으로 입력해 주세요.");return}
-  if(nw!==nw2){alert("새 비밀번호가 서로 다릅니다.");return}
-  adminPassword=nw;
-  localStorage.setItem("submaterial_admin_pw",adminPassword);
-  document.getElementById("oldpw").value="";
-  document.getElementById("newpw").value="";
-  document.getElementById("newpw2").value="";
-  alert("관리자 비밀번호가 변경되었습니다.");
+  const old=document.getElementById("oldpw").value,nw=document.getElementById("newpw").value,nw2=document.getElementById("newpw2").value;
+  if(old!==adminPassword)return alert("현재 비밀번호가 맞지 않습니다.");
+  if(nw.length<4)return alert("새 비밀번호는 4자리 이상으로 입력해 주세요.");
+  if(nw!==nw2)return alert("새 비밀번호가 서로 다릅니다.");
+  adminPassword=nw;localStorage.setItem("submaterial_admin_pw",adminPassword);alert("관리자 비밀번호가 변경되었습니다.");openModal("admin");
 }
 function resetData(){
-  if(!confirm("모든 재고 변동 기록을 삭제하고 현재 품목 구성을 초기화하시겠습니까?"))return;
-  items=DEFAULT_ITEMS.map(x=>x.slice());
-  localStorage.setItem("submaterial_data_version",DATA_VERSION);
-  records=[];
-  localStorage.setItem("submaterial_items",JSON.stringify(items));
-  localStorage.setItem("submaterial_records","[]");
-  render();renderAdmin();alert("전체 초기화 완료!");
+  if(!confirm("모든 재고 변동 기록과 현재 구성을 초기화하시겠습니까?"))return;
+  items=DEFAULT_ITEMS.map(x=>x.slice());records=[];
+  localStorage.setItem("submaterial_items",JSON.stringify(items));localStorage.setItem("submaterial_records","[]");
+  ensureSeedSnapshots();render();openModal("admin");alert("초기화 완료!");
 }
-
 render();
 </script>
-</body></html>
+</body>
+</html>
