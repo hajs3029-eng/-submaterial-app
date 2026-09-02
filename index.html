@@ -69,7 +69,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <div class="modal" id="stock"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
   <h3>📦 전체 재고 입력</h3>
-  <p class="muted">오늘 창고에서 확인한 <b>현재 재고</b>를 품목별로 한 번에 입력해줘.<br>
+  <p class="muted">오늘 창고에서 확인한 <b>현재 재고</b>를 품목별로 한 번에 입력해 주세요 주세요.<br>
   이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동 기록돼.</p>
   <label>확인 날짜</label><input id="sdate" type="date">
   <div id="bulkStockList"></div>
@@ -104,7 +104,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <div class="modal" id="login"><div class="sheet">
   <button class="close" onclick="closeAll()">닫기</button>
   <h3>🔐 관리자 모드</h3>
-  <p class="muted">관리자 비밀번호를 입력해줘.</p>
+  <p class="muted">관리자 비밀번호를 입력해 주세요 주세요.</p>
   <label>비밀번호</label><input id="adminpw" type="password" inputmode="numeric" placeholder="비밀번호">
   <button class="primary" onclick="loginAdmin()">관리자 모드 들어가기</button>
 </div></div>
@@ -224,12 +224,13 @@ function render(){
     box.innerHTML+=`
       <div class="card">
         <div class="row">
-          <div><div class="name">${esc(it[0])}</div><div class="muted">현재 재고 ${Number(it[1]).toLocaleString()}${getUnit(it[0])}</div></div>
+          <div><div class="name">${esc(it[0])} <span class="item-unit">${getUnit(it[0])}</span></div></div>
           <div class="${status==="재고 적정"?"ok":"order"}">${status}</div>
         </div>
         <div class="grid">
-          <div class="metric"><span>최근 3개월 평균 사용량</span><b>${avg.toLocaleString()}${getUnit(it[0])}</b></div>
-          <div class="metric"><span>전년 동월 사용</span><b>${last.toLocaleString()}</b></div>
+          <div class="metric"><span>현재 재고</span><b>${Number(it[1]).toLocaleString()}</b></div>
+          <div class="metric"><span>최근 3개월 평균 사용량</span><b>${avg.toLocaleString()}</b></div>
+          <div class="metric"><span>전년 동월</span><b>${last.toLocaleString()}</b></div>
           
         </div>
       </div>`;
@@ -243,7 +244,7 @@ function render(){
   document.getElementById("history").innerHTML=changes.length ? changes.map(r=>`
     <tr>
       <td>${r.date}</td><td>${esc(r.name)}</td>
-      <td>${r.type==="사용"?"-":"+"}${Number(r.qty).toLocaleString()}${getUnit(r.name)}${getUnit(r.name)}</td>
+      <td>${r.type==="사용"?"-":"+"}${Number(r.qty).toLocaleString()}${getUnit(r.name)}</td>
       <td>${Number(r.stock).toLocaleString()}${getUnit(r.name)}</td>
       <td>${r.type}</td>
     </tr>`).join("") : `<tr><td colspan="5">아직 재고 변동 기록이 없습니다.</td></tr>`;
@@ -289,14 +290,14 @@ function renderBulkStockInputs(){
 
 function saveBulkStock(){
   const date=document.getElementById("sdate").value;
-  if(!date){alert("날짜를 입력해줘.");return}
+  if(!date){alert("날짜를 입력해 주세요 주세요.");return}
 
   const changes=[];
   items.forEach((item,i)=>{
     const input=document.getElementById(`bulk-${i}`);
     const q=parseInt(input.value,10);
     if(!Number.isInteger(q)||q<0){
-      throw new Error(`${item[0]}의 재고를 0 이상의 숫자로 입력해줘.`);
+      throw new Error(`${item[0]}의 재고를 0 이상의 숫자로 입력해 주세요 주세요.`);
     }
     const previous=Number(item[1]||0);
     const diff=q-previous;
@@ -352,7 +353,7 @@ function saveInitialStock(){
   if(!confirm("입력한 수량을 초기 기준 재고로 설정할까? 기존 재고 변동 기록은 삭제되지 않아.")) return;
   items.forEach((x,i)=>{
     const q=parseInt(document.getElementById(`initial-${i}`).value,10);
-    if(!Number.isInteger(q)||q<0) throw new Error(`${x[0]}의 재고를 0 이상의 숫자로 입력해줘.`);
+    if(!Number.isInteger(q)||q<0) throw new Error(`${x[0]}의 재고를 0 이상의 숫자로 입력해 주세요 주세요.`);
     x[1]=q;
   });
   localStorage.setItem("submaterial_items",JSON.stringify(items));
@@ -395,7 +396,7 @@ function saveAdmin(){
 }
 
 function addItem(){
-  const name=prompt("추가할 품목명을 입력해줘.");
+  const name=prompt("추가할 품목명을 입력해 주세요 주세요.");
   if(!name||!name.trim())return;
   items.push([name.trim(),0,0,0,0]);
   localStorage.setItem("submaterial_items",JSON.stringify(items));
@@ -412,7 +413,7 @@ function changeAdminPassword(){
   const nw=document.getElementById("newpw").value;
   const nw2=document.getElementById("newpw2").value;
   if(old!==adminPassword){alert("현재 비밀번호가 맞지 않아.");return}
-  if(nw.length<4){alert("새 비밀번호는 4자리 이상으로 입력해줘.");return}
+  if(nw.length<4){alert("새 비밀번호는 4자리 이상으로 입력해 주세요 주세요.");return}
   if(nw!==nw2){alert("새 비밀번호가 서로 달라.");return}
   adminPassword=nw;
   localStorage.setItem("submaterial_admin_pw",adminPassword);
