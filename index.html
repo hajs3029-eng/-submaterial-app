@@ -298,7 +298,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.43"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.44"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1342,6 +1342,9 @@ function renderHistoryCalendar(){
   const title=document.getElementById("historyTitle");
   const desc=document.getElementById("historyDesc");
   const view=document.getElementById("historyCalendarView");
+  // 날짜 상세 화면에서 돌아올 때 달력 화면을 다시 표시합니다.
+  view.style.display="block";
+  document.getElementById("historyRecordView").style.display="none";
   title.textContent=`📋 ${historySelectedCategory} 재고 입력 기록`;
   desc.textContent="입력된 이력이 있는 날짜에 점이 표시됩니다. 날짜를 누르면 해당 날짜의 품목과 입력 재고를 확인할 수 있습니다.";
   const scoped=records.filter(r=>r.type==="재고확인" && r.date && (historySelectedCategory==="전체" || r.category===historySelectedCategory));
