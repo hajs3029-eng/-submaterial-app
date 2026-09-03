@@ -123,7 +123,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
       <div class="title">소모품 관리 시스템</div>
     </div>
   </div>
-  <div class="date"><span>기준일 : <span id="today"></span></span><div class="version">버전 <span id="appVersion">1.65</span></div></div>
+  <div class="date"><span>기준일 : <span id="today"></span></span><div class="version">버전 <span id="appVersion">1.66</span></div></div>
 </header>
 
 <main>
@@ -341,7 +341,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION="1.65"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.66"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -452,7 +452,8 @@ function ensureInitialSnapshot(){
   if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
 }
 
-let adminPassword=localStorage.getItem("submaterial_admin_pw")||"1234";
+let adminPassword="1233";
+let adminPasswordLoaded=false;
 
 function migrateSeedSnapshotV8(){
   const key="submaterial_seed_snapshot_v8";
@@ -1885,7 +1886,10 @@ function openAdminLogin(){
   openModal("login");
   document.getElementById("adminpw").value="";
 }
-function loginAdmin(){
+async function loginAdmin(){
+  if(!adminPasswordLoaded){
+    await loadAdminPasswordFromSupabase();
+  }
   if(document.getElementById("adminpw").value!==adminPassword){alert("비밀번호가 맞지 않습니다.");return}
   openModal("admin");
 }
@@ -2089,19 +2093,24 @@ function closeAdminItemDetail(){
   document.getElementById("adminItemDetailModal").style.display="none";
   openModal("admin");
 }
-function changeAdminPassword(){
+async function changeAdminPassword(){
   const old=document.getElementById("oldpw").value;
   const nw=document.getElementById("newpw").value;
   const nw2=document.getElementById("newpw2").value;
+  if(!adminPasswordLoaded) await loadAdminPasswordFromSupabase();
   if(old!==adminPassword){alert("현재 비밀번호가 맞지 않습니다.");return}
   if(nw.length<4){alert("새 비밀번호는 4자리 이상으로 입력해 주세요.");return}
   if(nw!==nw2){alert("새 비밀번호가 서로 다릅니다.");return}
+  if(!supabaseClient){alert("서버 연결이 없어 비밀번호를 변경할 수 없습니다.");return}
+  const {error}=await supabaseClient.from("app_settings").upsert({key:"admin_password",value:nw,updated_at:new Date().toISOString()},{onConflict:"key"});
+  if(error){console.error("관리자 비밀번호 서버 저장 실패:",error);alert("관리자 비밀번호 서버 저장에 실패했습니다.\n\n"+(error.message||error));return}
   adminPassword=nw;
-  localStorage.setItem("submaterial_admin_pw",adminPassword);
+  adminPasswordLoaded=true;
+  localStorage.removeItem("submaterial_admin_pw");
   document.getElementById("oldpw").value="";
   document.getElementById("newpw").value="";
   document.getElementById("newpw2").value="";
-  alert("관리자 비밀번호가 변경되었습니다.");
+  alert("관리자 비밀번호가 변경되었습니다.\n\n모든 기기에 동일하게 적용됩니다.");
 }
 function resetData(){
   if(!confirm("모든 재고 변동 기록을 삭제하고 현재 품목 구성을 초기화하시겠습니까?"))return;
@@ -2114,7 +2123,7 @@ function resetData(){
 }
 
 /* =========================
-   Supabase 연결 (v1.64)
+   Supabase 연결 (v1.66)
    브라우저에서는 Publishable key만 사용합니다.
    ========================= */
 const SUPABASE_URL="https://ovetqiqpbhizlmrovadq.supabase.co";
@@ -2387,7 +2396,7 @@ async function syncLocalStateToSupabase(){
 
 
 /* =========================
-   Supabase 활동 유지 (v1.64)
+   Supabase 활동 유지 (v1.66)
    앱을 열었을 때 가벼운 조회를 보내고, 앱이 열려 있는 동안
    24시간마다 한 번씩 같은 조회를 보냅니다. 재고 데이터는 변경하지 않습니다.
    실제로 아무도 앱을 열지 않는 기간에도 유지하려면 아래 GitHub Actions
@@ -2414,6 +2423,42 @@ function startSupabaseKeepAlive(){
   setInterval(supabaseKeepAlive, 24*60*60*1000);
 }
 
+async function loadAdminPasswordFromSupabase(){
+  if(!supabaseClient){
+    adminPasswordLoaded=false;
+    return false;
+  }
+  try{
+    const {data,error}=await supabaseClient
+      .from("app_settings")
+      .select("value")
+      .eq("key","admin_password")
+      .maybeSingle();
+    if(error) throw error;
+    if(data && typeof data.value==="string" && data.value.length>=4){
+      adminPassword=data.value;
+      adminPasswordLoaded=true;
+      localStorage.removeItem("submaterial_admin_pw");
+      return true;
+    }
+    // 서버에 아직 관리자 비밀번호가 없으면 최초 기준값 1233을 서버에 등록합니다.
+    const {error:upsertError}=await supabaseClient.from("app_settings").upsert({
+      key:"admin_password",
+      value:"1233",
+      updated_at:new Date().toISOString()
+    },{onConflict:"key"});
+    if(upsertError) throw upsertError;
+    adminPassword="1233";
+    adminPasswordLoaded=true;
+    localStorage.removeItem("submaterial_admin_pw");
+    return true;
+  }catch(err){
+    console.error("관리자 비밀번호 서버 조회 실패:",err);
+    adminPasswordLoaded=false;
+    return false;
+  }
+}
+
 async function initSupabase(){
   if(!supabaseClient){
     render();
@@ -2423,6 +2468,7 @@ async function initSupabase(){
   try{
     const state=await fetchSupabaseState();
     applySupabaseState(state);
+    await loadAdminPasswordFromSupabase();
     supabaseReady=true;
     render();
     updateBottomNav();
