@@ -1452,6 +1452,15 @@ function performSaveBulkStock(blankConfirmed){
   localStorage.setItem("submaterial_items",JSON.stringify(items));
   localStorage.setItem("submaterial_records",JSON.stringify(records));
 
+  // 저장 버튼을 누른 직후 새 기록을 Supabase에 직접 저장합니다.
+  // 기존 v1.61의 전체 덮어쓰기 방식은 다중 사용자 환경에서 충돌할 수 있어 사용하지 않습니다.
+  if(supabaseClient && supabaseReady){
+    syncNewLocalRecordsToSupabase().catch(err=>{
+      console.error("Supabase 재고 저장 실패:",err);
+      alert("재고는 화면에 저장되었지만 서버 저장에 실패했습니다.\n\n"+(err?.message||err));
+    });
+  }
+
   const savedHistoricalDate=stockInputDate || date;
   const returnToHistorical=historical;
 
@@ -2144,7 +2153,7 @@ async function fetchSupabaseState(){
     supabaseClient.from("departments").select("id,name,sort_order").order("sort_order"),
     supabaseClient.from("items").select("id,name,unit").order("id"),
     supabaseClient.from("department_items").select("id,department_id,item_id,sort_order,is_active").order("department_id").order("sort_order"),
-    supabaseClient.from("inventory_records").select("id,record_date,department_id,item_id,record_type,stock,previous_stock,diff,quantity,no_stock,is_manual,created_at").order("id")
+    supabaseClient.from("inventory_records").select("id,record_date,department_id,item_id,record_type,stock,previous_stock,diff,quantity,no_stock,is_manual,is_baseline,created_at").order("id")
   ]);
   for(const r of [dRes,iRes,diRes,rRes]) if(r.error) throw r.error;
   return {departments:dRes.data||[], dbItems:iRes.data||[], mappings:diRes.data||[], dbRecords:rRes.data||[]};
@@ -2277,6 +2286,78 @@ async function replaceSupabaseRecords(){
   }
 }
 
+async function syncNewLocalRecordsToSupabase(){
+  if(!supabaseClient||!supabaseReady) return;
+
+  const pending=records.filter(r=>!r.id && r.date && r.name && r.category && r.type);
+  if(!pending.length) return;
+
+  const {data:departments,error:dErr}=await supabaseClient.from("departments").select("id,name");
+  if(dErr) throw dErr;
+  const deptByName={};
+  (departments||[]).forEach(d=>deptByName[d.name]=d.id);
+
+  const {data:dbItems,error:iErr}=await supabaseClient.from("items").select("id,name");
+  if(iErr) throw iErr;
+  const itemByName={};
+  (dbItems||[]).forEach(it=>itemByName[it.name]=it.id);
+
+  // 이번 저장에서 새로 생긴 재고확인 기록을 기준으로 같은 날짜의
+  // 해당 품목 서버 기록을 먼저 제거합니다. 따라서 같은 날짜를 수정해도
+  // 서버에 이전 값이 중복으로 남지 않습니다.
+  const inventoryKeys=[];
+  pending.filter(r=>r.type==="재고확인").forEach(r=>{
+    const department_id=deptByName[r.category];
+    const item_id=itemByName[r.name];
+    if(department_id&&item_id) inventoryKeys.push({date:r.date,department_id,item_id});
+  });
+
+  for(const k of inventoryKeys){
+    const {error:delErr}=await supabaseClient
+      .from("inventory_records")
+      .delete()
+      .eq("record_date",k.date)
+      .eq("department_id",k.department_id)
+      .eq("item_id",k.item_id)
+      .eq("is_baseline",false);
+    if(delErr) throw delErr;
+  }
+
+  const rows=pending.map(r=>({
+    record_date:r.date,
+    department_id:deptByName[r.category],
+    item_id:itemByName[r.name],
+    record_type:r.type,
+    stock:Number(r.stock||0),
+    previous_stock:Number(r.previous||0),
+    diff:Number(r.diff||0),
+    quantity:r.qty==null?null:Number(r.qty),
+    no_stock:!!r.noStock,
+    is_manual:!!r.manual,
+    is_baseline:!!r.seedSnapshot
+  })).filter(r=>r.department_id&&r.item_id);
+
+  if(!rows.length) return;
+
+  const {data:inserted,error:insErr}=await supabaseClient
+    .from("inventory_records")
+    .insert(rows)
+    .select("id,record_date,department_id,item_id,record_type,stock,previous_stock,diff,quantity,no_stock,is_manual,is_baseline");
+  if(insErr) throw insErr;
+
+  // 반환된 DB id를 로컬 기록에 붙여 중복 업로드를 방지합니다.
+  const insertedRows=inserted||[];
+  let j=0;
+  records.forEach(r=>{
+    if(!r.id && r.date && r.name && r.category && r.type){
+      const db=insertedRows[j++];
+      if(db) r.id=db.id;
+    }
+  });
+  localStorage.setItem("submaterial_records",JSON.stringify(records));
+  console.log("Supabase 신규 재고 기록 저장 완료",insertedRows.length);
+}
+
 async function syncLocalStateToSupabase(){
   if(!supabaseClient||!supabaseReady||supabaseHydrating) return;
   try{
@@ -2299,7 +2380,6 @@ async function initSupabase(){
     const state=await fetchSupabaseState();
     applySupabaseState(state);
     supabaseReady=true;
-    installSupabaseStorageSync();
     render();
     updateBottomNav();
     console.log("Supabase 연결 완료",SUPABASE_URL);
