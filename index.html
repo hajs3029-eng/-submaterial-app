@@ -123,7 +123,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
       <div class="title">소모품 관리 시스템</div>
     </div>
   </div>
-  <div class="date"><span>기준일 : <span id="today"></span></span><div class="version">버전 <span id="appVersion">1.64</span></div></div>
+  <div class="date"><span>기준일 : <span id="today"></span></span><div class="version">버전 <span id="appVersion">1.65</span></div></div>
 </header>
 
 <main>
@@ -341,7 +341,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION="1.64"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.65"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -2124,6 +2124,7 @@ const supabaseClient=(window.supabase&&window.supabase.createClient)
   : null;
 let supabaseHydrating=false;
 let supabaseSyncTimer=null;
+let supabaseSyncInFlight=null;
 let supabaseReady=false;
 
 function supabaseLocalSet(key,value){
@@ -2291,8 +2292,13 @@ async function replaceSupabaseRecords(){
 async function syncNewLocalRecordsToSupabase(){
   if(!supabaseClient||!supabaseReady) return;
 
-  const pending=records.filter(r=>!r.id && r.date && r.name && r.category && r.type);
-  if(!pending.length) return;
+  // 저장 버튼의 직접 동기화와 localStorage 변경 감지 동기화가
+  // 동시에 실행되면서 같은 기록을 두 번 넣지 않도록 단일 실행 잠금을 둡니다.
+  if(supabaseSyncInFlight) return supabaseSyncInFlight;
+
+  supabaseSyncInFlight=(async()=>{
+    const pending=records.filter(r=>!r.id && r.date && r.name && r.category && r.type);
+    if(!pending.length) return;
 
   const {data:departments,error:dErr}=await supabaseClient.from("departments").select("id,name");
   if(dErr) throw dErr;
@@ -2358,6 +2364,13 @@ async function syncNewLocalRecordsToSupabase(){
   });
   localStorage.setItem("submaterial_records",JSON.stringify(records));
   console.log("Supabase 신규 재고 기록 저장 완료",insertedRows.length);
+  })();
+
+  try{
+    return await supabaseSyncInFlight;
+  }finally{
+    supabaseSyncInFlight=null;
+  }
 }
 
 async function syncLocalStateToSupabase(){
