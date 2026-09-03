@@ -1134,21 +1134,29 @@ function saveBulkStock(){
   }
 
   document.getElementById("stock").style.display="none";
-  render();
-  renderCalendar();
-  renderAdminStockCalendar();
 
   if(returnToHistorical){
-    // 선택한 날짜를 유지한 채 부서 선택 화면으로 복귀합니다.
+    // ★ 관리자 과거 재고 수정은 저장 직후 반드시 "부서 선택"으로 돌아갑니다.
+    // 선택했던 부서를 초기화하여 현재고 화면으로 빠지지 않도록 합니다.
     stockInputMode="historical";
     stockInputDate=savedHistoricalDate;
-    selectedCategory="";
+    selectedCategory=null;
     document.getElementById("sdate").value=savedHistoricalDate;
-    openModal("adminHistoricalDepartment");
+
+    render();
+    renderCalendar();
+    renderAdminStockCalendar();
+
+    // 다른 화면이 남아 있더라도 부서 선택 화면을 확실하게 최상단에 표시합니다.
+    document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
+    document.getElementById("adminHistoricalDepartment").style.display="flex";
     renderHistoricalDepartmentSelector();
   }else{
     stockInputMode="normal";
     stockInputDate="";
+    render();
+    renderCalendar();
+    renderAdminStockCalendar();
   }
 }
 
