@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="소모품 관리">
+<meta name="application-name" content="소모품 관리">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#1769e0">
 <title>소모품 관리 시스템</title>
@@ -402,7 +407,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION="1.76"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.77"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
