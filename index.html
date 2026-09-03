@@ -1166,7 +1166,7 @@ function renderBulkStockInputs(){
     desc.innerHTML="선택한 날짜에 실제로 확인한 <b>현재 재고</b>를 품목별로 입력해 주세요.<br>해당 날짜 이전의 재고와 비교하여 <b>사용</b> 또는 <b>입고</b>로 기록됩니다.";
   }else{
     title.textContent=selectedCategory ? `📦 ${selectedCategory} 재고 입력` : "📦 전체 재고 입력";
-    desc.innerHTML=selectedCategory ? `${selectedCategory}에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br>입력한 품목만 새 기록으로 저장됩니다.<br>빈 칸은 기존 재고와 입력일을 유지하고, 숫자 0은 오늘 입력을 취소하여 이전 최신 재고로 돌아갑니다.` : "오늘 창고에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br><b>입력한 품목만 저장</b>됩니다.<br>빈 칸은 기존 재고와 입력일을 그대로 유지하고, 숫자 0은 오늘 입력을 취소합니다.<br>이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동 기록됩니다.";
+    desc.innerHTML=selectedCategory ? `${selectedCategory}에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br>입력한 품목만 새 기록으로 저장됩니다.<br>빈 칸은 해당 날짜에 입력된 기록이 있으면 그 날짜 입력을 취소하고 직전 재고로 돌아갑니다. 입력 기록이 없으면 저장하지 않습니다.` : "오늘 창고에서 확인한 <b>현재 재고</b>를 입력해 주세요.<br><b>입력한 품목만 저장</b>됩니다.<br>빈 칸은 해당 날짜에 입력된 기록이 있으면 그 날짜 입력을 취소하고 직전 재고로 돌아갑니다. 입력 기록이 없으면 저장하지 않습니다.<br>이전 재고보다 줄면 <b>사용</b>, 늘면 <b>입고</b>로 자동 기록됩니다.";
   }
 }
 
@@ -1234,10 +1234,21 @@ function saveBulkStock(){
     const noStock=!!(noStockBtn && noStockBtn.classList.contains("active"));
     const raw=String(input.value??"").trim();
 
-    // ★ 빈 칸 = 이번에는 입력하지 않음 → 기존 최신 재고/날짜 유지
-    if(raw==="" && !noStock) return;
-
     const category=item[5]||"P/S";
+
+    // ★ 빈 칸 처리
+    // - 해당 날짜에 아직 입력 기록이 없으면: 아무 작업도 하지 않습니다.
+    // - 해당 날짜에 이미 입력 기록이 있으면: 그 날짜의 입력을 취소(삭제)합니다.
+    //   따라서 현재 재고/최신 입력일은 자동으로 직전 기록으로 돌아갑니다.
+    // 예: 9/2 = 44 → 9/3 = 47 입력 → 9/3을 공란으로 저장
+    //     = 9/3 기록 삭제 → 현재 재고 44, 최신 입력일 9/2
+    if(raw==="" && !noStock){
+      const removed=removeSameDayInventoryInput(item[0],category,date);
+      if(!historical && removed){
+        item[1]=getPreviousStockBefore(item[0],category,date);
+      }
+      return;
+    }
 
     // ★ 숫자 0 = 오늘 입력 취소
     // 예: 8/27 재고 25 → 9/2에 100 입력 → 다시 0 입력
