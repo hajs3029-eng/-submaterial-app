@@ -339,8 +339,9 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <div id="adminAnnualUsageReport"></div>
 </div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION="1.60"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.61"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -2103,7 +2104,213 @@ function resetData(){
   render();renderAdmin();alert("전체 초기화 완료!");
 }
 
-render();
-updateBottomNav();
+/* =========================
+   Supabase 연결 (v1.61)
+   브라우저에서는 Publishable key만 사용합니다.
+   ========================= */
+const SUPABASE_URL="https://ovetqiqpbhizlmrovadq.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_T8DgwptX4eTcBYKTLYvWLg_LTyqS_vR";
+const supabaseClient=(window.supabase&&window.supabase.createClient)
+  ? window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY)
+  : null;
+let supabaseHydrating=false;
+let supabaseSyncTimer=null;
+let supabaseReady=false;
+
+function supabaseLocalSet(key,value){
+  supabaseHydrating=true;
+  try{ localStorage.setItem(key,value); } finally { supabaseHydrating=false; }
+}
+
+function supabaseScheduleSync(){
+  if(supabaseHydrating || !supabaseReady) return;
+  clearTimeout(supabaseSyncTimer);
+  supabaseSyncTimer=setTimeout(()=>syncLocalStateToSupabase(),350);
+}
+
+function installSupabaseStorageSync(){
+  const originalSetItem=localStorage.setItem.bind(localStorage);
+  localStorage.setItem=function(key,value){
+    originalSetItem(key,value);
+    if((key==="submaterial_items" || key==="submaterial_records") && !supabaseHydrating){
+      supabaseScheduleSync();
+    }
+  };
+}
+
+async function fetchSupabaseState(){
+  if(!supabaseClient) throw new Error("Supabase 라이브러리를 불러오지 못했습니다.");
+  const [dRes,iRes,diRes,rRes]=await Promise.all([
+    supabaseClient.from("departments").select("id,name,sort_order").order("sort_order"),
+    supabaseClient.from("items").select("id,name,unit").order("id"),
+    supabaseClient.from("department_items").select("id,department_id,item_id,sort_order,is_active").order("department_id").order("sort_order"),
+    supabaseClient.from("inventory_records").select("id,record_date,department_id,item_id,record_type,stock,previous_stock,diff,quantity,no_stock,is_manual,created_at").order("id")
+  ]);
+  for(const r of [dRes,iRes,diRes,rRes]) if(r.error) throw r.error;
+  return {departments:dRes.data||[], dbItems:iRes.data||[], mappings:diRes.data||[], dbRecords:rRes.data||[]};
+}
+
+function applySupabaseState(state){
+  const deptById={};
+  state.departments.forEach(d=>deptById[d.id]=d.name);
+  const itemById={};
+  state.dbItems.forEach(it=>itemById[it.id]=it);
+
+  const nextItems=[];
+  const mappingRows=state.mappings.filter(m=>m.is_active!==false).slice().sort((a,b)=>{
+    if(a.department_id!==b.department_id) return Number(a.department_id)-Number(b.department_id);
+    return Number(a.sort_order||0)-Number(b.sort_order||0);
+  });
+
+  mappingRows.forEach(m=>{
+    const dbItem=itemById[m.item_id], category=deptById[m.department_id];
+    if(!dbItem||!category) return;
+    nextItems.push([dbItem.name,0,0,0,0,category,dbItem.unit||"박스",{}]);
+  });
+
+  const nextRecords=state.dbRecords.map(r=>({
+    id:r.id,
+    date:String(r.record_date),
+    time:String(r.id).padStart(20,"0"),
+    name:itemById[r.item_id]?.name||"",
+    category:deptById[r.department_id]||"",
+    type:r.record_type,
+    stock:Number(r.stock||0),
+    previous:Number(r.previous_stock||0),
+    diff:Number(r.diff||0),
+    qty:r.quantity==null?undefined:Number(r.quantity),
+    noStock:!!r.no_stock,
+    manual:!!r.is_manual,
+    seedSnapshot:!!r.is_baseline,
+    inputSource:"supabase"
+  })).filter(r=>r.name&&r.category);
+
+  // 날짜별 마지막 재고확인값을 품목 배열의 호환용 snapshots에도 반영합니다.
+  const latest={};
+  nextRecords.filter(r=>r.type==="재고확인").forEach(r=>{
+    const k=`${r.category}||${r.name}||${r.date}`;
+    if(!latest[k] || String(r.time).localeCompare(String(latest[k].time))>0) latest[k]=r;
+  });
+  nextItems.forEach(it=>{
+    const cat=it[5], name=it[0];
+    Object.keys(latest).forEach(k=>{
+      const [c,n,d]=k.split("||");
+      if(c===cat&&n===name) it[7][d]=Number(latest[k].stock||0);
+    });
+    const current=nextRecords.filter(r=>r.type==="재고확인"&&r.category===cat&&r.name===name).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).pop();
+    it[1]=current?Number(current.stock||0):0;
+  });
+
+  items=nextItems;
+  records=nextRecords;
+  supabaseLocalSet("submaterial_items",JSON.stringify(items));
+  supabaseLocalSet("submaterial_records",JSON.stringify(records));
+  supabaseLocalSet("submaterial_data_version",DATA_VERSION);
+}
+
+async function replaceSupabaseItems(){
+  const {data:departments,error:dErr}=await supabaseClient.from("departments").select("id,name");
+  if(dErr) throw dErr;
+  const deptByName={};
+  (departments||[]).forEach(d=>deptByName[d.name]=d.id);
+
+  const unique={};
+  items.forEach(x=>{
+    const name=x[0];
+    if(!unique[name]) unique[name]={name,unit:x[6]||"박스"};
+  });
+  const {error:uErr}=await supabaseClient.from("items").upsert(Object.values(unique),{onConflict:"name"});
+  if(uErr) throw uErr;
+
+  const {data:dbItems,error:iErr}=await supabaseClient.from("items").select("id,name,unit");
+  if(iErr) throw iErr;
+  const itemByName={};
+  (dbItems||[]).forEach(it=>itemByName[it.name]=it.id);
+
+  const {error:delErr}=await supabaseClient.from("department_items").delete().gte("id",0);
+  if(delErr) throw delErr;
+
+  const rows=[];
+  const deptOrder={};
+  items.forEach(x=>{
+    const category=x[5]||"P/S";
+    if(deptByName[category]==null||itemByName[x[0]]==null) return;
+    const order=deptOrder[category]||0;
+    rows.push({department_id:deptByName[category],item_id:itemByName[x[0]],sort_order:order,is_active:true});
+    deptOrder[category]=order+1;
+  });
+  if(rows.length){
+    const {error:mErr}=await supabaseClient.from("department_items").insert(rows);
+    if(mErr) throw mErr;
+  }
+}
+
+async function replaceSupabaseRecords(){
+  const {data:departments,error:dErr}=await supabaseClient.from("departments").select("id,name");
+  if(dErr) throw dErr;
+  const deptByName={};
+  (departments||[]).forEach(d=>deptByName[d.name]=d.id);
+  const {data:dbItems,error:iErr}=await supabaseClient.from("items").select("id,name");
+  if(iErr) throw iErr;
+  const itemByName={};
+  (dbItems||[]).forEach(it=>itemByName[it.name]=it.id);
+
+  const rows=records.map(r=>({
+    record_date:r.date,
+    department_id:deptByName[r.category||"P/S"],
+    item_id:itemByName[r.name],
+    record_type:r.type,
+    stock:Number(r.stock||0),
+    previous_stock:Number(r.previous||0),
+    diff:Number(r.diff||0),
+    quantity:r.qty==null?null:Number(r.qty),
+    no_stock:!!r.noStock,
+    is_manual:!!r.manual,
+    is_baseline:!!r.seedSnapshot
+  })).filter(r=>r.department_id&&r.item_id&&r.record_date&&r.record_type);
+
+  const {error:delErr}=await supabaseClient.from("inventory_records").delete().gte("id",0);
+  if(delErr) throw delErr;
+  if(rows.length){
+    const {error:insErr}=await supabaseClient.from("inventory_records").insert(rows);
+    if(insErr) throw insErr;
+  }
+}
+
+async function syncLocalStateToSupabase(){
+  if(!supabaseClient||!supabaseReady||supabaseHydrating) return;
+  try{
+    await replaceSupabaseItems();
+    await replaceSupabaseRecords();
+    console.log("Supabase 동기화 완료");
+  }catch(err){
+    console.error("Supabase 동기화 실패:",err);
+    console.warn("RLS 정책 또는 Data API 권한을 확인해 주세요.");
+  }
+}
+
+async function initSupabase(){
+  if(!supabaseClient){
+    render();
+    updateBottomNav();
+    return;
+  }
+  try{
+    const state=await fetchSupabaseState();
+    applySupabaseState(state);
+    supabaseReady=true;
+    installSupabaseStorageSync();
+    render();
+    updateBottomNav();
+    console.log("Supabase 연결 완료",SUPABASE_URL);
+  }catch(err){
+    console.error("Supabase 초기 연결 실패:",err);
+    render();
+    updateBottomNav();
+    setTimeout(()=>alert("Supabase 연결에 실패했습니다.\n\nRLS 정책 또는 Data API 권한을 확인해야 합니다.\n\n앱은 기존 저장 데이터로 계속 실행됩니다."),300);
+  }
+}
+
+initSupabase();
 </script>
 </body></html>
