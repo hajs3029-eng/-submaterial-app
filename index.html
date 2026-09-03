@@ -123,7 +123,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
       <div class="title">소모품 관리 시스템</div>
     </div>
   </div>
-  <div class="date"><span>기준일 : <span id="today"></span></span><div class="version">버전 <span id="appVersion">1.62</span></div></div>
+  <div class="date"><span>기준일 : <span id="today"></span></span><div class="version">버전 <span id="appVersion">1.64</span></div></div>
 </header>
 
 <main>
@@ -341,7 +341,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION="1.62"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.64"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -2114,7 +2114,7 @@ function resetData(){
 }
 
 /* =========================
-   Supabase 연결 (v1.61)
+   Supabase 연결 (v1.64)
    브라우저에서는 Publishable key만 사용합니다.
    ========================= */
 const SUPABASE_URL="https://ovetqiqpbhizlmrovadq.supabase.co";
@@ -2134,7 +2134,7 @@ function supabaseLocalSet(key,value){
 function supabaseScheduleSync(){
   if(supabaseHydrating || !supabaseReady) return;
   clearTimeout(supabaseSyncTimer);
-  supabaseSyncTimer=setTimeout(()=>syncLocalStateToSupabase(),350);
+  supabaseSyncTimer=setTimeout(()=>syncNewLocalRecordsToSupabase(),350);
 }
 
 function installSupabaseStorageSync(){
@@ -2146,6 +2146,8 @@ function installSupabaseStorageSync(){
     }
   };
 }
+
+installSupabaseStorageSync();
 
 async function fetchSupabaseState(){
   if(!supabaseClient) throw new Error("Supabase 라이브러리를 불러오지 못했습니다.");
@@ -2370,6 +2372,35 @@ async function syncLocalStateToSupabase(){
   }
 }
 
+
+/* =========================
+   Supabase 활동 유지 (v1.64)
+   앱을 열었을 때 가벼운 조회를 보내고, 앱이 열려 있는 동안
+   24시간마다 한 번씩 같은 조회를 보냅니다. 재고 데이터는 변경하지 않습니다.
+   실제로 아무도 앱을 열지 않는 기간에도 유지하려면 아래 GitHub Actions
+   워크플로 파일을 저장소에 함께 추가합니다.
+   ========================= */
+async function supabaseKeepAlive(){
+  if(!supabaseClient) return false;
+  try{
+    const {error}=await supabaseClient
+      .from("departments")
+      .select("id", {head:true, count:"exact"});
+    if(error) throw error;
+    localStorage.setItem("supabase_last_keepalive", new Date().toISOString());
+    console.log("Supabase keep-alive 완료");
+    return true;
+  }catch(err){
+    console.warn("Supabase keep-alive 실패:",err);
+    return false;
+  }
+}
+
+function startSupabaseKeepAlive(){
+  supabaseKeepAlive();
+  setInterval(supabaseKeepAlive, 24*60*60*1000);
+}
+
 async function initSupabase(){
   if(!supabaseClient){
     render();
@@ -2391,6 +2422,7 @@ async function initSupabase(){
   }
 }
 
+startSupabaseKeepAlive();
 initSupabase();
 </script>
 </body></html>
