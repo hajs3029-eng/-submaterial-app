@@ -187,6 +187,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <h3 id="historyTitle">📋 재고 입력 기록</h3>
   <p id="historyDesc" class="muted">확인할 부서를 선택해 주세요. 선택하면 해당 부서에서 입력한 재고 기록을 표로 확인할 수 있습니다.</p>
   <div id="historyDepartmentList" class="admin-dept-grid"></div>
+  <div id="historyCalendarView" style="display:none"></div>
   <div id="historyRecordView" style="display:none"></div>
 </div></div>
 
@@ -297,7 +298,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.42"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.43"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1303,66 +1304,101 @@ function saveBulkStock(){
   }
 }
 
+let historyCalendarDate=new Date();
+let historySelectedCategory="";
+
 function showHistoryDepartmentSelector(){
   const title=document.getElementById("historyTitle");
   const desc=document.getElementById("historyDesc");
   const list=document.getElementById("historyDepartmentList");
+  const calView=document.getElementById("historyCalendarView");
   const view=document.getElementById("historyRecordView");
   title.textContent="📋 재고 입력 기록";
-  desc.textContent="확인할 부서를 선택해 주세요. 선택하면 해당 부서에서 입력한 재고 기록을 표로 확인할 수 있습니다.";
-  view.style.display="none";
+  desc.textContent="확인할 부서를 선택해 주세요. 선택하면 해당 부서에서 입력된 날짜만 달력에 표시됩니다.";
   list.style.display="grid";
+  calView.style.display="none";
+  view.style.display="none";
 
   const allCount=records.filter(r=>r.type==="재고확인" && r.date).length;
-  const buttons=[`<button class="admin-dept-btn" onclick="showHistoryRecords('전체')">전체<br><span style="font-size:12px;font-weight:500;opacity:.9">${allCount}건</span></button>`];
+  const buttons=[`<button class="admin-dept-btn" onclick="openHistoryCalendar('전체')">전체<br><span style="font-size:12px;font-weight:500;opacity:.9">${allCount}건</span></button>`];
   CATEGORIES.forEach(c=>{
     const count=records.filter(r=>r.type==="재고확인" && r.date && r.category===c).length;
-    buttons.push(`<button class="admin-dept-btn" onclick="showHistoryRecords('${c}')">${esc(c)}<br><span style="font-size:12px;font-weight:500;opacity:.9">${count}건</span></button>`);
+    buttons.push(`<button class="admin-dept-btn" onclick="openHistoryCalendar('${c}')">${esc(c)}<br><span style="font-size:12px;font-weight:500;opacity:.9">${count}건</span></button>`);
   });
   list.innerHTML=buttons.join("");
 }
 
-function showHistoryRecords(category){
+function openHistoryCalendar(category){
+  historySelectedCategory=category;
+  historyCalendarDate=new Date();
+  document.getElementById("historyDepartmentList").style.display="none";
+  document.getElementById("historyRecordView").style.display="none";
+  document.getElementById("historyCalendarView").style.display="block";
+  renderHistoryCalendar();
+}
+
+function renderHistoryCalendar(){
+  const y=historyCalendarDate.getFullYear(),m=historyCalendarDate.getMonth();
   const title=document.getElementById("historyTitle");
   const desc=document.getElementById("historyDesc");
-  const list=document.getElementById("historyDepartmentList");
-  const view=document.getElementById("historyRecordView");
-  const scoped=records
-    .filter(r=>r.type==="재고확인" && r.date && (category==="전체" || r.category===category))
-    .slice()
-    .sort((a,b)=>{
-      const ad=a.date+String(a.time||"").padStart(20,"0");
-      const bd=b.date+String(b.time||"").padStart(20,"0");
-      return bd.localeCompare(ad);
-    });
-
-  title.textContent=`📋 ${category} 재고 입력 기록`;
-  desc.textContent="실제로 입력된 재고확인 기록입니다. 날짜별로 어떤 품목을 몇 개로 입력했는지 확인할 수 있습니다.";
-  list.style.display="none";
-  view.style.display="block";
-
-  const rows=scoped.map(r=>{
-    const unit=getUnit(r.name,r.category);
-    const diff=Number(r.diff||0);
-    const change=diff>0?`+${diff.toLocaleString()}`:diff<0?`${diff.toLocaleString()}`:"-";
-    const changeClass=diff>0?"history-in":diff<0?"history-out":"history-same";
-    return `<tr>
-      <td>${esc(r.date)}</td>
-      <td>${esc(r.category||"P/S")}</td>
-      <td class="history-item">${esc(r.name)}</td>
-      <td><b>${Number(r.stock??0).toLocaleString()}</b> ${esc(unit)}</td>
-      <td class="${changeClass}">${change}</td>
-    </tr>`;
-  }).join("");
-
-  view.innerHTML=`
+  const view=document.getElementById("historyCalendarView");
+  title.textContent=`📋 ${historySelectedCategory} 재고 입력 기록`;
+  desc.textContent="입력된 이력이 있는 날짜에 점이 표시됩니다. 날짜를 누르면 해당 날짜의 품목과 입력 재고를 확인할 수 있습니다.";
+  const scoped=records.filter(r=>r.type==="재고확인" && r.date && (historySelectedCategory==="전체" || r.category===historySelectedCategory));
+  let html=`
     <button class="history-back-btn" onclick="showHistoryDepartmentSelector()">‹ 부서 선택으로 돌아가기</button>
-    <div class="history-table-wrap">
-      <table class="history-table">
-        <thead><tr><th>날짜</th><th>부서</th><th>품목명</th><th>입력 재고</th><th>변동</th></tr></thead>
-        <tbody>${rows || `<tr><td colspan="5" class="history-empty">입력된 재고 기록이 없습니다.</td></tr>`}</tbody>
-      </table>
+    <div class="calendar-head">
+      <button onclick="changeHistoryCalendarMonth(-1)">‹</button>
+      <div class="calendar-title">${y}년 ${m+1}월</div>
+      <button onclick="changeHistoryCalendarMonth(1)">›</button>
+    </div>
+    <div class="calendar-week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+    <div class="calendar-grid" id="historyCalendarGrid"></div>
+    <div class="muted" style="margin-top:10px;font-size:13px">● 입력 이력이 있는 날짜</div>`;
+  view.innerHTML=html;
+  const grid=view.querySelector("#historyCalendarGrid");
+  const first=new Date(y,m,1).getDay();
+  const last=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++) grid.insertAdjacentHTML("beforeend",`<div class="calendar-cell empty"></div>`);
+  for(let day=1;day<=last;day++){
+    const key=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const dayRecords=scoped.filter(r=>r.date===key);
+    const cell=document.createElement("div");
+    cell.className="calendar-cell"+(dayRecords.length?" has-record":"");
+    cell.innerHTML=`<div class="calendar-num">${day}</div>${dayRecords.length?'<div class="calendar-dot"></div>':''}`;
+    if(dayRecords.length) cell.onclick=()=>showHistoryDateDetail(key,dayRecords);
+    grid.appendChild(cell);
+  }
+}
+
+function changeHistoryCalendarMonth(delta){
+  historyCalendarDate.setMonth(historyCalendarDate.getMonth()+delta);
+  renderHistoryCalendar();
+  document.getElementById("historyRecordView").style.display="none";
+}
+
+function showHistoryDateDetail(date, rows){
+  const calView=document.getElementById("historyCalendarView");
+  const view=document.getElementById("historyRecordView");
+  const sorted=rows.slice().sort((a,b)=>String(a.time||"").localeCompare(String(b.time||"")));
+  const htmlRows=sorted.map(r=>{
+    const unit=getUnit(r.name,r.category);
+    const stock=Number(r.stock??0).toLocaleString();
+    const diff=Number(r.diff||0);
+    const change=diff>0?`+${diff.toLocaleString()} ${unit}`:diff<0?`-${Math.abs(diff).toLocaleString()} ${unit}`:"변동 없음";
+    const changeClass=diff>0?"history-in":diff<0?"history-out":"history-same";
+    return `<div class="record-row">
+      <b>${esc(r.name)}</b> <span class="item-unit">${esc(unit)}</span>
+      <div style="margin-top:5px"><b>입력 재고: ${stock} ${esc(unit)}</b></div>
+      <div class="record-meta ${changeClass}">변동: ${esc(change)}</div>
     </div>`;
+  }).join("");
+  calView.style.display="none";
+  view.style.display="block";
+  view.innerHTML=`
+    <button class="history-back-btn" onclick="renderHistoryCalendar()">‹ 날짜 선택으로 돌아가기</button>
+    <div class="calendar-detail-title">${esc(date)} 입력 기록</div>
+    ${htmlRows || '<div class="history-empty">입력된 재고 기록이 없습니다.</div>'}`;
 }
 
 function renderCalendar(){
