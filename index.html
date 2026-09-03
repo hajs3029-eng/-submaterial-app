@@ -310,7 +310,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script>
-const APP_VERSION="1.45"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.46"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 const CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1126,7 +1126,20 @@ function renderBulkStockInputs(){
   const inputItems = selectedCategory ? items.filter(x=>(x[5]||"P/S")===selectedCategory) : items;
 
   document.getElementById("bulkStockList").innerHTML=inputItems.map((x,i)=>{
-    const previous = historical ? getPreviousStockBefore(x[0], x[5]||"P/S", date) : getLastKnownStock(x[0], x[5]||"P/S");
+    const category=x[5]||"P/S";
+    const previous = historical ? getPreviousStockBefore(x[0], category, date) : getLastKnownStock(x[0], category);
+
+    // ★ 해당 날짜에 이미 저장된 재고확인 이력이 있으면 그 값을 그대로 불러옵니다.
+    // 이력이 없을 때만 공란으로 표시합니다.
+    const sameDayRecords=records
+      .filter(r=>r.type==="재고확인" && r.name===x[0] && (r.category||"P/S")===category && r.date===date)
+      .slice()
+      .sort((a,b)=>String(a.time||"").localeCompare(String(b.time||"")));
+    const existing=sameDayRecords.length ? sameDayRecords[sameDayRecords.length-1] : null;
+    const existingNoStock=!!(existing && existing.noStock);
+    const existingValue=existing ? Number(existing.stock??0) : "";
+    const inputValue=existing && !existingNoStock ? String(existingValue) : "";
+
     return `
       <div class="bulk-row">
         <div class="bulk-name">
@@ -1135,8 +1148,8 @@ function renderBulkStockInputs(){
         </div>
         <div class="bulk-input-wrap">
           <input id="bulk-${i}" data-item-index="${items.indexOf(x)}" class="bulk-input" type="number" min="0" step="1"
-            inputmode="numeric" placeholder="" value="">
-          <button type="button" class="no-stock-btn" id="nostock-${i}" onclick="toggleNoStock(${i})">재고없음 X</button>
+            inputmode="numeric" placeholder="" value="${inputValue}" ${existingNoStock?"disabled":""}>
+          <button type="button" class="no-stock-btn${existingNoStock?" active":""}" id="nostock-${i}" onclick="toggleNoStock(${i})">재고없음 X</button>
         </div>
       </div>
     `;
