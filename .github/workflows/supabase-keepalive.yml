@@ -1,0 +1,22 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # 매일 한국시간 오전 9시 17분 (UTC 00:17)
+    - cron: '17 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Data API
+        env:
+          SUPABASE_URL: https://ovetqiqpbhizlmrovadq.supabase.co
+          SUPABASE_PUBLISHABLE_KEY: sb_publishable_T8DgwptX4eTcBYKTLYvWLg_LTyqS_vR
+        run: |
+          curl --fail-with-body --silent --show-error --retry 3 --max-time 20 \
+            --request GET \
+            --url "${SUPABASE_URL}/rest/v1/departments?select=id&limit=1" \
+            --header "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}"
