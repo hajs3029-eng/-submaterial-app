@@ -61,6 +61,8 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 .admin-date-picker-grid button{border:1px solid #dfe5ec;background:#fff;border-radius:11px;min-height:46px;font-size:15px;font-weight:700;color:#18212f}
 .admin-date-picker-grid button.selected{border-color:#1769e0;background:#f3f7ff;color:#1769e0;font-weight:900}
 .month-picker-grid{grid-template-columns:repeat(3,1fr)}
+.date-picker-tabs{display:flex;gap:8px;margin:10px 0 12px;overflow-x:auto}.date-picker-tabs button{flex:0 0 auto;border:1px solid #dfe5ec;background:#fff;color:#667085;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:800}.date-picker-tabs button.active{border-color:#1769e0;background:#f3f7ff;color:#1769e0}.date-picker-years{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.date-picker-years button{min-height:46px}.history-date-controls{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(92px,.82fr) minmax(92px,.9fr);gap:8px;align-items:end;margin:18px 0}.history-date-control{min-width:0}.history-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.history-date-select,.history-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}.history-date-select{color:#18212f;justify-content:space-between;padding:0 13px}.history-date-select span:last-child{font-size:20px;color:#18212f}.history-date-action{cursor:pointer;white-space:nowrap}.admin-usage-date-controls{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(92px,.82fr) minmax(92px,.9fr);gap:8px;align-items:end;margin:18px 0 14px}.admin-usage-date-control{min-width:0}.admin-usage-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.admin-usage-date-select,.admin-usage-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}.admin-usage-date-select{color:#18212f;justify-content:space-between;padding:0 13px}.admin-usage-date-select span:last-child{font-size:20px;color:#18212f}.admin-usage-date-action{cursor:pointer;white-space:nowrap}
+
 .calendar-detail{margin-top:12px;border:1px solid #e4e9ef;border-radius:12px;padding:12px;background:#fff}
 .calendar-detail-title{font-weight:800;margin-bottom:8px}
 .admin-record-form{border:1px solid #e2e7ee;border-radius:12px;padding:12px;margin-top:12px}
@@ -234,10 +236,11 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <h3 id="historyTitle">📋 재고 이력</h3>
   <p id="historyDesc" class="muted">조회할 날짜를 선택해 주세요. 입력 이력이 있는 날짜에 점이 표시됩니다.</p>
   <div id="historyDateView">
-    <div class="history-calendar-nav">
-      <button type="button" class="calendar-nav-btn" onclick="changeHistoryCalendarMonth(-1)">‹</button>
-      <b id="historyCalendarTitle"></b>
-      <button type="button" class="calendar-nav-btn" onclick="changeHistoryCalendarMonth(1)">›</button>
+    <div class="history-date-controls">
+      <div class="history-date-control"><div class="history-date-label">연도</div><button type="button" class="history-date-select" onclick="openHistoryYearPicker()"><span id="historyYearText"></span><span>⌄</span></button></div>
+      <div class="history-date-control"><div class="history-date-label">월</div><button type="button" class="history-date-select" onclick="openHistoryMonthPicker()"><span id="historyMonthText"></span><span>⌄</span></button></div>
+      <button type="button" class="history-date-action" onclick="applyHistoryDateSelection()">→&nbsp; 이동</button>
+      <button type="button" class="history-date-action" onclick="goHistoryToday()">▣&nbsp; 당월</button>
     </div>
     <div class="calendar-weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
     <div id="historyCalendarGrid" class="calendar-grid"></div>
@@ -379,6 +382,14 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <div id="adminItemDetailContent"></div>
 </div></div>
 
+<div class="modal" id="historyYearPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('cal')">닫기</button><h3>연도 선택</h3>
+  <div id="historyYearPickerTabs" class="date-picker-tabs"></div><div id="historyYearPickerGrid" class="date-picker-years"></div>
+</div></div>
+<div class="modal" id="historyMonthPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('cal')">닫기</button><h3>월 선택</h3><div id="historyMonthPickerGrid" class="admin-date-picker-grid month-picker-grid"></div>
+</div></div>
+
 <!-- 관리자 과거 재고 수정: 날짜 선택 -->
 <div class="modal" id="adminStockCalendar"><div class="sheet">
   <button class="close" onclick="closeAdminStockCalendar()">닫기</button>
@@ -404,7 +415,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <div class="modal" id="adminYearPicker"><div class="sheet admin-date-picker-sheet">
   <button class="close" onclick="openModal('adminStockCalendar')">닫기</button>
   <h3>연도 선택</h3>
-  <div id="adminYearPickerGrid" class="admin-date-picker-grid"></div>
+  <div id="adminYearPickerTabs" class="date-picker-tabs"></div><div id="adminYearPickerGrid" class="date-picker-years"></div>
 </div></div>
 
 <div class="modal" id="adminMonthPicker"><div class="sheet admin-date-picker-sheet">
@@ -413,10 +424,18 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <div id="adminMonthPickerGrid" class="admin-date-picker-grid month-picker-grid"></div>
 </div></div>
 
+<div class="modal" id="adminUsageYearPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('adminStats')">닫기</button><h3>연도 선택</h3>
+  <div id="adminUsageYearPickerTabs" class="date-picker-tabs"></div><div id="adminUsageYearPickerGrid" class="date-picker-years"></div>
+</div></div>
+<div class="modal" id="adminUsageMonthPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('adminStats')">닫기</button><h3>월 선택</h3><div id="adminUsageMonthPickerGrid" class="admin-date-picker-grid month-picker-grid"></div>
+</div></div>
+
 <div class="modal" id="adminAnnualYearPicker"><div class="sheet admin-date-picker-sheet">
   <button class="close" onclick="openModal('adminAnnualStats')">닫기</button>
   <h3>연도 선택</h3>
-  <div id="adminAnnualYearPickerGrid" class="admin-date-picker-grid"></div>
+  <div id="adminAnnualYearPickerTabs" class="date-picker-tabs"></div><div id="adminAnnualYearPickerGrid" class="date-picker-years"></div>
 </div></div>
 
 <div class="modal" id="adminAnnualMonthPicker"><div class="sheet admin-date-picker-sheet">
@@ -436,10 +455,11 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <button class="close" onclick="openModal('admin')">닫기</button>
   <div class="stats-title-row"><h3>📅 월별 사용량 통계</h3><button type="button" class="annual-stats-btn" onclick="openAdminAnnualStats()">연간 사용량 통계</button></div>
   <p class="muted">재고확인 기록의 변동을 기준으로 부서별·품목별 사용량을 확인합니다. 당일 입력은 사용량 산정에서 제외됩니다.</p>
-  <div class="calendar-head">
-    <button onclick="changeAdminUsageMonth(-1)">‹</button>
-    <div id="adminUsageMonthTitle" class="calendar-title"></div>
-    <button onclick="changeAdminUsageMonth(1)">›</button>
+  <div class="admin-usage-date-controls">
+    <div class="admin-usage-date-control"><div class="admin-usage-date-label">연도</div><button type="button" class="admin-usage-date-select" onclick="openAdminUsageYearPicker()"><span id="adminUsageYearText"></span><span>⌄</span></button></div>
+    <div class="admin-usage-date-control"><div class="admin-usage-date-label">월</div><button type="button" class="admin-usage-date-select" onclick="openAdminUsageMonthPicker()"><span id="adminUsageMonthText"></span><span>⌄</span></button></div>
+    <button type="button" class="admin-usage-date-action" onclick="applyAdminUsageDateSelection()">→&nbsp; 이동</button>
+    <button type="button" class="admin-usage-date-action" onclick="goAdminUsageToday()">▣&nbsp; 당월</button>
   </div>
   <div id="adminUsageReport"></div>
 </div></div>
@@ -466,7 +486,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.80"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.81"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1640,60 +1660,68 @@ function performSaveBulkStock(blankConfirmed){
 
 let historyCalendarDate=new Date();
 let historySelectedDate="";
+let historySelectedYear=new Date().getFullYear();
+let historySelectedMonth=new Date().getMonth();
+let historyPendingYear=historySelectedYear;
+let historyPendingMonth=historySelectedMonth;
 
-function openHistory(){
-  openModal("cal");
+function resetHistoryCalendarToToday(){
+  const now=new Date();
+  historySelectedYear=now.getFullYear(); historySelectedMonth=now.getMonth();
+  historyPendingYear=historySelectedYear; historyPendingMonth=historySelectedMonth;
+  historyCalendarDate=new Date(historySelectedYear,historySelectedMonth,1);
 }
+function syncHistoryDateControls(){
+  const y=document.getElementById('historyYearText'),m=document.getElementById('historyMonthText');
+  if(y) y.textContent=`${historyPendingYear}년`;
+  if(m) m.textContent=`${historyPendingMonth+1}월`;
+}
+function getYearGroups(currentYear){
+  const groups=[{label:'2020년 이전',start:2016,end:Math.min(2020,currentYear)}];
+  for(let start=2021;start<=currentYear;start+=10){
+    const end=Math.min(start+9,currentYear);
+    groups.push({label:`${start}~${start+9}`,start,end});
+  }
+  return groups.filter(g=>g.start<=g.end);
+}
+function renderYearPicker(target,tabsId,gridId,pendingYear){
+  const currentYear=new Date().getFullYear(),tabs=document.getElementById(tabsId),grid=document.getElementById(gridId); if(!tabs||!grid)return;
+  const groups=getYearGroups(currentYear); let active=groups.findIndex(g=>pendingYear>=g.start&&pendingYear<=g.end); if(active<0)active=groups.length-1;
+  tabs.innerHTML=groups.map((g,i)=>`<button type="button" class="${i===active?'active':''}" onclick="${target==='selectHistoryYear'?'selectHistoryYearGroup':target==='selectAdminUsageYear'?'selectAdminUsageYearGroup':''}(${i})">${g.label}</button>`).join('');
+  const g=groups[active]; grid.innerHTML=''; for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===pendingYear)btn.classList.add('selected');btn.onclick=()=>{if(target==='selectHistoryYear'){historyPendingYear=y;if(y===currentYear&&historyPendingMonth>new Date().getMonth())historyPendingMonth=new Date().getMonth();syncHistoryDateControls();openModal('cal');}else{adminUsagePendingYear=y;if(y===currentYear&&adminUsagePendingMonth>new Date().getMonth())adminUsagePendingMonth=new Date().getMonth();syncAdminUsageDateControls();openModal('adminStats');}};grid.appendChild(btn);}
+}
+function selectHistoryYearGroup(i){ renderYearPicker('selectHistoryYear','historyYearPickerTabs','historyYearPickerGrid',historyPendingYear); const tabs=document.getElementById('historyYearPickerTabs'); if(tabs) [...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i)); const groups=getYearGroups(new Date().getFullYear()); const g=groups[i]; const grid=document.getElementById('historyYearPickerGrid'); if(g&&grid){grid.innerHTML=''; for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===historyPendingYear)btn.classList.add('selected');btn.onclick=()=>{historyPendingYear=y;if(y===new Date().getFullYear()&&historyPendingMonth>new Date().getMonth())historyPendingMonth=new Date().getMonth();syncHistoryDateControls();openModal('cal');};grid.appendChild(btn);}}}
+function openHistoryYearPicker(){renderYearPicker('selectHistoryYear','historyYearPickerTabs','historyYearPickerGrid',historyPendingYear);openModal('historyYearPicker');}
+function openHistoryMonthPicker(){const grid=document.getElementById('historyMonthPickerGrid');if(!grid)return;grid.innerHTML='';const currentYear=new Date().getFullYear(),max=historyPendingYear===currentYear?new Date().getMonth():11;for(let m=0;m<=max;m++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${m+1}월`;if(m===historyPendingMonth)btn.classList.add('selected');btn.onclick=()=>{historyPendingMonth=m;syncHistoryDateControls();openModal('cal');};grid.appendChild(btn);}openModal('historyMonthPicker');}
+function applyHistoryDateSelection(){historySelectedYear=historyPendingYear;historySelectedMonth=historyPendingMonth;historyCalendarDate=new Date(historySelectedYear,historySelectedMonth,1);renderHistoryDateCalendar();}
+function goHistoryToday(){resetHistoryCalendarToToday();syncHistoryDateControls();renderHistoryDateCalendar();}
+function openHistory(){resetHistoryCalendarToToday();syncHistoryDateControls();openModal('cal');}
 
 function renderHistoryDateCalendar(){
   const y=historyCalendarDate.getFullYear(), m=historyCalendarDate.getMonth();
-  document.getElementById("historyCalendarTitle").textContent=`${y}년 ${m+1}월`;
-  const grid=document.getElementById("historyCalendarGrid");
-  grid.innerHTML="";
-  const first=new Date(y,m,1).getDay();
-  const last=new Date(y,m+1,0).getDate();
+  if(document.getElementById("historyCalendarTitle")) document.getElementById("historyCalendarTitle").textContent=`${y}년 ${m+1}월`;
+  syncHistoryDateControls();
+  const grid=document.getElementById("historyCalendarGrid"); grid.innerHTML="";
+  const first=new Date(y,m,1).getDay(), last=new Date(y,m+1,0).getDate(), todayKey=dateStr(new Date());
   for(let i=0;i<first;i++) grid.insertAdjacentHTML("beforeend",`<div class="calendar-cell empty"></div>`);
   for(let day=1;day<=last;day++){
     const key=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-    const hasRecord=records.some(r=>r.type==="재고확인" && r.date===key);
-    const cell=document.createElement("div");
-    cell.className="calendar-cell"+(hasRecord?" has-record":"");
+    const hasRecord=records.some(r=>r.type==="재고확인"&&r.date===key), dow=new Date(y,m,day).getDay(), isToday=key===todayKey;
+    const cell=document.createElement("div"); cell.className="calendar-cell"+(hasRecord?" has-record":"")+(dow===0?" sunday":"")+(dow===6?" saturday":"")+(isToday?" today-cell":"");
     cell.innerHTML=`<div class="calendar-num">${day}</div>${hasRecord?'<div class="calendar-dot"></div>':''}`;
-    if(hasRecord) cell.onclick=()=>showHistoryDepartments(key);
-    grid.appendChild(cell);
+    if(hasRecord)cell.onclick=()=>showHistoryDepartments(key); grid.appendChild(cell);
   }
 }
 
-function changeHistoryCalendarMonth(delta){
-  historyCalendarDate.setMonth(historyCalendarDate.getMonth()+delta);
-  renderHistoryDateCalendar();
-}
+function changeHistoryCalendarMonth(delta){historyCalendarDate.setMonth(historyCalendarDate.getMonth()+delta);historySelectedYear=historyCalendarDate.getFullYear();historySelectedMonth=historyCalendarDate.getMonth();historyPendingYear=historySelectedYear;historyPendingMonth=historySelectedMonth;renderHistoryDateCalendar();}
 
 function resetHistoryView(){
   document.getElementById("historyTitle").textContent="📋 재고 이력";
   document.getElementById("historyDesc").textContent="조회할 날짜를 선택해 주세요. 입력 이력이 있는 날짜에 점이 표시됩니다.";
-  document.getElementById("historyDateView").style.display="block";
-  document.getElementById("historyDepartmentView").style.display="none";
-  document.getElementById("historyRecordView").style.display="none";
+  document.getElementById("historyDateView").style.display="block"; document.getElementById("historyDepartmentView").style.display="none"; document.getElementById("historyRecordView").style.display="none";
   renderHistoryDateCalendar();
 }
-
-function showHistoryDepartmentSelector(){
-  resetHistoryView();
-}
-
-function getHistoryDayRecords(date, category){
-  const scoped=records.filter(r=>r.type==="재고확인" && r.date===date && (!category || category==="전체" || r.category===category));
-  const map=new Map();
-  scoped.forEach(r=>{
-    const key=`${r.category||"P/S"}||${r.name}`;
-    const prev=map.get(key);
-    const prevTime=prev?String(prev.time||""):"";
-    const curTime=String(r.time||"");
-    if(!prev || curTime>=prevTime) map.set(key,r);
-  });
-  return [...map.values()];
-}
+function showHistoryDepartmentSelector(){resetHistoryView();}
 
 function showHistoryDepartments(date){
   historySelectedDate=date;
@@ -1792,7 +1820,9 @@ function showCalendarDetail(date,rows,adminMode){
 }
 
 function openAdminStats(){
+  resetAdminUsageDateToToday();
   openModal("adminStats");
+  syncAdminUsageDateControls();
   renderAdminUsageReport();
 }
 
@@ -1800,6 +1830,10 @@ let adminStockCalendarDate=new Date();
 let adminStockSelectedYear=adminStockCalendarDate.getFullYear();
 let adminStockSelectedMonth=adminStockCalendarDate.getMonth();
 let adminUsageMonthDate=new Date();
+let adminUsageSelectedYear=new Date().getFullYear();
+let adminUsageSelectedMonth=new Date().getMonth();
+let adminUsagePendingYear=adminUsageSelectedYear;
+let adminUsagePendingMonth=adminUsageSelectedMonth;
 
 function resetAdminStockCalendarToToday(){
   const now=new Date();
@@ -1824,27 +1858,15 @@ function closeAdminStockCalendar(){
   openModal("admin");
 }
 
-function openAdminYearPicker(){
-  const grid=document.getElementById("adminYearPickerGrid");
-  const currentYear=new Date().getFullYear();
-  const selected=adminStockSelectedYear;
-  grid.innerHTML="";
-  for(let y=currentYear-10;y<=currentYear+2;y++){
-    const btn=document.createElement("button");
-    btn.type="button";
-    btn.textContent=`${y}년`;
-    if(y===selected) btn.classList.add("selected");
-    btn.onclick=()=>{adminStockSelectedYear=y;openModal("adminStockCalendar");renderAdminStockCalendar();};
-    grid.appendChild(btn);
-  }
-  openModal("adminYearPicker");
-}
+function selectAdminStockYearGroup(i){const groups=getYearGroups(new Date().getFullYear());const g=groups[i];const grid=document.getElementById('adminYearPickerGrid');const tabs=document.getElementById('adminYearPickerTabs');if(!g||!grid)return;if(tabs)[...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));grid.innerHTML='';for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===adminStockSelectedYear)btn.classList.add('selected');btn.onclick=()=>{adminStockSelectedYear=y;if(y===new Date().getFullYear()&&adminStockSelectedMonth>new Date().getMonth())adminStockSelectedMonth=new Date().getMonth();syncAdminStockDateControls();openModal('adminStockCalendar');renderAdminStockCalendar();};grid.appendChild(btn);}}
+function openAdminYearPicker(){const groups=getYearGroups(new Date().getFullYear());const tabs=document.getElementById('adminYearPickerTabs');const grid=document.getElementById('adminYearPickerGrid');const active=Math.max(0,groups.findIndex(g=>adminStockSelectedYear>=g.start&&adminStockSelectedYear<=g.end));tabs.innerHTML=groups.map((g,i)=>`<button type="button" class="${i===active?'active':''}" onclick="selectAdminStockYearGroup(${i})">${g.label}</button>`).join('');selectAdminStockYearGroup(active);openModal('adminYearPicker');}
 
 function openAdminMonthPicker(){
   const grid=document.getElementById("adminMonthPickerGrid");
   const selected=adminStockSelectedMonth;
   grid.innerHTML="";
-  for(let m=0;m<12;m++){
+  const maxMonth=adminStockSelectedYear===new Date().getFullYear()?new Date().getMonth():11;
+  for(let m=0;m<=maxMonth;m++){
     const btn=document.createElement("button");
     btn.type="button";
     btn.textContent=`${m+1}월`;
@@ -1896,10 +1918,22 @@ function openHistoricalStock(date){
   renderHistoricalDepartmentSelector();
 }
 
+function syncAdminUsageDateControls(){
+  const y=document.getElementById('adminUsageYearText'),m=document.getElementById('adminUsageMonthText');
+  if(y)y.textContent=`${adminUsagePendingYear}년`; if(m)m.textContent=`${adminUsagePendingMonth+1}월`;
+}
+function resetAdminUsageDateToToday(){const now=new Date();adminUsageSelectedYear=now.getFullYear();adminUsageSelectedMonth=now.getMonth();adminUsagePendingYear=adminUsageSelectedYear;adminUsagePendingMonth=adminUsageSelectedMonth;adminUsageMonthDate=new Date(adminUsageSelectedYear,adminUsageSelectedMonth,1);}
+function selectAdminUsageYearGroup(i){const groups=getYearGroups(new Date().getFullYear());const g=groups[i],grid=document.getElementById('adminUsageYearPickerGrid'),tabs=document.getElementById('adminUsageYearPickerTabs');if(!g||!grid)return;if(tabs)[...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));grid.innerHTML='';for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===adminUsagePendingYear)btn.classList.add('selected');btn.onclick=()=>{adminUsagePendingYear=y;if(y===new Date().getFullYear()&&adminUsagePendingMonth>new Date().getMonth())adminUsagePendingMonth=new Date().getMonth();syncAdminUsageDateControls();openModal('adminStats');};grid.appendChild(btn);}}
+function openAdminUsageYearPicker(){renderYearPicker('selectAdminUsageYear','adminUsageYearPickerTabs','adminUsageYearPickerGrid',adminUsagePendingYear);openModal('adminUsageYearPicker');}
+function openAdminUsageMonthPicker(){const grid=document.getElementById('adminUsageMonthPickerGrid');if(!grid)return;grid.innerHTML='';const max=adminUsagePendingYear===new Date().getFullYear()?new Date().getMonth():11;for(let m=0;m<=max;m++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${m+1}월`;if(m===adminUsagePendingMonth)btn.classList.add('selected');btn.onclick=()=>{adminUsagePendingMonth=m;syncAdminUsageDateControls();openModal('adminStats');};grid.appendChild(btn);}openModal('adminUsageMonthPicker');}
+function applyAdminUsageDateSelection(){adminUsageSelectedYear=adminUsagePendingYear;adminUsageSelectedMonth=adminUsagePendingMonth;adminUsageMonthDate=new Date(adminUsageSelectedYear,adminUsageSelectedMonth,1);renderAdminUsageReport();}
+function goAdminUsageToday(){resetAdminUsageDateToToday();syncAdminUsageDateControls();renderAdminUsageReport();}
+
 function renderAdminUsageReport(){
   const d=adminUsageMonthDate;
   const y=d.getFullYear(),m=d.getMonth();
-  document.getElementById("adminUsageMonthTitle").textContent=`${y}년 ${m+1}월`;
+  syncAdminUsageDateControls();
+  if(document.getElementById("adminUsageMonthTitle")) document.getElementById("adminUsageMonthTitle").textContent=`${y}년 ${m+1}월`;
   const today=dateStr(new Date());
   const monthStart=dateStr(new Date(y,m,1));
   let monthEnd=dateStr(new Date(y,m+1,0));
@@ -1951,27 +1985,15 @@ function syncAdminAnnualDateControls(){
   if(m) m.textContent=`${adminAnnualPendingMonth+1}월`;
 }
 
-function openAdminAnnualYearPicker(){
-  const currentYear=new Date().getFullYear();
-  const grid=document.createElement('div');
-  grid.className='admin-date-picker-grid';
-  for(let y=currentYear-10;y<=currentYear+2;y++){
-    const btn=document.createElement('button');
-    btn.type='button'; btn.textContent=`${y}년`;
-    if(y===adminAnnualPendingYear) btn.classList.add('selected');
-    btn.onclick=()=>{adminAnnualPendingYear=y;syncAdminAnnualDateControls();openModal('adminAnnualStats');};
-    grid.appendChild(btn);
-  }
-  const host=document.getElementById('adminAnnualYearPickerGrid');
-  if(host) host.innerHTML=grid.innerHTML;
-  openModal('adminAnnualYearPicker');
-}
+function selectAnnualYearGroup(i){const groups=getYearGroups(new Date().getFullYear());const g=groups[i];const grid=document.getElementById('adminAnnualYearPickerGrid');const tabs=document.getElementById('adminAnnualYearPickerTabs');if(!g||!grid)return;if(tabs)[...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));grid.innerHTML='';for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===adminAnnualPendingYear)btn.classList.add('selected');btn.onclick=()=>{adminAnnualPendingYear=y;if(y===new Date().getFullYear()&&adminAnnualPendingMonth>new Date().getMonth())adminAnnualPendingMonth=new Date().getMonth();syncAdminAnnualDateControls();openModal('adminAnnualStats');};grid.appendChild(btn);}}
+function openAdminAnnualYearPicker(){const currentYear=new Date().getFullYear();const groups=getYearGroups(currentYear);const tabs=document.getElementById('adminAnnualYearPickerTabs');const grid=document.getElementById('adminAnnualYearPickerGrid');const active=Math.max(0,groups.findIndex(g=>adminAnnualPendingYear>=g.start&&adminAnnualPendingYear<=g.end));tabs.innerHTML=groups.map((g,i)=>`<button type="button" class="${i===active?'active':''}" onclick="selectAnnualYearGroup(${i})">${g.label}</button>`).join('');selectAnnualYearGroup(active);openModal('adminAnnualYearPicker');}
 
 function openAdminAnnualMonthPicker(){
   const grid=document.getElementById('adminAnnualMonthPickerGrid');
   if(!grid) return;
   grid.innerHTML='';
-  for(let m=0;m<12;m++){
+  const maxMonth=adminAnnualPendingYear===new Date().getFullYear()?new Date().getMonth():11;
+  for(let m=0;m<=maxMonth;m++){
     const btn=document.createElement('button');
     btn.type='button'; btn.textContent=`${m+1}월`;
     if(m===adminAnnualPendingMonth) btn.classList.add('selected');
@@ -2585,10 +2607,7 @@ function deleteItem(i){
   deleteDepartmentItem(i);
 }
 
-function changeAdminUsageMonth(delta){
-  adminUsageMonthDate.setMonth(adminUsageMonthDate.getMonth()+delta);
-  renderAdminUsageReport();
-}
+function changeAdminUsageMonth(delta){adminUsageMonthDate.setMonth(adminUsageMonthDate.getMonth()+delta);adminUsageSelectedYear=adminUsageMonthDate.getFullYear();adminUsageSelectedMonth=adminUsageMonthDate.getMonth();adminUsagePendingYear=adminUsageSelectedYear;adminUsagePendingMonth=adminUsageSelectedMonth;renderAdminUsageReport();}
 
 function openAdminPasswordChange(){
   openModal("adminPasswordChange");
