@@ -486,7 +486,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.83"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.84"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -604,7 +604,7 @@ function ensureInitialSnapshot(){
   if(changed) localStorage.setItem("submaterial_records",JSON.stringify(records));
 }
 
-let adminPassword="1233";
+let adminPassword="000000";
 let adminPasswordLoaded=false;
 
 function migrateSeedSnapshotV8(){
@@ -1532,6 +1532,10 @@ function removeSameDayInventoryInput(itemName, category, date){
   });
 
   if(!removedTimes.length) return false;
+
+  // 실제 서버에 이미 저장된 기록이라면, 수정/취소 후 서버에서도
+  // 같은 날짜·부서·품목의 기존 기록을 삭제해야 합니다.
+  supabasePendingDeletes.push({date,category,itemName});
 
   records=records.filter(r=>{
     if(r.date!==date || (r.type!=="사용" && r.type!=="입고")) return true;
@@ -2803,6 +2807,7 @@ let supabaseHydrating=false;
 let supabaseSyncTimer=null;
 let supabaseSyncInFlight=null;
 let supabaseReady=false;
+let supabasePendingDeletes=[];
 
 function supabaseLocalSet(key,value){
   supabaseHydrating=true;
@@ -2903,75 +2908,6 @@ function applySupabaseState(state){
   renderHomeCategories();
 }
 
-async function replaceSupabaseItems(){
-  const {data:departments,error:dErr}=await supabaseClient.from("departments").select("id,name");
-  if(dErr) throw dErr;
-  const deptByName={};
-  (departments||[]).forEach(d=>deptByName[d.name]=d.id);
-
-  const unique={};
-  items.forEach(x=>{
-    const name=x[0];
-    if(!unique[name]) unique[name]={name,unit:x[6]||"박스"};
-  });
-  const {error:uErr}=await supabaseClient.from("items").upsert(Object.values(unique),{onConflict:"name"});
-  if(uErr) throw uErr;
-
-  const {data:dbItems,error:iErr}=await supabaseClient.from("items").select("id,name,unit");
-  if(iErr) throw iErr;
-  const itemByName={};
-  (dbItems||[]).forEach(it=>itemByName[it.name]=it.id);
-
-  const {error:delErr}=await supabaseClient.from("department_items").delete().gte("id",0);
-  if(delErr) throw delErr;
-
-  const rows=[];
-  const deptOrder={};
-  items.forEach(x=>{
-    const category=x[5]||"P/S";
-    if(deptByName[category]==null||itemByName[x[0]]==null) return;
-    const order=deptOrder[category]||0;
-    rows.push({department_id:deptByName[category],item_id:itemByName[x[0]],sort_order:order,is_active:true});
-    deptOrder[category]=order+1;
-  });
-  if(rows.length){
-    const {error:mErr}=await supabaseClient.from("department_items").insert(rows);
-    if(mErr) throw mErr;
-  }
-}
-
-async function replaceSupabaseRecords(){
-  const {data:departments,error:dErr}=await supabaseClient.from("departments").select("id,name");
-  if(dErr) throw dErr;
-  const deptByName={};
-  (departments||[]).forEach(d=>deptByName[d.name]=d.id);
-  const {data:dbItems,error:iErr}=await supabaseClient.from("items").select("id,name");
-  if(iErr) throw iErr;
-  const itemByName={};
-  (dbItems||[]).forEach(it=>itemByName[it.name]=it.id);
-
-  const rows=records.map(r=>({
-    record_date:r.date,
-    department_id:deptByName[r.category||"P/S"],
-    item_id:itemByName[r.name],
-    record_type:r.type,
-    stock:Number(r.stock||0),
-    previous_stock:Number(r.previous||0),
-    diff:Number(r.diff||0),
-    quantity:r.qty==null?null:Number(r.qty),
-    no_stock:!!r.noStock,
-    is_manual:!!r.manual,
-    is_baseline:!!r.seedSnapshot
-  })).filter(r=>r.department_id&&r.item_id&&r.record_date&&r.record_type);
-
-  const {error:delErr}=await supabaseClient.from("inventory_records").delete().gte("id",0);
-  if(delErr) throw delErr;
-  if(rows.length){
-    const {error:insErr}=await supabaseClient.from("inventory_records").insert(rows);
-    if(insErr) throw insErr;
-  }
-}
-
 async function syncNewLocalRecordsToSupabase(){
   if(!supabaseClient||!supabaseReady) return;
 
@@ -2981,7 +2917,8 @@ async function syncNewLocalRecordsToSupabase(){
 
   supabaseSyncInFlight=(async()=>{
     const pending=records.filter(r=>!r.id && r.date && r.name && r.category && r.type);
-    if(!pending.length) return;
+    const pendingDeletes=supabasePendingDeletes.slice();
+    if(!pending.length && !pendingDeletes.length) return;
 
   const {data:departments,error:dErr}=await supabaseClient.from("departments").select("id,name");
   if(dErr) throw dErr;
@@ -3002,8 +2939,19 @@ async function syncNewLocalRecordsToSupabase(){
     const item_id=itemByName[r.name];
     if(department_id&&item_id) inventoryKeys.push({date:r.date,department_id,item_id});
   });
+  pendingDeletes.forEach(r=>{
+    const department_id=deptByName[r.category];
+    const item_id=itemByName[r.itemName];
+    if(department_id&&item_id) inventoryKeys.push({date:r.date,department_id,item_id});
+  });
+  const uniqueInventoryKeys=[];
+  const seenInventoryKeys=new Set();
+  inventoryKeys.forEach(k=>{
+    const key=`${k.date}|${k.department_id}|${k.item_id}`;
+    if(!seenInventoryKeys.has(key)){seenInventoryKeys.add(key);uniqueInventoryKeys.push(k);}
+  });
 
-  for(const k of inventoryKeys){
+  for(const k of uniqueInventoryKeys){
     const {error:delErr}=await supabaseClient
       .from("inventory_records")
       .delete()
@@ -3028,7 +2976,10 @@ async function syncNewLocalRecordsToSupabase(){
     is_baseline:!!r.seedSnapshot
   })).filter(r=>r.department_id&&r.item_id);
 
-  if(!rows.length) return;
+  if(!rows.length){
+    supabasePendingDeletes=[];
+    return;
+  }
 
   const {data:inserted,error:insErr}=await supabaseClient
     .from("inventory_records")
@@ -3046,6 +2997,7 @@ async function syncNewLocalRecordsToSupabase(){
     }
   });
   localStorage.setItem("submaterial_records",JSON.stringify(records));
+  supabasePendingDeletes=[];
   console.log("Supabase 신규 재고 기록 저장 완료",insertedRows.length);
   })();
 
@@ -3056,106 +3008,7 @@ async function syncNewLocalRecordsToSupabase(){
   }
 }
 
-async function syncLocalStateToSupabase(){
-  if(!supabaseClient||!supabaseReady||supabaseHydrating) return;
-  try{
-    await replaceSupabaseItems();
-    await replaceSupabaseRecords();
-    console.log("Supabase 동기화 완료");
-  }catch(err){
-    console.error("Supabase 동기화 실패:",err);
-    console.warn("RLS 정책 또는 Data API 권한을 확인해 주세요.");
-  }
-}
-
-
-/* =========================
-   Supabase 활동 유지 (v1.66)
-   앱을 열었을 때 가벼운 조회를 보내고, 앱이 열려 있는 동안
-   24시간마다 한 번씩 같은 조회를 보냅니다. 재고 데이터는 변경하지 않습니다.
-   실제로 아무도 앱을 열지 않는 기간에도 유지하려면 아래 GitHub Actions
-   워크플로 파일을 저장소에 함께 추가합니다.
-   ========================= */
-async function supabaseKeepAlive(){
-  if(!supabaseClient) return false;
-  try{
-    const {error}=await supabaseClient
-      .from("departments")
-      .select("id", {head:true, count:"exact"});
-    if(error) throw error;
-    localStorage.setItem("supabase_last_keepalive", new Date().toISOString());
-    console.log("Supabase keep-alive 완료");
-    return true;
-  }catch(err){
-    console.warn("Supabase keep-alive 실패:",err);
-    return false;
-  }
-}
-
-function startSupabaseKeepAlive(){
-  supabaseKeepAlive();
-  setInterval(supabaseKeepAlive, 24*60*60*1000);
-}
-
-async function loadAdminPasswordFromSupabase(){
-  if(!supabaseClient){
-    adminPasswordLoaded=false;
-    return false;
-  }
-  try{
-    const {data,error}=await supabaseClient
-      .from("app_settings")
-      .select("value")
-      .eq("key","admin_password")
-      .maybeSingle();
-    if(error) throw error;
-    if(data && typeof data.value==="string" && data.value.length>=4){
-      adminPassword=data.value;
-      adminPasswordLoaded=true;
-      localStorage.removeItem("submaterial_admin_pw");
-      return true;
-    }
-    // 서버에 아직 관리자 비밀번호가 없으면 최초 기준값 1233을 서버에 등록합니다.
-    const {error:upsertError}=await supabaseClient.from("app_settings").upsert({
-      key:"admin_password",
-      value:"1233",
-      updated_at:new Date().toISOString()
-    },{onConflict:"key"});
-    if(upsertError) throw upsertError;
-    adminPassword="1233";
-    adminPasswordLoaded=true;
-    localStorage.removeItem("submaterial_admin_pw");
-    return true;
-  }catch(err){
-    console.error("관리자 비밀번호 서버 조회 실패:",err);
-    adminPasswordLoaded=false;
-    return false;
-  }
-}
-
-async function initSupabase(){
-  if(!supabaseClient){
-    render();
-    updateBottomNav();
-    return;
-  }
-  try{
-    const state=await fetchSupabaseState();
-    applySupabaseState(state);
-    await loadAdminPasswordFromSupabase();
-    supabaseReady=true;
-    render();
-    updateBottomNav();
-    console.log("Supabase 연결 완료",SUPABASE_URL);
-  }catch(err){
-    console.error("Supabase 초기 연결 실패:",err);
-    render();
-    updateBottomNav();
-    setTimeout(()=>alert("Supabase 연결에 실패했습니다.\n\nRLS 정책 또는 Data API 권한을 확인해야 합니다.\n\n앱은 기존 저장 데이터로 계속 실행됩니다."),300);
-  }
-}
-
-startSupabaseKeepAlive();
-initSupabase();
+/* v1.84: 전체 서버 데이터를 삭제 후 재생성하는 동기화 함수는 제거했습니다.
+   실제 운영 데이터 보호를 위해 신규/수정 재고 기록만 증분 동기화합니다. */
 </script>
 </body></html>
