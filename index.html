@@ -490,7 +490,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.88"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.90"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1179,13 +1179,14 @@ function getInventoryStatus(itemName, category, refDate){
   const currentStock=lastInput ? Number(lastInput.stock||0) : Number((items.find(x=>x[0]===itemName && (x[5]||"P/S")===category)||[])[1]||0);
   const forecast=getPurchaseForecast(itemName,category,refDate);
   const oneMonth=forecast.oneMonth;
-  // 배송기간 1주를 고려해, 발주 판단선은 2주분으로 잡습니다.
-  // 발주 후 입고 시점에는 총 3주분(배송기간 1주 + 입고 후 보유 2주)이 확보되도록 계산합니다.
+  // 배송기간 1주를 고려해, 현재 재고가 2주분 이내면 발주합니다.
+  // 발주량은 예상 주간 사용량의 3주분으로 고정합니다. 배송 중 1주분을 소모하므로,
+  // 발주 시점에 2주분이 남아 있다면 입고 시점에는 4주분이 확보됩니다.
   const reorderPoint=forecast.weekly*2;
   let status;
   if(!lastInput) status="확인 필요";
   else if(forecast.weekly<=0) status=currentStock===0?"확인 필요":"재고 적정";
-  else status=currentStock<reorderPoint?"발주 필요":"재고 적정";
+  else status=currentStock<=reorderPoint?"발주 필요":"재고 적정";
   return {status,currentStock,oneMonth,lastInput,threeMonth:forecast.threeMonth,lastYear:forecast.lastYear,weeklyUsage:forecast.weekly,reorderPoint};
 }
 
@@ -1201,8 +1202,9 @@ function getTransferRecommendation(itemName, shortageCategory, refDate){
     if(c===shortageCategory) return;
     const info=getInventoryStatus(itemName,c,refDate);
     const weekly=Number(info.weeklyUsage||0);
-    if(weekly<=0) return;
     const stock=Number(info.currentStock||0);
+    // 사용량이 0인 부서도 보유 재고가 있으면 이동 후보로 봅니다.
+    // (사용량 0이면 2주분 기준이 0이므로 보유 재고 전체가 여유 재고입니다.)
     const excess=Math.max(0,stock-(weekly*2));
     if(excess>0) candidates.push({category:c,stock,weekly,excess,oneMonth:Number(info.oneMonth||0),threeMonth:Number(info.threeMonth||0),lastYear:info.lastYear});
   });
@@ -1353,15 +1355,15 @@ function openOtherDeptStock(itemName, currentCategory){
   if(recommendation){
     const unit=getUnit(itemName,recommendation.category);
     const months=recommendation.oneMonth>0?recommendation.stock/recommendation.oneMonth:null;
-    recommendHtml=`<div class="other-stock-recommend"><div class="other-stock-recommend-title">👍 재고 사용 추천</div><div><b>${esc(recommendation.category)}</b>의 재고 사용을 추천합니다.</div><div>현재 재고 <b>${recommendation.stock.toLocaleString()} ${esc(unit)}</b>${months!==null?` / 최근 1개월 사용량 <b>${recommendation.oneMonth.toLocaleString()} ${esc(unit)}</b> 기준 약 <b>${months.toFixed(1)}개월</b> 사용 가능합니다.`:`이며 최근 1개월 사용량이 0이라 사용기간은 산정할 수 없습니다.`}</div></div>`;
+    recommendHtml=`<div class="other-stock-recommend"><div class="other-stock-recommend-title">🚚 재고 이동 추천</div><div><b>${esc(recommendation.category)}</b>의 재고를 현재 부서로 이동하는 것을 추천합니다.</div><div>현재 ${esc(recommendation.category)} 재고 <b>${recommendation.stock.toLocaleString()} ${esc(unit)}</b>${recommendation.oneMonth>0?` / 최근 1개월 사용량 <b>${recommendation.oneMonth.toLocaleString()} ${esc(unit)}</b> 기준 약 <b>${months.toFixed(1)}개월</b> 사용 가능`: ` / 최근 1개월 사용량 0으로 사용량 기준 여유 재고로 판단`}</div></div>`;
   }else{
     const unit=getUnit(itemName,currentCategory);
     const weekly=current.weekly;
     const stockout=weekly>0?current.stock/weekly:null;
     const leadWeeks=1;
-    const targetWeeks=2;
+    const orderWeeks=3;
     const currentAfterLead=Math.max(0,current.stock-weekly*leadWeeks);
-    const orderQty=weekly>0?Math.max(0,Math.ceil(weekly*targetWeeks-currentAfterLead)):0;
+    const orderQty=weekly>0?Math.ceil(weekly*orderWeeks):0;
     const expectedAfterDelivery=current.stock+orderQty-weekly*leadWeeks;
     const expectedWeeks=weekly>0?expectedAfterDelivery/weekly:null;
     const warning=weekly>0 && current.stock/weekly<2;
@@ -1373,7 +1375,7 @@ function openOtherDeptStock(itemName, currentCategory){
     if(current.lastYear!==null && current.lastYear>0) parts.push(`전년 동월 ${current.lastYear.toLocaleString()}${unit}`);
     const basis=parts.length?parts.join(' / '):'사용량 데이터 없음';
     const warningHtml=warning?`<div class="purchase-warning">⚠️ 현재 재고가 배송기간을 고려한 권장 재고 수준보다 부족합니다.</div>`:'';
-    const mainHtml=weekly>0?`<div class="purchase-recommend"><div class="purchase-recommend-title">🛒 추천 발주량</div><div class="purchase-qty"><b>${orderQty.toLocaleString()} ${esc(unit)}</b></div><div class="purchase-after"><b>${orderQty.toLocaleString()}${esc(unit)} 입고 후 예상 보유량 약 ${expectedAfterDelivery.toFixed(1)}${esc(unit)}</b><br>- 예상 주간 사용량 ${weekly.toFixed(1)}${esc(unit)} 기준 약 ${expectedWeeks.toFixed(1)}주 사용 가능</div><button type="button" id="purchaseCalculationBtn" class="purchase-detail-btn" onclick="togglePurchaseCalculation()">▾ 산정 내역 보기</button><div id="purchaseCalculationDetails" class="purchase-calculation" style="display:none"><b>산정 내역</b><div>• 예상 주간 사용량: ${weekly.toFixed(1)}${esc(unit)}</div><div>• 참고 사용량: ${basis}</div><div>• 배송기간: ${leadWeeks}주</div><div>• 입고 후 재고 확보 목표: ${targetWeeks}주</div><div>• 배송기간 동안 예상 사용량: 약 ${(weekly*leadWeeks).toFixed(1)}${esc(unit)}</div><div>• 배송 후 ${targetWeeks}주 사용 가능하도록 필요한 수량을 계산하고 올림하여 추천합니다.</div></div></div>${warningHtml}`:`<div class="other-stock-recommend"><div class="other-stock-recommend-title">ℹ️ 발주량 산정 안내</div><div>1개월·3개월·전년 동월 사용량을 확인할 수 있는 데이터가 부족하여 예상 주간 사용량을 산정할 수 없습니다.</div></div>`;
+    const mainHtml=weekly>0?`<div class="purchase-recommend"><div class="purchase-recommend-title">🛒 추천 발주량</div><div class="purchase-qty"><b>${orderQty.toLocaleString()} ${esc(unit)}</b></div><div class="purchase-after"><b>${orderQty.toLocaleString()}${esc(unit)} 입고 후 예상 보유량 약 ${expectedAfterDelivery.toFixed(1)}${esc(unit)}</b><br>- 예상 주간 사용량 ${weekly.toFixed(1)}${esc(unit)} 기준 약 ${expectedWeeks.toFixed(1)}주 사용 가능</div><button type="button" id="purchaseCalculationBtn" class="purchase-detail-btn" onclick="togglePurchaseCalculation()">▾ 산정 내역 보기</button><div id="purchaseCalculationDetails" class="purchase-calculation" style="display:none"><b>산정 내역</b><div>• 예상 주간 사용량: ${weekly.toFixed(1)}${esc(unit)}</div><div>• 참고 사용량: ${basis}</div><div>• 배송기간: ${leadWeeks}주</div><div>• 추천 발주량: 예상 주간 사용량의 ${orderWeeks}주분</div><div>• 배송기간 동안 예상 사용량: 약 ${(weekly*leadWeeks).toFixed(1)}${esc(unit)}</div><div>• 배송기간 1주 동안 약 1주분을 소모한 뒤, ${orderWeeks}주분이 입고됩니다. 따라서 발주 시점 재고가 2주분이라면 입고 시점에는 약 4주분이 됩니다.</div></div></div>${warningHtml}`:`<div class="other-stock-recommend"><div class="other-stock-recommend-title">ℹ️ 발주량 산정 안내</div><div>1개월·3개월·전년 동월 사용량을 확인할 수 있는 데이터가 부족하여 예상 주간 사용량을 산정할 수 없습니다.</div></div>`;
     recommendHtml=mainHtml;
   }
   content.innerHTML=`<div class="other-stock-item">품목명</div><div style="font-size:18px;font-weight:900;margin-top:3px">${esc(itemName)} <span class="item-unit">${esc(getUnit(itemName,currentCategory))}</span></div><div class="muted">현재 ${esc(currentCategory)}에는 재고가 부족하거나 확인이 필요합니다. 다른 부서의 보유 현황을 확인할 수 있습니다.</div><div class="other-stock-table"><table><thead><tr><th>부서</th><th>보유 수량</th><th>최근 1개월 사용량</th><th>최근 3개월 사용량</th></tr></thead><tbody>${tableRows}</tbody></table></div>${recommendHtml}`;
@@ -1944,12 +1946,33 @@ function showHistoryDepartments(date){
 
   const allRecords=getHistoryDayRecords(date);
   const allCount=allRecords.length;
-  const buttons=[`<button class="admin-dept-btn" onclick="showHistoryRecords('전체')">전체<br><span style="font-size:12px;font-weight:500;opacity:.9">${allCount}건</span></button>`];
+  // 부서 순서는 홈 화면과 동일한 CATEGORIES(서버 부서 마스터 순서)를 사용하고,
+  // 전체는 항상 맨 마지막에 배치합니다.
+  const buttons=[];
   CATEGORIES.forEach(c=>{
     const count=getHistoryDayRecords(date,c).length;
     if(count>0) buttons.push(`<button class="admin-dept-btn" onclick="showHistoryRecords('${esc(c)}')">${esc(c)}<br><span style="font-size:12px;font-weight:500;opacity:.9">${count}건</span></button>`);
   });
+  buttons.push(`<button class="admin-dept-btn" onclick="showHistoryRecords('전체')">전체<br><span style="font-size:12px;font-weight:500;opacity:.9">${allCount}건</span></button>`);
   document.getElementById("historyDepartmentList").innerHTML=buttons.join("");
+}
+
+// 재고 입력 화면과 동일한 품목 순서를 반환합니다.
+// items에는 부서별 품목이 department_items.sort_order 순서로 들어오므로,
+// 해당 부서의 입력 순서를 그대로 사용하고 이력에만 남은 품목은 마지막에 보존합니다.
+function getHistoryOrderedRecords(date, category){
+  const rows=getHistoryDayRecords(date,category);
+  if(category==='전체') return rows;
+  const order=items.filter(x=>(x[5]||"P/S")===category).map(x=>x[0]);
+  const rank={};
+  order.forEach((name,i)=>{ if(rank[name]===undefined) rank[name]=i; });
+  return rows.slice().sort((a,b)=>{
+    const ar=rank[a.name], br=rank[b.name];
+    const ax=ar===undefined?Number.MAX_SAFE_INTEGER:ar;
+    const bx=br===undefined?Number.MAX_SAFE_INTEGER:br;
+    if(ax!==bx) return ax-bx;
+    return String(a.name).localeCompare(String(b.name),"ko");
+  });
 }
 
 function formatHistoryDateKorean(date){
@@ -1962,7 +1985,7 @@ function showHistoryRecords(category){
   const date=historySelectedDate;
   const list=document.getElementById("historyDepartmentView");
   const view=document.getElementById("historyRecordView");
-  const rows=getHistoryDayRecords(date,category).sort((a,b)=>String(a.name).localeCompare(String(b.name),"ko"));
+  const rows=getHistoryOrderedRecords(date,category);
   document.getElementById("historyTitle").textContent=category==="전체"?"📋 재고 이력 (전체)":`📋 ${category} 재고 이력`;
   document.getElementById("historyDesc").textContent=category==="전체"?"선택한 날짜의 부서별 재고 현황입니다.":`선택한 날짜의 ${category} 품목별 재고 기록입니다.`;
   list.style.display="none";
