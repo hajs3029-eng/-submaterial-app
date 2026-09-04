@@ -486,7 +486,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.84"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.85"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -3010,5 +3010,88 @@ async function syncNewLocalRecordsToSupabase(){
 
 /* v1.84: 전체 서버 데이터를 삭제 후 재생성하는 동기화 함수는 제거했습니다.
    실제 운영 데이터 보호를 위해 신규/수정 재고 기록만 증분 동기화합니다. */
+
+// v1.85: 초기 화면에서도 기준일/버전을 즉시 표시하고, 앱 시작 시 서버 상태를 먼저 불러옵니다.
+async function supabaseKeepAlive(){
+  if(!supabaseClient) return false;
+  try{
+    const {error}=await supabaseClient
+      .from("departments")
+      .select("id", {head:true, count:"exact"});
+    if(error) throw error;
+    localStorage.setItem("supabase_last_keepalive", new Date().toISOString());
+    console.log("Supabase keep-alive 완료");
+    return true;
+  }catch(err){
+    console.warn("Supabase keep-alive 실패:",err);
+    return false;
+  }
+}
+
+function startSupabaseKeepAlive(){
+  supabaseKeepAlive();
+  setInterval(supabaseKeepAlive, 24*60*60*1000);
+}
+
+async function loadAdminPasswordFromSupabase(){
+  if(!supabaseClient){
+    adminPasswordLoaded=false;
+    return false;
+  }
+  try{
+    const {data,error}=await supabaseClient
+      .from("app_settings")
+      .select("value")
+      .eq("key","admin_password")
+      .maybeSingle();
+    if(error) throw error;
+    if(data && typeof data.value==="string" && data.value.length>=4){
+      adminPassword=data.value;
+      adminPasswordLoaded=true;
+      localStorage.removeItem("submaterial_admin_pw");
+      return true;
+    }
+    // 서버에 비밀번호가 아직 없을 때의 최초 기준값
+    const {error:upsertError}=await supabaseClient.from("app_settings").upsert({
+      key:"admin_password",
+      value:"000000",
+      updated_at:new Date().toISOString()
+    },{onConflict:"key"});
+    if(upsertError) throw upsertError;
+    adminPassword="000000";
+    adminPasswordLoaded=true;
+    localStorage.removeItem("submaterial_admin_pw");
+    return true;
+  }catch(err){
+    console.error("관리자 비밀번호 서버 조회 실패:",err);
+    adminPasswordLoaded=false;
+    return false;
+  }
+}
+
+async function initSupabase(){
+  // 서버 연결 전에도 헤더를 먼저 그려 기준일/버전이 바로 보이게 합니다.
+  render();
+  updateBottomNav();
+
+  if(!supabaseClient) return;
+  try{
+    const state=await fetchSupabaseState();
+    applySupabaseState(state);
+    await loadAdminPasswordFromSupabase();
+    supabaseReady=true;
+    render();
+    updateBottomNav();
+    console.log("Supabase 연결 완료",SUPABASE_URL);
+  }catch(err){
+    console.error("Supabase 초기 연결 실패:",err);
+    render();
+    updateBottomNav();
+    setTimeout(()=>alert("Supabase 연결에 실패했습니다.\n\nRLS 정책 또는 Data API 권한을 확인해야 합니다.\n\n앱은 기존 저장 데이터로 계속 실행됩니다."),300);
+  }
+}
+
+startSupabaseKeepAlive();
+initSupabase();
 </script>
 </body></html>
