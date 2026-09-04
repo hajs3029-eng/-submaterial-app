@@ -486,7 +486,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.85"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.86"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1407,6 +1407,10 @@ function render(){
   document.getElementById("check").textContent=check;
   document.getElementById("good").textContent=good;
 
+}
+function closeModal(id){
+  const modal=document.getElementById(id);
+  if(modal) modal.style.display="none";
 }
 function openModal(id){
   document.querySelectorAll(".modal").forEach(x=>x.style.display="none");
@@ -2833,16 +2837,38 @@ function installSupabaseStorageSync(){
 installSupabaseStorageSync();
 renderHomeCategories();
 
+async function fetchAllSupabaseInventoryRecords(){
+  // Supabase Data API의 기본 조회 건수 제한(보통 1,000건)에 걸리지 않도록
+  // 재고 기록은 페이지 단위로 끝까지 가져옵니다.
+  const pageSize=1000;
+  const all=[];
+  let from=0;
+  while(true){
+    const to=from+pageSize-1;
+    const {data,error}=await supabaseClient
+      .from("inventory_records")
+      .select("id,record_date,department_id,item_id,record_type,stock,previous_stock,diff,quantity,no_stock,is_manual,is_baseline,created_at")
+      .order("id")
+      .range(from,to);
+    if(error) throw error;
+    const rows=data||[];
+    all.push(...rows);
+    if(rows.length<pageSize) break;
+    from+=pageSize;
+  }
+  return all;
+}
+
 async function fetchSupabaseState(){
   if(!supabaseClient) throw new Error("Supabase 라이브러리를 불러오지 못했습니다.");
-  const [dRes,iRes,diRes,rRes]=await Promise.all([
+  const [dRes,iRes,diRes,dbRecords]=await Promise.all([
     supabaseClient.from("departments").select("id,name,sort_order").order("sort_order"),
     supabaseClient.from("items").select("id,name,unit").order("id"),
     supabaseClient.from("department_items").select("id,department_id,item_id,sort_order,is_active").order("department_id").order("sort_order"),
-    supabaseClient.from("inventory_records").select("id,record_date,department_id,item_id,record_type,stock,previous_stock,diff,quantity,no_stock,is_manual,is_baseline,created_at").order("id")
+    fetchAllSupabaseInventoryRecords()
   ]);
-  for(const r of [dRes,iRes,diRes,rRes]) if(r.error) throw r.error;
-  return {departments:dRes.data||[], dbItems:iRes.data||[], mappings:diRes.data||[], dbRecords:rRes.data||[]};
+  for(const r of [dRes,iRes,diRes]) if(r.error) throw r.error;
+  return {departments:dRes.data||[], dbItems:iRes.data||[], mappings:diRes.data||[], dbRecords:dbRecords||[]};
 }
 
 function applySupabaseState(state){
@@ -2862,7 +2888,7 @@ function applySupabaseState(state){
   mappingRows.forEach(m=>{
     const dbItem=itemById[m.item_id], category=deptById[m.department_id];
     if(!dbItem||!category) return;
-    nextItems.push([dbItem.name,0,0,0,0,category,dbItem.unit||"박스",{}]);
+    nextItems.push([dbItem.name,0,0,0,0,category,dbItem.unit ?? "",{}]);
   });
 
   const nextRecords=state.dbRecords.map(r=>({
@@ -2898,7 +2924,7 @@ function applySupabaseState(state){
     it[1]=current?Number(current.stock||0):0;
   });
 
-  masterItems=state.dbItems.map(it=>({name:it.name,unit:it.unit||"박스"}));
+  masterItems=state.dbItems.map(it=>({name:it.name,unit:it.unit ?? ""}));
   items=nextItems;
   records=nextRecords;
   supabaseLocalSet("submaterial_items",JSON.stringify(items));
