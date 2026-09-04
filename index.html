@@ -7,8 +7,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="소모품 관리">
 <meta name="application-name" content="소모품 관리">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=1.78">
-<link rel="manifest" href="manifest.json?v=1.78">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#1769e0">
 <title>소모품 관리 시스템</title>
@@ -34,13 +34,33 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 14px}
 .calendar-head button{border:0;background:#f1f4f8;border-radius:10px;width:40px;height:38px;font-size:22px}
 .calendar-title{font-weight:800;font-size:17px}
+.admin-stock-date-controls{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(92px,.82fr) minmax(92px,.9fr);gap:8px;align-items:end;margin:18px 0 18px}
+.admin-stock-date-control{min-width:0}
+.admin-stock-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}
+.admin-stock-date-select,.admin-stock-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+.admin-stock-date-select{color:#18212f;justify-content:space-between;padding:0 14px}
+.admin-stock-date-select span:last-child{font-size:21px;line-height:1;color:#18212f;transform:translateY(-2px)}
+.admin-stock-date-action{cursor:pointer;white-space:nowrap}
+.admin-stock-date-action.move{font-size:15px}
+.admin-stock-date-action.today{font-size:15px}
 .calendar-week,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .calendar-week div{text-align:center;font-size:11px;color:#7b8492;padding:4px 0}
-.calendar-cell{min-height:55px;border:1px solid #e7ebf0;border-radius:9px;background:#fff;padding:5px;position:relative}
+.calendar-cell{min-height:55px;border:1px solid #e7ebf0;border-radius:9px;background:#fff;padding:5px;position:relative;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
 .calendar-cell.empty{border:0;background:transparent}
 .calendar-cell.has-record{cursor:pointer;background:#f7faff}
-.calendar-num{font-size:11px;color:#596575}
-.calendar-dot{width:6px;height:6px;border-radius:50%;background:#1769e0;margin:9px auto 0}
+.calendar-num{font-size:13px;color:#18212f;line-height:24px;text-align:center;width:100%}
+.calendar-cell.sunday .calendar-num{color:#e12b2b}
+.calendar-cell.saturday .calendar-num{color:#1769e0}
+.calendar-cell.today-cell{border:2px solid #e12b2b;border-radius:50%;background:#fff;min-height:55px;padding:4px}
+.calendar-cell.today-cell .calendar-num{color:#18212f}
+.calendar-dot{width:6px;height:6px;border-radius:50%;background:#1769e0;margin:3px auto 0}
+.admin-stock-today-legend{display:flex;align-items:center;gap:7px;margin:12px 0 2px 2px;font-size:12px;color:#596575}
+.admin-stock-today-circle{width:14px;height:14px;border:2px solid #e12b2b;border-radius:50%;display:inline-block}
+.admin-date-picker-sheet{max-height:calc(100vh - 180px);max-height:calc(100dvh - 180px)}
+.admin-date-picker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}
+.admin-date-picker-grid button{border:1px solid #dfe5ec;background:#fff;border-radius:11px;min-height:46px;font-size:15px;font-weight:700;color:#18212f}
+.admin-date-picker-grid button.selected{border-color:#1769e0;background:#f3f7ff;color:#1769e0;font-weight:900}
+.month-picker-grid{grid-template-columns:repeat(3,1fr)}
 .calendar-detail{margin-top:12px;border:1px solid #e4e9ef;border-radius:12px;padding:12px;background:#fff}
 .calendar-detail-title{font-weight:800;margin-bottom:8px}
 .admin-record-form{border:1px solid #e2e7ee;border-radius:12px;padding:12px;margin-top:12px}
@@ -110,7 +130,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 .other-stock-item{font-size:12px;color:#667085;margin-top:3px}.other-stock-table{margin-top:12px;border:1px solid #e2e7ee;border-radius:12px;overflow:hidden}.other-stock-table table{border-radius:0;font-size:12px}.other-stock-table th,.other-stock-table td{padding:10px 7px}.other-stock-table .current-dept{color:#1769e0;font-weight:800}.other-stock-table tr.recommended-dept td{background:#ecf9f2;color:#168653;font-weight:800}.other-stock-table tr.recommended-dept td:first-child::before{content:"★ ";color:#16965b}.other-stock-recommend{margin-top:12px;padding:13px;border:1px solid #bfe5cf;background:#effaf4;border-radius:12px;color:#244d38;line-height:1.55}.other-stock-recommend-title{font-weight:900;color:#16965b;margin-bottom:4px}.other-stock-recommend b{color:#1769e0}#attentionItems .sheet{padding-top:72px}#attentionItems .close{position:absolute;top:18px;right:18px;z-index:50;padding:9px 12px;background:#f0f2f5;color:#1769e0;border-radius:10px}
 .attention-action-btn{border:1px solid #d5d9e0;background:#fff8df;color:#b07b00;border-radius:8px;padding:6px 8px;font-size:10px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:none}.attention-action-btn:active{transform:scale(.98)}.attention-table th:last-child,.attention-table td:last-child{text-align:center}
-.stats-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding-right:82px}.stats-title-row h3{margin:0!important;min-width:0}.annual-stats-btn{border:1px solid #d5ddea;background:#fff;color:#1769e0;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}.annual-period-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.annual-period-tabs button{border:1px solid #d8dee8;background:#f6f8fb;color:#667085;border-radius:11px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer}.annual-period-tabs button.active{background:#1769e0;border-color:#1769e0;color:#fff}.annual-period-info{background:#f6f8fb;border-radius:10px;padding:10px 11px;color:#667085;font-size:12px;line-height:1.5;margin-bottom:12px}.annual-dept-section{border:1px solid #e2e7ee;border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}.annual-dept-toggle{width:100%;display:flex;align-items:center;padding:12px 13px;border:0;background:#fff;color:#172033;text-align:left;font-size:15px;font-weight:900}.annual-dept-body{padding:0 9px 10px}.annual-usage-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:10px;background:#fff}.annual-usage-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-size:10.5px}.annual-usage-table th,.annual-usage-table td{padding:8px 4px;border-bottom:1px solid #edf0f4;text-align:center;white-space:normal;overflow-wrap:anywhere}.annual-usage-table th{background:#eef3f9;color:#526071;font-weight:800}.annual-usage-table th:nth-child(2){width:23%}.annual-usage-table th:nth-child(3){width:27%}.annual-usage-table th:nth-child(4){width:16%}.annual-compare-sub{white-space:nowrap;font-size:9.5px;letter-spacing:-.2px}.annual-usage-table th:first-child,.annual-usage-table td:first-child{text-align:center;width:34%}.annual-usage-table td:first-child{font-weight:700;white-space:normal}.annual-usage-table .annual-total td{background:#f6f8fb;font-weight:900}.annual-usage-table .annual-change{font-weight:900}.annual-change.up{color:#df3f3f}.annual-change.down{color:#1769e0}.annual-change.same{color:#667085}.annual-usage-note{margin-top:12px;padding:11px 12px;border:1px solid #e2e7ee;border-radius:11px;background:#fff;color:#667085;font-size:12px;line-height:1.55}.annual-empty{padding:14px;color:#667085;background:#fff;border:1px solid #e2e7ee;border-radius:12px}
+.stats-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding-right:82px}.stats-title-row h3{margin:0!important;min-width:0}.annual-stats-btn{border:1px solid #d5ddea;background:#fff;color:#1769e0;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}.annual-period-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.annual-date-controls{display:grid;grid-template-columns:1fr 1fr .9fr .95fr;gap:8px;align-items:end;margin:14px 0 8px}.annual-date-control{min-width:0}.annual-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.annual-date-select,.annual-date-action{width:100%;height:44px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}.annual-date-select{color:#18212f;justify-content:space-between;padding:0 12px}.annual-date-select span:last-child{font-size:19px;color:#18212f}.annual-date-action{cursor:pointer;white-space:nowrap}.annual-period-tabs button{border:1px solid #d8dee8;background:#f6f8fb;color:#667085;border-radius:11px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer}.annual-period-tabs button.active{background:#1769e0;border-color:#1769e0;color:#fff}.annual-period-info{background:#f6f8fb;border-radius:10px;padding:10px 11px;color:#667085;font-size:12px;line-height:1.5;margin-bottom:12px}.annual-dept-section{border:1px solid #e2e7ee;border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}.annual-dept-toggle{width:100%;display:flex;align-items:center;padding:12px 13px;border:0;background:#fff;color:#172033;text-align:left;font-size:15px;font-weight:900}.annual-dept-body{padding:0 9px 10px}.annual-usage-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:10px;background:#fff}.annual-usage-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-size:10.5px}.annual-usage-table th,.annual-usage-table td{padding:8px 4px;border-bottom:1px solid #edf0f4;text-align:center;white-space:normal;overflow-wrap:anywhere}.annual-usage-table th{background:#eef3f9;color:#526071;font-weight:800}.annual-usage-table th:nth-child(2){width:23%}.annual-usage-table th:nth-child(3){width:27%}.annual-usage-table th:nth-child(4){width:16%}.annual-compare-sub{white-space:nowrap;font-size:9.5px;letter-spacing:-.2px}.annual-usage-table th:first-child,.annual-usage-table td:first-child{text-align:center;width:34%}.annual-usage-table td:first-child{font-weight:700;white-space:normal}.annual-usage-table .annual-total td{background:#f6f8fb;font-weight:900}.annual-usage-table .annual-change{font-weight:900}.annual-change.up{color:#df3f3f}.annual-change.down{color:#1769e0}.annual-change.same{color:#667085}.annual-usage-note{margin-top:12px;padding:11px 12px;border:1px solid #e2e7ee;border-radius:11px;background:#fff;color:#667085;font-size:12px;line-height:1.55}.annual-excel-btn{width:100%;height:44px;border:1.5px solid #1769e0;border-radius:10px;background:#1769e0;color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin:0 0 12px}.annual-empty{padding:14px;color:#667085;background:#fff;border:1px solid #e2e7ee;border-radius:12px}
 .blank-confirm-sheet{max-width:430px;text-align:center;padding:28px 22px!important}.blank-confirm-sheet h3{margin:0 0 12px;font-size:20px}.blank-confirm-message{font-size:14px;line-height:1.65;margin:0}.blank-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.blank-confirm-actions button{border:0;border-radius:12px;padding:13px;font-size:17px;font-weight:900;cursor:pointer}.blank-x-btn{background:#f1f3f6;color:#667085}.blank-o-btn{background:#1769e0;color:#fff}.blank-confirm-actions button:active{transform:scale(.98)}
 .history-calendar-nav{display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:10px;margin:14px 0 12px;text-align:center}.history-calendar-nav b{font-size:20px;color:#172033}.calendar-nav-btn{border:0;background:#f2f5f9;color:#1769e0;border-radius:12px;min-height:52px;font-size:32px;font-weight:700;cursor:pointer}.calendar-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;color:#8a93a1;text-align:center;font-size:12px;font-weight:700}.history-calendar-legend{display:flex;align-items:center;gap:7px;margin:12px 2px;color:#667085;font-size:12px}.history-calendar-legend .calendar-dot{width:9px;height:9px;background:#1769e0;border-radius:50%;display:inline-block}.history-selected-date{background:#eef5ff;color:#1769e0;border-radius:12px;padding:12px;text-align:center;font-size:15px;font-weight:900;margin-top:12px}.history-dept-back{margin-bottom:10px}.history-record-title{font-size:19px;font-weight:900;margin:10px 0 12px}.history-record-sub{color:#667085;font-size:12px;margin-bottom:12px}.history-simple-table-wrap{overflow:hidden;border:1px solid #e2e7ee;border-radius:12px;background:#fff}.history-simple-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}.history-simple-table th{background:#eef3f9;color:#526071;font-weight:800;padding:11px 8px;text-align:center}.history-simple-table th:first-child{width:72%}.history-simple-table th:last-child{width:28%}.history-simple-table td{padding:11px 8px;border-top:1px solid #edf0f4;vertical-align:middle}.history-simple-table td:first-child{font-weight:700}.history-simple-table td:last-child{text-align:center;font-weight:800}.history-all-section{margin-top:12px}.history-all-section-title{font-size:15px;font-weight:900;color:#1769e0;margin:14px 2px 7px}.history-all-table-wrap{overflow:hidden;border:1px solid #e2e7ee;border-radius:11px;background:#fff}.history-all-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.history-all-table th{background:#eef3f9;color:#526071;font-weight:800;padding:9px 7px;text-align:center}.history-all-table th:first-child{width:74%}.history-all-table th:last-child{width:26%}.history-all-table td{padding:9px 7px;border-top:1px solid #edf0f4}.history-all-table td:last-child{text-align:center;font-weight:800}.history-top-btn{display:block;width:100%;margin:18px 0 6px;padding:13px 12px;border:1px solid #d8e0ec;background:#f5f8fc;color:#1769e0;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:none}.history-no-record{padding:20px;text-align:center;color:#667085;border:1px solid #e2e7ee;border-radius:12px;background:#fff}
 .overall-item-section{margin:18px 0 20px}.overall-item-title{font-size:17px;font-weight:900;margin:0 0 8px}.overall-table-wrap{overflow:hidden;border:1px solid #dfe5ee;border-radius:12px;background:#fff}.overall-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.overall-table th,.overall-table td{padding:10px 5px;border-bottom:1px solid #edf0f4;text-align:center;word-break:keep-all}.overall-table th{background:#eef3f9;color:#526071;font-weight:800}.overall-table th:first-child,.overall-table td:first-child{width:17%}.overall-table th:not(:first-child),.overall-table td:not(:first-child){width:13.83%}.overall-table tr:last-child td{border-bottom:0}.overall-table td{font-size:13px}.overall-stock-number{font-weight:800}.overall-note{margin-top:12px;padding:11px 12px;border:1px solid #dce5f2;border-radius:11px;background:#f8fbff;color:#667085;font-size:12px;line-height:1.55}.overall-empty{padding:18px;text-align:center;color:#667085;border:1px solid #e2e7ee;border-radius:12px;background:#fff}
@@ -361,16 +381,48 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 
 <!-- 관리자 과거 재고 수정: 날짜 선택 -->
 <div class="modal" id="adminStockCalendar"><div class="sheet">
-  <button class="close" onclick="openModal('admin')">닫기</button>
+  <button class="close" onclick="closeAdminStockCalendar()">닫기</button>
   <h3>📦 재고 수정 (관리자 권한)</h3>
   <p class="muted">수정할 날짜를 선택해 주세요. 과거 날짜의 재고도 입력·수정할 수 있습니다.</p>
-  <div class="calendar-head">
-    <button onclick="changeAdminStockCalendarMonth(-1)">‹</button>
-    <div id="adminStockCalendarTitle" class="calendar-title"></div>
-    <button onclick="changeAdminStockCalendarMonth(1)">›</button>
+  <div class="admin-stock-date-controls">
+    <div class="admin-stock-date-control year-control">
+      <div class="admin-stock-date-label">연도</div>
+      <button type="button" class="admin-stock-date-select" onclick="openAdminYearPicker()"><span id="adminStockYearText"></span><span>⌄</span></button>
+    </div>
+    <div class="admin-stock-date-control month-control">
+      <div class="admin-stock-date-label">월</div>
+      <button type="button" class="admin-stock-date-select" onclick="openAdminMonthPicker()"><span id="adminStockMonthText"></span><span>⌄</span></button>
+    </div>
+    <button type="button" class="admin-stock-date-action move" onclick="applyAdminStockCalendarSelection()">→&nbsp; 이동</button>
+    <button type="button" class="admin-stock-date-action today" onclick="goAdminStockToday()">▣&nbsp; 당일</button>
   </div>
   <div class="calendar-week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
   <div id="adminStockCalendarGrid" class="calendar-grid"></div>
+  <div class="admin-stock-today-legend"><span class="admin-stock-today-circle"></span><span>오늘</span></div>
+</div></div>
+
+<div class="modal" id="adminYearPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('adminStockCalendar')">닫기</button>
+  <h3>연도 선택</h3>
+  <div id="adminYearPickerGrid" class="admin-date-picker-grid"></div>
+</div></div>
+
+<div class="modal" id="adminMonthPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('adminStockCalendar')">닫기</button>
+  <h3>월 선택</h3>
+  <div id="adminMonthPickerGrid" class="admin-date-picker-grid month-picker-grid"></div>
+</div></div>
+
+<div class="modal" id="adminAnnualYearPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('adminAnnualStats')">닫기</button>
+  <h3>연도 선택</h3>
+  <div id="adminAnnualYearPickerGrid" class="admin-date-picker-grid"></div>
+</div></div>
+
+<div class="modal" id="adminAnnualMonthPicker"><div class="sheet admin-date-picker-sheet">
+  <button class="close" onclick="openModal('adminAnnualStats')">닫기</button>
+  <h3>월 선택</h3>
+  <div id="adminAnnualMonthPickerGrid" class="admin-date-picker-grid month-picker-grid"></div>
 </div></div>
 
 <div class="modal" id="adminHistoricalDepartment"><div class="sheet">
@@ -396,7 +448,13 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <div class="modal" id="adminAnnualStats"><div class="sheet">
   <button class="close" onclick="openModal('adminStats');renderAdminUsageReport();">닫기</button>
   <div class="stats-title-row"><h3>📊 연간 사용량 통계</h3></div>
-  <p class="muted">당해 연도는 올해의 사용량으로 표시하고, 1년·3년·5년 전 기간과 비교한 증감률을 확인합니다. 3년·5년 비교값은 각각 직전 3년·5년의 평균 사용량입니다.</p>
+  <p class="muted">당해 연도는 선택한 기준월까지의 사용량으로 표시하고, 1년·3년·5년 전 기간과 비교한 증감률을 확인합니다. 3년·5년 비교값은 각각 직전 3년·5년의 평균 사용량입니다.</p>
+  <div class="annual-date-controls">
+    <div class="annual-date-control"><div class="annual-date-label">연도</div><button type="button" class="annual-date-select" onclick="openAdminAnnualYearPicker()"><span id="adminAnnualYearText"></span><span>⌄</span></button></div>
+    <div class="annual-date-control"><div class="annual-date-label">월</div><button type="button" class="annual-date-select" onclick="openAdminAnnualMonthPicker()"><span id="adminAnnualMonthText"></span><span>⌄</span></button></div>
+    <button type="button" class="annual-date-action" onclick="applyAdminAnnualDateSelection()">→&nbsp; 이동</button>
+    <button type="button" class="annual-date-action" onclick="goAdminAnnualToday()">▣&nbsp; 당월</button>
+  </div>
   <div class="annual-period-tabs">
     <button type="button" data-years="1" onclick="setAnnualUsagePeriod(1)">1년 통계</button>
     <button type="button" data-years="3" onclick="setAnnualUsagePeriod(3)">3년 통계</button>
@@ -406,8 +464,9 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.78"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.80"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1738,35 +1797,94 @@ function openAdminStats(){
 }
 
 let adminStockCalendarDate=new Date();
+let adminStockSelectedYear=adminStockCalendarDate.getFullYear();
+let adminStockSelectedMonth=adminStockCalendarDate.getMonth();
 let adminUsageMonthDate=new Date();
 
+function resetAdminStockCalendarToToday(){
+  const now=new Date();
+  adminStockCalendarDate=new Date(now.getFullYear(),now.getMonth(),1);
+  adminStockSelectedYear=now.getFullYear();
+  adminStockSelectedMonth=now.getMonth();
+}
+
+function syncAdminStockDateControls(){
+  document.getElementById("adminStockYearText").textContent=`${adminStockSelectedYear}년`;
+  document.getElementById("adminStockMonthText").textContent=`${adminStockSelectedMonth+1}월`;
+}
+
 function openAdminStockEdit(){
+  resetAdminStockCalendarToToday();
   openModal("adminStockCalendar");
+  renderAdminStockCalendar();
+}
+
+function closeAdminStockCalendar(){
+  resetAdminStockCalendarToToday();
+  openModal("admin");
+}
+
+function openAdminYearPicker(){
+  const grid=document.getElementById("adminYearPickerGrid");
+  const currentYear=new Date().getFullYear();
+  const selected=adminStockSelectedYear;
+  grid.innerHTML="";
+  for(let y=currentYear-10;y<=currentYear+2;y++){
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.textContent=`${y}년`;
+    if(y===selected) btn.classList.add("selected");
+    btn.onclick=()=>{adminStockSelectedYear=y;openModal("adminStockCalendar");renderAdminStockCalendar();};
+    grid.appendChild(btn);
+  }
+  openModal("adminYearPicker");
+}
+
+function openAdminMonthPicker(){
+  const grid=document.getElementById("adminMonthPickerGrid");
+  const selected=adminStockSelectedMonth;
+  grid.innerHTML="";
+  for(let m=0;m<12;m++){
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.textContent=`${m+1}월`;
+    if(m===selected) btn.classList.add("selected");
+    btn.onclick=()=>{adminStockSelectedMonth=m;openModal("adminStockCalendar");renderAdminStockCalendar();};
+    grid.appendChild(btn);
+  }
+  openModal("adminMonthPicker");
+}
+
+function applyAdminStockCalendarSelection(){
+  adminStockCalendarDate=new Date(adminStockSelectedYear,adminStockSelectedMonth,1);
+  renderAdminStockCalendar();
+}
+
+function goAdminStockToday(){
+  resetAdminStockCalendarToToday();
   renderAdminStockCalendar();
 }
 
 function renderAdminStockCalendar(){
   const y=adminStockCalendarDate.getFullYear(),m=adminStockCalendarDate.getMonth();
-  document.getElementById("adminStockCalendarTitle").textContent=`${y}년 ${m+1}월`;
+  syncAdminStockDateControls();
   const grid=document.getElementById("adminStockCalendarGrid");
   grid.innerHTML="";
   const first=new Date(y,m,1).getDay();
   const last=new Date(y,m+1,0).getDate();
+  const todayKey=dateStr(new Date());
   for(let i=0;i<first;i++) grid.insertAdjacentHTML("beforeend",`<div class="calendar-cell empty"></div>`);
   for(let day=1;day<=last;day++){
     const key=`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     const dayRecords=records.some(r=>r.date===key && r.type==="재고확인");
+    const dow=new Date(y,m,day).getDay();
+    const isToday=key===todayKey;
     const cell=document.createElement("div");
-    cell.className="calendar-cell"+(dayRecords?" has-record":"");
+    cell.className="calendar-cell"+(dayRecords?" has-record":"")+(dow===0?" sunday":"")+(dow===6?" saturday":"")+(isToday?" today-cell":"");
     cell.innerHTML=`<div class="calendar-num">${day}</div>${dayRecords?'<div class="calendar-dot"></div>':''}`;
     cell.onclick=()=>openHistoricalStock(key);
     grid.appendChild(cell);
   }
-}
-
-function changeAdminStockCalendarMonth(delta){
-  adminStockCalendarDate.setMonth(adminStockCalendarDate.getMonth()+delta);
-  renderAdminStockCalendar();
 }
 
 function openHistoricalStock(date){
@@ -1814,41 +1932,101 @@ function renderAdminUsageReport(){
 }
 
 let adminAnnualUsageYears=1;
+let adminAnnualSelectedYear=new Date().getFullYear();
+let adminAnnualSelectedMonth=new Date().getMonth();
+let adminAnnualPendingYear=adminAnnualSelectedYear;
+let adminAnnualPendingMonth=adminAnnualSelectedMonth;
+
+function resetAdminAnnualDateToToday(){
+  const now=new Date();
+  adminAnnualSelectedYear=now.getFullYear();
+  adminAnnualSelectedMonth=now.getMonth();
+  adminAnnualPendingYear=adminAnnualSelectedYear;
+  adminAnnualPendingMonth=adminAnnualSelectedMonth;
+}
+
+function syncAdminAnnualDateControls(){
+  const y=document.getElementById('adminAnnualYearText'),m=document.getElementById('adminAnnualMonthText');
+  if(y) y.textContent=`${adminAnnualPendingYear}년`;
+  if(m) m.textContent=`${adminAnnualPendingMonth+1}월`;
+}
+
+function openAdminAnnualYearPicker(){
+  const currentYear=new Date().getFullYear();
+  const grid=document.createElement('div');
+  grid.className='admin-date-picker-grid';
+  for(let y=currentYear-10;y<=currentYear+2;y++){
+    const btn=document.createElement('button');
+    btn.type='button'; btn.textContent=`${y}년`;
+    if(y===adminAnnualPendingYear) btn.classList.add('selected');
+    btn.onclick=()=>{adminAnnualPendingYear=y;syncAdminAnnualDateControls();openModal('adminAnnualStats');};
+    grid.appendChild(btn);
+  }
+  const host=document.getElementById('adminAnnualYearPickerGrid');
+  if(host) host.innerHTML=grid.innerHTML;
+  openModal('adminAnnualYearPicker');
+}
+
+function openAdminAnnualMonthPicker(){
+  const grid=document.getElementById('adminAnnualMonthPickerGrid');
+  if(!grid) return;
+  grid.innerHTML='';
+  for(let m=0;m<12;m++){
+    const btn=document.createElement('button');
+    btn.type='button'; btn.textContent=`${m+1}월`;
+    if(m===adminAnnualPendingMonth) btn.classList.add('selected');
+    btn.onclick=()=>{adminAnnualPendingMonth=m;syncAdminAnnualDateControls();openModal('adminAnnualStats');};
+    grid.appendChild(btn);
+  }
+  openModal('adminAnnualMonthPicker');
+}
+
+function applyAdminAnnualDateSelection(){
+  adminAnnualSelectedYear=adminAnnualPendingYear;
+  adminAnnualSelectedMonth=adminAnnualPendingMonth;
+  renderAdminAnnualUsageReport();
+}
+
+function goAdminAnnualToday(){
+  resetAdminAnnualDateToToday();
+  renderAdminAnnualUsageReport();
+}
+
 function openAdminAnnualStats(){
-  openModal("adminAnnualStats");
+  resetAdminAnnualDateToToday();
+  openModal('adminAnnualStats');
+  syncAdminAnnualDateControls();
   setAnnualUsagePeriod(adminAnnualUsageYears);
 }
 
 function setAnnualUsagePeriod(years){
   adminAnnualUsageYears=years;
-  document.querySelectorAll("#adminAnnualStats .annual-period-tabs button").forEach(btn=>{
-    btn.classList.toggle("active",Number(btn.dataset.years)===years);
+  document.querySelectorAll('#adminAnnualStats .annual-period-tabs button').forEach(btn=>{
+    btn.classList.toggle('active',Number(btn.dataset.years)===years);
   });
   renderAdminAnnualUsageReport();
 }
 
-function getAnnualUsageValue(itemName, category, startYear, endYear){
-  const start=`${startYear}-01-01`;
-  // 연간 통계는 조회 기준 월까지의 누적 사용량으로 비교합니다.
-  // 당해 연도는 해당 월의 오늘 입력분을 제외하고, 과거 연도는 같은 월의 말일까지 집계합니다.
+function getAnnualUsageValue(itemName, category, year, cutoffYear, cutoffMonth){
+  const start=`${year}-01-01`;
   const now=new Date();
-  const targetMonth=now.getMonth()+1;
   let end;
-  if(endYear===now.getFullYear()){
+  if(year===cutoffYear && year===now.getFullYear() && cutoffMonth===now.getMonth()){
+    end=getPreviousDate(dateStr(now));
+  }else if(year===cutoffYear && year===now.getFullYear() && cutoffMonth>now.getMonth()){
     end=getPreviousDate(dateStr(now));
   }else{
-    const lastDay=new Date(endYear,targetMonth,0);
-    end=dateStr(lastDay);
+    end=dateStr(new Date(year,cutoffMonth+1,0));
   }
+  if(end<start) return 0;
   return getUsageFromInventoryChanges(itemName,category,start,end).value;
 }
 
 function getAnnualPeriodInfo(years){
-  // 당해는 항상 실제 현재 연도입니다. 비교 기간은 당해 직전의 완료 연도를 기준으로 합니다.
-  const currentYear=new Date().getFullYear();
+  const currentYear=adminAnnualSelectedYear;
   const compareEnd=currentYear-1;
   const compareStart=years===1 ? compareEnd : compareEnd-years+1;
-  return {currentYear,compareStart,compareEnd};
+  return {currentYear,compareStart,compareEnd,cutoffMonth:adminAnnualSelectedMonth};
 }
 
 function annualAverage(total,years){
@@ -1863,13 +2041,10 @@ function formatAnnualNumber(value){
 
 function formatAnnualChange(current,previous){
   const c=Number(current||0), p=Number(previous||0);
-  if(c===p) return {text:"0.0%",cls:"same"};
-  if(p===0){
-    if(c>0) return {text:"신규",cls:"up"};
-    return {text:"0.0%",cls:"same"};
-  }
+  if(c===p) return {text:'0.0%',cls:'same'};
+  if(p===0){ if(c>0) return {text:'신규',cls:'up'}; return {text:'0.0%',cls:'same'}; }
   const pct=((c-p)/p)*100;
-  return {text:`${pct>0?"+":""}${pct.toFixed(1)}%`,cls:pct>0?"up":"down"};
+  return {text:`${pct>0?'+':''}${pct.toFixed(1)}%`,cls:pct>0?'up':'down'};
 }
 
 function getAnnualComparisonLabel(years,info){
@@ -1878,59 +2053,64 @@ function getAnnualComparisonLabel(years,info){
   return `비교 대상<br><span class="annual-compare-sub">(최근 5년 평균)</span>`;
 }
 
+function buildAnnualExportRows(){
+  const years=adminAnnualUsageYears, info=getAnnualPeriodInfo(years), rows=[];
+  CATEGORIES.forEach(category=>{
+    const deptItems=items.filter(x=>(x[5]||'P/S')===category);
+    deptItems.forEach(item=>{
+      const current=getAnnualUsageValue(item[0],category,info.currentYear,info.currentYear,info.cutoffMonth);
+      let comparison;
+      if(years===1) comparison=getAnnualUsageValue(item[0],category,info.compareEnd,info.currentYear,info.cutoffMonth);
+      else { let total=0; for(let y=info.compareStart;y<=info.compareEnd;y++) total+=getAnnualUsageValue(item[0],category,y,info.currentYear,info.cutoffMonth); comparison=annualAverage(total,years); }
+      const ch=formatAnnualChange(current,comparison);
+      rows.push({부서:category,품목:item[0],단위:getUnit(item[0],category),당해연도:`${info.currentYear}년`,기준월:`${info.cutoffMonth+1}월`,당해사용량:Number(current),비교기간:years===1?`${info.compareEnd}년`:`${info.compareStart}~${info.compareEnd}년 평균`,비교사용량:Number(comparison),증감률:ch.text});
+    });
+  });
+  return rows;
+}
+
+function downloadAnnualUsageExcel(){
+  if(typeof XLSX==='undefined'){ alert('엑셀 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 후 다시 시도해 주세요.'); return; }
+  const rows=buildAnnualExportRows();
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws['!cols']=[{wch:10},{wch:30},{wch:10},{wch:12},{wch:10},{wch:14},{wch:22},{wch:14},{wch:10}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,`${adminAnnualUsageYears}년 통계`);
+  const info=getAnnualPeriodInfo(adminAnnualUsageYears);
+  XLSX.writeFile(wb,`소모품관리_${adminAnnualUsageYears}년통계_${info.currentYear}_${String(info.cutoffMonth+1).padStart(2,'0')}.xlsx`);
+}
+
 function renderAdminAnnualUsageReport(){
-  const box=document.getElementById("adminAnnualUsageReport");
+  const box=document.getElementById('adminAnnualUsageReport');
   if(!box) return;
+  syncAdminAnnualDateControls();
   const years=adminAnnualUsageYears;
   const info=getAnnualPeriodInfo(years);
   const comparisonLabel=getAnnualComparisonLabel(years,info);
   const periodLabel=years===1
-    ? `${info.currentYear}년 당해 사용량 vs ${info.compareEnd}년 사용량`
-    : `${info.currentYear}년 당해 사용량 vs ${info.compareStart}~${info.compareEnd}년 평균 사용량`;
+    ? `${info.currentYear}년 ${info.cutoffMonth+1}월까지 사용량 vs ${info.compareEnd}년 ${info.cutoffMonth+1}월까지 사용량`
+    : `${info.currentYear}년 ${info.cutoffMonth+1}월까지 사용량 vs ${info.compareStart}~${info.compareEnd}년 ${info.cutoffMonth+1}월까지 평균 사용량`;
 
   const sections=CATEGORIES.map((category,index)=>{
-    const deptItems=items.filter(x=>(x[5]||"P/S")===category);
-    if(!deptItems.length) return "";
-
+    const deptItems=items.filter(x=>(x[5]||'P/S')===category);
+    if(!deptItems.length) return '';
     let currentTotal=0, comparisonTotal=0;
     const rows=deptItems.map(item=>{
       const name=item[0];
-      const current= getAnnualUsageValue(name,category,info.currentYear,info.currentYear);
+      const current=getAnnualUsageValue(name,category,info.currentYear,info.currentYear,info.cutoffMonth);
       let comparison;
-      if(years===1){
-        comparison=getAnnualUsageValue(name,category,info.compareEnd,info.compareEnd);
-      }else{
-        let total=0;
-        for(let y=info.compareStart;y<=info.compareEnd;y++){
-          total+=getAnnualUsageValue(name,category,y,y);
-        }
-        comparison=annualAverage(total,years);
-      }
-      currentTotal+=current;
-      comparisonTotal+=comparison;
+      if(years===1) comparison=getAnnualUsageValue(name,category,info.compareEnd,info.currentYear,info.cutoffMonth);
+      else { let total=0; for(let y=info.compareStart;y<=info.compareEnd;y++) total+=getAnnualUsageValue(name,category,y,info.currentYear,info.cutoffMonth); comparison=annualAverage(total,years); }
+      currentTotal+=current; comparisonTotal+=comparison;
       const ch=formatAnnualChange(current,comparison);
       return `<tr><td>${esc(name)}</td><td>${formatAnnualNumber(current)}</td><td>${formatAnnualNumber(comparison)}</td><td class="annual-change ${ch.cls}">${ch.text}</td></tr>`;
-    }).join("");
-
+    }).join('');
     const totalChange=formatAnnualChange(currentTotal,comparisonTotal);
-    return `<section class="annual-dept-section open">
-      <div class="annual-dept-toggle">
-        <span>${esc(category)}</span>
-      </div>
-      <div class="annual-dept-body"><div class="annual-usage-table-wrap"><table class="annual-usage-table"><thead><tr><th>품목</th><th>당해 사용량<br>(${info.currentYear}년)</th><th>${comparisonLabel}</th><th>증감률</th></tr></thead><tbody>${rows}<tr class="annual-total"><td>합계</td><td>${formatAnnualNumber(currentTotal)}</td><td>${formatAnnualNumber(comparisonTotal)}</td><td class="annual-change ${totalChange.cls}">${totalChange.text}</td></tr></tbody></table></div></div>
-    </section>`;
-  }).join("");
-
+    return `<section class="annual-dept-section open"><div class="annual-dept-toggle"><span>${esc(category)}</span></div><div class="annual-dept-body"><div class="annual-usage-table-wrap"><table class="annual-usage-table"><thead><tr><th>품목</th><th>당해 사용량<br>(${info.currentYear}년)</th><th>${comparisonLabel}</th><th>증감률</th></tr></thead><tbody>${rows}<tr class="annual-total"><td>합계</td><td>${formatAnnualNumber(currentTotal)}</td><td>${formatAnnualNumber(comparisonTotal)}</td><td class="annual-change ${totalChange.cls}">${totalChange.text}</td></tr></tbody></table></div></div></section>`;
+  }).join('');
   if(!sections){ box.innerHTML='<div class="annual-empty">등록된 품목이 없습니다.</div>'; return; }
-
-  const comparisonRule=years===1
-    ? `${info.currentYear}년 당해 사용량과 ${info.compareEnd}년 사용량을 비교합니다.`
-    : `${info.currentYear}년 당해 사용량과 ${info.compareStart}~${info.compareEnd}년 평균 사용량을 비교합니다.`;
-
-  box.innerHTML=`
-    <div class="annual-period-info"><b>${periodLabel}</b><br>${comparisonRule}<br>증감률 = (당해 사용량 − 비교 사용량) ÷ 비교 사용량 × 100<br>당일 입력은 사용량 산정에서 제외됩니다.</div>
-    ${sections}
-    <div class="annual-usage-note">* 1년 통계: 당해 연도 사용량과 1년 전 사용량을 비교합니다.<br>* 3년 통계: 당해 연도 사용량과 직전 3년의 <b>평균 사용량</b>을 비교합니다.<br>* 5년 통계: 당해 연도 사용량과 직전 5년의 <b>평균 사용량</b>을 비교합니다.<br>* 증감률이 +면 비교 기간보다 당해 사용량이 많고, −면 적게 사용한 것입니다.<br>* 사용량은 재고확인 기록의 감소분을 기준으로 산정하며 증가분은 사용량에 포함하지 않습니다.</div>`;
+  const comparisonRule=years===1 ? `${info.currentYear}년 당해 사용량과 ${info.compareEnd}년 ${info.cutoffMonth+1}월까지 사용량을 비교합니다.` : `${info.currentYear}년 당해 사용량과 ${info.compareStart}~${info.compareEnd}년의 ${info.cutoffMonth+1}월까지 평균 사용량을 비교합니다.`;
+  box.innerHTML=`<div class="annual-period-info"><b>${periodLabel}</b><br>${comparisonRule}<br>증감률 = (당해 사용량 − 비교 사용량) ÷ 비교 사용량 × 100<br>당일 입력은 사용량 산정에서 제외됩니다.</div><button type="button" class="annual-excel-btn" onclick="downloadAnnualUsageExcel()">📥 엑셀로 다운받기</button>${sections}<div class="annual-usage-note">* 1년 통계: 당해 연도 사용량과 1년 전 사용량을 비교합니다.<br>* 3년 통계: 당해 연도 사용량과 직전 3년의 <b>평균 사용량</b>을 비교합니다.<br>* 5년 통계: 당해 연도 사용량과 직전 5년의 <b>평균 사용량</b>을 비교합니다.<br>* 증감률이 +면 비교 기간보다 당해 사용량이 많고, −면 적게 사용한 것입니다.<br>* 사용량은 재고확인 기록의 감소분을 기준으로 산정하며 증가분은 사용량에 포함하지 않습니다.</div>`;
 }
 
 function scrollHistoryTop(){
