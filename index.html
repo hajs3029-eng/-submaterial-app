@@ -34,11 +34,11 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 14px}
 .calendar-head button{border:0;background:#f1f4f8;border-radius:10px;width:40px;height:38px;font-size:22px}
 .calendar-title{font-weight:800;font-size:17px}
-.admin-stock-date-controls{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(92px,.82fr) minmax(92px,.9fr);gap:8px;align-items:end;margin:18px 0 18px}
+.admin-stock-date-controls{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.92fr) minmax(88px,.82fr) minmax(88px,.88fr);gap:8px;align-items:end;margin:18px 0 18px}
 .admin-stock-date-control{min-width:0}
 .admin-stock-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}
-.admin-stock-date-select,.admin-stock-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
-.admin-stock-date-select{color:#18212f;justify-content:space-between;padding:0 14px}
+.admin-stock-date-select,.admin-stock-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;overflow:hidden}
+.admin-stock-date-select{color:#18212f;justify-content:space-between;padding:0 10px;white-space:nowrap}
 .admin-stock-date-select span:last-child{font-size:21px;line-height:1;color:#18212f;transform:translateY(-2px)}
 .admin-stock-date-action{cursor:pointer;white-space:nowrap}
 .admin-stock-date-action.move{font-size:15px}
@@ -61,7 +61,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 .admin-date-picker-grid button{border:1px solid #dfe5ec;background:#fff;border-radius:11px;min-height:46px;font-size:15px;font-weight:700;color:#18212f}
 .admin-date-picker-grid button.selected{border-color:#1769e0;background:#f3f7ff;color:#1769e0;font-weight:900}
 .month-picker-grid{grid-template-columns:repeat(3,1fr)}
-.date-picker-tabs{display:flex;gap:8px;margin:10px 0 12px;overflow-x:auto}.date-picker-tabs button{flex:0 0 auto;border:1px solid #dfe5ec;background:#fff;color:#667085;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:800}.date-picker-tabs button.active{border-color:#1769e0;background:#f3f7ff;color:#1769e0}.date-picker-years{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.date-picker-years button{min-height:46px}.history-date-controls{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(92px,.82fr) minmax(92px,.9fr);gap:8px;align-items:end;margin:18px 0}.history-date-control{min-width:0}.history-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.history-date-select,.history-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}.history-date-select{color:#18212f;justify-content:space-between;padding:0 13px}.history-date-select span:last-child{font-size:20px;color:#18212f}.history-date-action{cursor:pointer;white-space:nowrap}.admin-usage-date-controls{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(92px,.82fr) minmax(92px,.9fr);gap:8px;align-items:end;margin:18px 0 14px}.admin-usage-date-control{min-width:0}.admin-usage-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.admin-usage-date-select,.admin-usage-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px}.admin-usage-date-select{color:#18212f;justify-content:space-between;padding:0 13px}.admin-usage-date-select span:last-child{font-size:20px;color:#18212f}.admin-usage-date-action{cursor:pointer;white-space:nowrap}
+.date-picker-tabs{display:flex;gap:8px;margin:10px 0 12px;overflow-x:auto}.date-picker-tabs button{flex:0 0 auto;border:1px solid #dfe5ec;background:#fff;color:#667085;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:800}.date-picker-tabs button.active{border-color:#1769e0;background:#f3f7ff;color:#1769e0}.date-picker-years{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.date-picker-years button{min-height:46px}.history-date-controls{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(92px,.82fr) minmax(92px,.9fr);gap:8px;align-items:end;margin:18px 0}.history-date-control{min-width:0}.history-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.history-date-select,.history-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;overflow:hidden}.history-date-select{color:#18212f;justify-content:space-between;padding:0 10px;white-space:nowrap}.history-date-select span:last-child{font-size:20px;color:#18212f}.history-date-action{cursor:pointer;white-space:nowrap}.admin-usage-date-controls{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.92fr) minmax(88px,.82fr) minmax(88px,.88fr);gap:8px;align-items:end;margin:18px 0 14px}.admin-usage-date-control{min-width:0}.admin-usage-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.admin-usage-date-select,.admin-usage-date-action{width:100%;height:48px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;overflow:hidden}.admin-usage-date-select{color:#18212f;justify-content:space-between;padding:0 10px;white-space:nowrap}.admin-usage-date-select span:last-child{font-size:20px;color:#18212f}.admin-usage-date-action{cursor:pointer;white-space:nowrap}
 
 .calendar-detail{margin-top:12px;border:1px solid #e4e9ef;border-radius:12px;padding:12px;background:#fff}
 .calendar-detail-title{font-weight:800;margin-bottom:8px}
@@ -130,11 +130,11 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 .admin-menu{display:grid;grid-template-columns:1fr;gap:14px;margin:18px 0 14px}.admin-menu .primary{margin:0 !important;min-height:60px;border-radius:14px}.admin-menu-sub{font-weight:700;font-size:13px;opacity:.9}
 .admin-usage-period{font-size:12px;color:#667085;background:#f6f8fb;border-radius:10px;padding:9px 10px;margin:10px 0}.usage-chart{border:1px solid #e2e7ee;border-radius:12px;background:#fff;padding:12px}.usage-bar-row{display:grid;grid-template-columns:62px 1fr 48px;gap:8px;align-items:center;margin:10px 0}.usage-bar-label{font-size:12px;font-weight:800}.usage-bar-track{height:18px;background:#eef2f6;border-radius:999px;overflow:hidden}.usage-bar-fill{height:100%;background:#1769e0;border-radius:999px}.usage-bar-value{text-align:right;font-size:12px;font-weight:800}.admin-usage-report{margin-top:10px}.admin-usage-section{margin:14px 0}.admin-usage-section-title{font-size:16px;font-weight:800;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}.admin-usage-top-btn{border:1px solid #d8dee8;background:#f6f8fb;color:#1769e0;border-radius:8px;padding:5px 9px;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer}.admin-usage-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:12px;background:#fff}.admin-usage-table{width:100%;border-collapse:collapse;min-width:0;font-size:13px;table-layout:fixed}.admin-usage-table th{background:#f1f5fb;color:#667085;font-weight:800;padding:10px 6px;white-space:normal;text-align:center;word-break:break-word}.admin-usage-table td{padding:10px 6px;border-top:1px solid #edf0f4;text-align:center;word-break:break-word}.admin-usage-item{font-weight:700;text-align:center}.admin-usage-number{font-weight:800;text-align:center}.admin-usage-table th:nth-child(1),.admin-usage-table td:nth-child(1){width:46%}.admin-usage-table th:nth-child(2),.admin-usage-table td:nth-child(2){width:27%}.admin-usage-table th:nth-child(3),.admin-usage-table td:nth-child(3){width:27%}.admin-usage-empty{padding:14px;color:#667085;background:#fff;border:1px solid #e2e7ee;border-radius:12px}.admin-usage-note{margin-top:12px;padding:11px 12px;border:1px solid #e2e7ee;border-radius:11px;background:#fff;color:#667085;font-size:12px;line-height:1.55}.admin-usage-quick-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 16px}.admin-usage-quick-btn{min-height:54px;border:1px solid #dce3ed;background:#fff;border-radius:12px;color:#1769e0;font-size:13px;font-weight:800;cursor:pointer;box-shadow:none}.admin-usage-quick-btn:active{background:#f3f7fd}
 
-.other-stock-item{font-size:12px;color:#667085;margin-top:3px}.other-stock-table{margin-top:12px;border:1px solid #e2e7ee;border-radius:12px;overflow:hidden}.other-stock-table table{border-radius:0;font-size:12px}.other-stock-table th,.other-stock-table td{padding:10px 7px}.other-stock-table .current-dept{color:#1769e0;font-weight:800}.other-stock-table tr.recommended-dept td{background:#ecf9f2;color:#168653;font-weight:800}.other-stock-table tr.recommended-dept td:first-child::before{content:"★ ";color:#16965b}.other-stock-recommend{margin-top:12px;padding:13px;border:1px solid #bfe5cf;background:#effaf4;border-radius:12px;color:#244d38;line-height:1.55}.other-stock-recommend-title{font-weight:900;color:#16965b;margin-bottom:4px}.other-stock-recommend b{color:#1769e0}#attentionItems .sheet{padding-top:72px}#attentionItems .close{position:absolute;top:18px;right:18px;z-index:50;padding:9px 12px;background:#f0f2f5;color:#1769e0;border-radius:10px}
+.other-stock-item{font-size:12px;color:#667085;margin-top:3px}.other-stock-table{margin-top:12px;border:1px solid #e2e7ee;border-radius:12px;overflow:hidden}.other-stock-table table{border-radius:0;font-size:12px}.other-stock-table th,.other-stock-table td{padding:10px 7px}.other-stock-table .current-dept{color:#1769e0;font-weight:800}.other-stock-table tr.recommended-dept td{background:#ecf9f2;color:#168653;font-weight:800}.other-stock-table tr.recommended-dept td:first-child::before{content:"★ ";color:#16965b}.other-stock-recommend{margin-top:12px;padding:13px;border:1px solid #bfe5cf;background:#effaf4;border-radius:12px;color:#244d38;line-height:1.55}.other-stock-recommend-title{font-weight:900;color:#16965b;margin-bottom:4px}.other-stock-recommend b{color:#1769e0}.purchase-recommend{margin-top:12px;padding:14px;border:1.5px solid #b9d9ff;background:#f5f9ff;border-radius:14px;color:#24405f;line-height:1.55}.purchase-recommend-title{font-weight:900;color:#1769e0;font-size:15px;margin-bottom:3px}.purchase-qty{font-size:25px;color:#1769e0;margin:2px 0 7px}.purchase-after{background:#fff;border-radius:10px;padding:10px 11px;font-size:12px}.purchase-after b{color:#1769e0}.purchase-detail-btn{width:100%;margin-top:9px;border:1px solid #d5ddea;background:#fff;color:#526071;border-radius:9px;padding:8px;font-size:11px;font-weight:800}.purchase-calculation{margin-top:8px;padding:10px 11px;border-radius:9px;background:#fff;border:1px solid #e2e7ee;font-size:11px;line-height:1.65;color:#667085}.purchase-warning{margin-top:8px;padding:10px 11px;border:1px solid #f0c36a;background:#fff8df;color:#a06d00;border-radius:10px;font-size:11px;font-weight:800}#attentionItems .sheet{padding-top:72px}#attentionItems .close{position:absolute;top:18px;right:18px;z-index:50;padding:9px 12px;background:#f0f2f5;color:#1769e0;border-radius:10px}
 .attention-action-btn{border:1px solid #d5d9e0;background:#fff8df;color:#b07b00;border-radius:8px;padding:6px 8px;font-size:10px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:none}.attention-action-btn:active{transform:scale(.98)}.attention-table th:last-child,.attention-table td:last-child{text-align:center}
-.stats-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding-right:82px}.stats-title-row h3{margin:0!important;min-width:0}.annual-stats-btn{border:1px solid #d5ddea;background:#fff;color:#1769e0;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}.annual-period-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.annual-date-controls{display:grid;grid-template-columns:1fr 1fr .9fr .95fr;gap:8px;align-items:end;margin:14px 0 8px}.annual-date-control{min-width:0}.annual-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.annual-date-select,.annual-date-action{width:100%;height:44px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}.annual-date-select{color:#18212f;justify-content:space-between;padding:0 12px}.annual-date-select span:last-child{font-size:19px;color:#18212f}.annual-date-action{cursor:pointer;white-space:nowrap}.annual-period-tabs button{border:1px solid #d8dee8;background:#f6f8fb;color:#667085;border-radius:11px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer}.annual-period-tabs button.active{background:#1769e0;border-color:#1769e0;color:#fff}.annual-period-info{background:#f6f8fb;border-radius:10px;padding:10px 11px;color:#667085;font-size:12px;line-height:1.5;margin-bottom:12px}.annual-dept-section{border:1px solid #e2e7ee;border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}.annual-dept-toggle{width:100%;display:flex;align-items:center;padding:12px 13px;border:0;background:#fff;color:#172033;text-align:left;font-size:15px;font-weight:900}.annual-dept-body{padding:0 9px 10px}.annual-usage-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:10px;background:#fff}.annual-usage-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-size:10.5px}.annual-usage-table th,.annual-usage-table td{padding:8px 4px;border-bottom:1px solid #edf0f4;text-align:center;white-space:normal;overflow-wrap:anywhere}.annual-usage-table th{background:#eef3f9;color:#526071;font-weight:800}.annual-usage-table th:nth-child(2){width:23%}.annual-usage-table th:nth-child(3){width:27%}.annual-usage-table th:nth-child(4){width:16%}.annual-compare-sub{white-space:nowrap;font-size:9.5px;letter-spacing:-.2px}.annual-usage-table th:first-child,.annual-usage-table td:first-child{text-align:center;width:34%}.annual-usage-table td:first-child{font-weight:700;white-space:normal}.annual-usage-table .annual-total td{background:#f6f8fb;font-weight:900}.annual-usage-table .annual-change{font-weight:900}.annual-change.up{color:#df3f3f}.annual-change.down{color:#1769e0}.annual-change.same{color:#667085}.annual-usage-note{margin-top:12px;padding:11px 12px;border:1px solid #e2e7ee;border-radius:11px;background:#fff;color:#667085;font-size:12px;line-height:1.55}.annual-excel-btn{width:100%;height:44px;border:1.5px solid #1769e0;border-radius:10px;background:#1769e0;color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin:0 0 12px}.annual-empty{padding:14px;color:#667085;background:#fff;border:1px solid #e2e7ee;border-radius:12px}
+.stats-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding-right:82px}.stats-title-row h3{margin:0!important;min-width:0}.annual-stats-btn{border:1px solid #d5ddea;background:#fff;color:#1769e0;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;white-space:nowrap;cursor:pointer}.annual-period-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.annual-date-controls{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.92fr) minmax(88px,.82fr) minmax(88px,.88fr);gap:8px;align-items:end;margin:14px 0 8px}.annual-date-control{min-width:0}.annual-date-label{text-align:center;font-size:12px;font-weight:800;color:#18212f;margin-bottom:5px}.annual-date-select,.annual-date-action{width:100%;height:44px;border:1.5px solid #1769e0;border-radius:10px;background:#fff;color:#1769e0;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;overflow:hidden}.annual-date-select{color:#18212f;justify-content:space-between;padding:0 10px;white-space:nowrap}.annual-date-select span:last-child{font-size:19px;color:#18212f}.annual-date-action{cursor:pointer;white-space:nowrap}.annual-period-tabs button{border:1px solid #d8dee8;background:#f6f8fb;color:#667085;border-radius:11px;padding:11px 6px;font-size:13px;font-weight:800;cursor:pointer}.annual-period-tabs button.active{background:#1769e0;border-color:#1769e0;color:#fff}.annual-period-info{background:#f6f8fb;border-radius:10px;padding:10px 11px;color:#667085;font-size:12px;line-height:1.5;margin-bottom:12px}.annual-dept-section{border:1px solid #e2e7ee;border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}.annual-dept-toggle{width:100%;display:flex;align-items:center;padding:12px 13px;border:0;background:#fff;color:#172033;text-align:left;font-size:15px;font-weight:900}.annual-dept-body{padding:0 9px 10px}.annual-usage-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:10px;background:#fff}.annual-usage-table{width:100%;min-width:0;border-collapse:collapse;table-layout:fixed;font-size:10.5px}.annual-usage-table th,.annual-usage-table td{padding:8px 4px;border-bottom:1px solid #edf0f4;text-align:center;white-space:normal;overflow-wrap:anywhere}.annual-usage-table th{background:#eef3f9;color:#526071;font-weight:800}.annual-usage-table th:nth-child(2){width:23%}.annual-usage-table th:nth-child(3){width:27%}.annual-usage-table th:nth-child(4){width:16%}.annual-compare-sub{white-space:nowrap;font-size:9.5px;letter-spacing:-.2px}.annual-usage-table th:first-child,.annual-usage-table td:first-child{text-align:center;width:34%}.annual-usage-table td:first-child{font-weight:700;white-space:normal}.annual-usage-table .annual-total td{background:#f6f8fb;font-weight:900}.annual-usage-table .annual-change{font-weight:900}.annual-change.up{color:#df3f3f}.annual-change.down{color:#1769e0}.annual-change.same{color:#667085}.annual-usage-note{margin-top:12px;padding:11px 12px;border:1px solid #e2e7ee;border-radius:11px;background:#fff;color:#667085;font-size:12px;line-height:1.55}.annual-excel-btn{width:100%;height:44px;border:1.5px solid #1769e0;border-radius:10px;background:#1769e0;color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin:0 0 12px}.annual-empty{padding:14px;color:#667085;background:#fff;border:1px solid #e2e7ee;border-radius:12px}
 .blank-confirm-sheet{max-width:430px;text-align:center;padding:28px 22px!important}.blank-confirm-sheet h3{margin:0 0 12px;font-size:20px}.blank-confirm-message{font-size:14px;line-height:1.65;margin:0}.blank-confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.blank-confirm-actions button{border:0;border-radius:12px;padding:13px;font-size:17px;font-weight:900;cursor:pointer}.blank-x-btn{background:#f1f3f6;color:#667085}.blank-o-btn{background:#1769e0;color:#fff}.blank-confirm-actions button:active{transform:scale(.98)}
-.history-calendar-nav{display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:10px;margin:14px 0 12px;text-align:center}.history-calendar-nav b{font-size:20px;color:#172033}.calendar-nav-btn{border:0;background:#f2f5f9;color:#1769e0;border-radius:12px;min-height:52px;font-size:32px;font-weight:700;cursor:pointer}.calendar-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;color:#8a93a1;text-align:center;font-size:12px;font-weight:700}.history-calendar-legend{display:flex;align-items:center;gap:7px;margin:12px 2px;color:#667085;font-size:12px}.history-calendar-legend .calendar-dot{width:9px;height:9px;background:#1769e0;border-radius:50%;display:inline-block}.history-selected-date{background:#eef5ff;color:#1769e0;border-radius:12px;padding:12px;text-align:center;font-size:15px;font-weight:900;margin-top:12px}.history-dept-back{margin-bottom:10px}.history-record-title{font-size:19px;font-weight:900;margin:10px 0 12px}.history-record-sub{color:#667085;font-size:12px;margin-bottom:12px}.history-simple-table-wrap{overflow:hidden;border:1px solid #e2e7ee;border-radius:12px;background:#fff}.history-simple-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}.history-simple-table th{background:#eef3f9;color:#526071;font-weight:800;padding:11px 8px;text-align:center}.history-simple-table th:first-child{width:72%}.history-simple-table th:last-child{width:28%}.history-simple-table td{padding:11px 8px;border-top:1px solid #edf0f4;vertical-align:middle}.history-simple-table td:first-child{font-weight:700}.history-simple-table td:last-child{text-align:center;font-weight:800}.history-all-section{margin-top:12px}.history-all-section-title{font-size:15px;font-weight:900;color:#1769e0;margin:14px 2px 7px}.history-all-table-wrap{overflow:hidden;border:1px solid #e2e7ee;border-radius:11px;background:#fff}.history-all-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.history-all-table th{background:#eef3f9;color:#526071;font-weight:800;padding:9px 7px;text-align:center}.history-all-table th:first-child{width:74%}.history-all-table th:last-child{width:26%}.history-all-table td{padding:9px 7px;border-top:1px solid #edf0f4}.history-all-table td:last-child{text-align:center;font-weight:800}.history-top-btn{display:block;width:100%;margin:18px 0 6px;padding:13px 12px;border:1px solid #d8e0ec;background:#f5f8fc;color:#1769e0;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:none}.history-no-record{padding:20px;text-align:center;color:#667085;border:1px solid #e2e7ee;border-radius:12px;background:#fff}
+.history-calendar-nav{display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:10px;margin:14px 0 12px;text-align:center}.history-calendar-nav b{font-size:20px;color:#172033}.calendar-nav-btn{border:0;background:#f2f5f9;color:#1769e0;border-radius:12px;min-height:52px;font-size:32px;font-weight:700;cursor:pointer}.calendar-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;color:#8a93a1;text-align:center;font-size:12px;font-weight:700}.history-calendar-legend{display:flex;align-items:center;gap:7px;margin:12px 2px;color:#667085;font-size:12px}.history-calendar-legend .calendar-dot{width:9px;height:9px;background:#1769e0;border-radius:50%;display:inline-block;margin:0;flex:0 0 9px}.history-selected-date{background:#eef5ff;color:#1769e0;border-radius:12px;padding:12px;text-align:center;font-size:15px;font-weight:900;margin-top:12px}.history-dept-back{margin-bottom:10px}.history-record-title{font-size:19px;font-weight:900;margin:10px 0 12px}.history-record-sub{color:#667085;font-size:12px;margin-bottom:12px}.history-simple-table-wrap{overflow:hidden;border:1px solid #e2e7ee;border-radius:12px;background:#fff}.history-simple-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}.history-simple-table th{background:#eef3f9;color:#526071;font-weight:800;padding:11px 8px;text-align:center}.history-simple-table th:first-child{width:72%}.history-simple-table th:last-child{width:28%}.history-simple-table td{padding:11px 8px;border-top:1px solid #edf0f4;vertical-align:middle}.history-simple-table td:first-child{font-weight:700}.history-simple-table td:last-child{text-align:center;font-weight:800}.history-all-section{margin-top:12px}.history-all-section-title{font-size:15px;font-weight:900;color:#1769e0;margin:14px 2px 7px}.history-all-table-wrap{overflow:hidden;border:1px solid #e2e7ee;border-radius:11px;background:#fff}.history-all-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.history-all-table th{background:#eef3f9;color:#526071;font-weight:800;padding:9px 7px;text-align:center}.history-all-table th:first-child{width:74%}.history-all-table th:last-child{width:26%}.history-all-table td{padding:9px 7px;border-top:1px solid #edf0f4}.history-all-table td:last-child{text-align:center;font-weight:800}.history-top-btn{display:block;width:100%;margin:18px 0 6px;padding:13px 12px;border:1px solid #d8e0ec;background:#f5f8fc;color:#1769e0;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:none}.history-no-record{padding:20px;text-align:center;color:#667085;border:1px solid #e2e7ee;border-radius:12px;background:#fff}
 .overall-item-section{margin:18px 0 20px}.overall-item-title{font-size:17px;font-weight:900;margin:0 0 8px}.overall-table-wrap{overflow:hidden;border:1px solid #dfe5ee;border-radius:12px;background:#fff}.overall-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}.overall-table th,.overall-table td{padding:10px 5px;border-bottom:1px solid #edf0f4;text-align:center;word-break:keep-all}.overall-table th{background:#eef3f9;color:#526071;font-weight:800}.overall-table th:first-child,.overall-table td:first-child{width:17%}.overall-table th:not(:first-child),.overall-table td:not(:first-child){width:13.83%}.overall-table tr:last-child td{border-bottom:0}.overall-table td{font-size:13px}.overall-stock-number{font-weight:800}.overall-note{margin-top:12px;padding:11px 12px;border:1px solid #dce5f2;border-radius:11px;background:#f8fbff;color:#667085;font-size:12px;line-height:1.55}.overall-empty{padding:18px;text-align:center;color:#667085;border:1px solid #e2e7ee;border-radius:12px;background:#fff}
 
 .admin-new-item-card{border:1px solid #e2e7ee;border-radius:14px;padding:14px;background:#fff;margin:14px 0}.admin-new-item-card h4,.admin-list-title-row h4{margin:0 0 10px;font-size:16px}.admin-list-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 10px}.admin-refresh-btn{border:0;background:#eef5ff;color:#1769e0;border-radius:9px;padding:8px 11px;font-weight:800}.material-master-table-wrap{overflow-x:auto;border:1px solid #e2e7ee;border-radius:12px}.material-master-table{width:100%;border-collapse:collapse;font-size:13px}.material-master-table th{background:#f1f5fb;color:#667085;padding:11px 8px;text-align:left}.material-master-table td{padding:11px 8px;border-top:1px solid #edf0f4}.department-master-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 12px;border:1px solid #e2e7ee;border-radius:12px;margin:8px 0;background:#fff}.department-master-name{display:flex;align-items:center;gap:7px;min-width:0}.department-master-index{color:#667085}.admin-dept-selector-empty{margin-top:24px}.admin-master-note{margin-top:14px;padding:12px;border-radius:12px;background:#f6f8fb;color:#667085;font-size:12px;line-height:1.6}</style>
@@ -486,7 +486,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.81"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.83"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -1137,15 +1137,34 @@ function openCategory(category){
 
 let selectedCategory=null;
 
+function getPurchaseForecast(itemName, category, refDate){
+  // 예상 주간 사용량은 최근 1개월·최근 3개월·전년 동월 사용량을 함께 반영합니다.
+  // 단기 변동을 조금 더 빠르게 반영하되, 3개월 평균과 전년 동월을 함께 참고하도록 가중 평균합니다.
+  const oneMonth=Number(getOneMonthUsage(itemName,category,refDate)||0);
+  const threeMonth=Number(getThreeMonthUsage(itemName,category,refDate)||0);
+  const lastYearRaw=getLastYearSameMonth(itemName,category,refDate);
+  const lastYear=lastYearRaw===null?null:Number(lastYearRaw||0);
+  const rates=[];
+  if(oneMonth>=0) rates.push({rate:oneMonth/4.345,weight:0.4,source:'최근 1개월'});
+  if(threeMonth>=0) rates.push({rate:threeMonth/(4.345*3),weight:0.4,source:'최근 3개월'});
+  if(lastYear!==null) rates.push({rate:lastYear/4.345,weight:0.2,source:'전년 동월'});
+  const weightSum=rates.reduce((a,x)=>a+x.weight,0);
+  const weekly=weightSum?rates.reduce((a,x)=>a+x.rate*x.weight,0)/weightSum:0;
+  return {oneMonth,threeMonth,lastYear,weekly,rates};
+}
+
 function getInventoryStatus(itemName, category, refDate){
   const lastInput=getLastInventoryInput(itemName,category);
   const currentStock=lastInput ? Number(lastInput.stock||0) : Number((items.find(x=>x[0]===itemName && (x[5]||"P/S")===category)||[])[1]||0);
-  const oneMonth=getOneMonthUsage(itemName,category,refDate);
+  const forecast=getPurchaseForecast(itemName,category,refDate);
+  const oneMonth=forecast.oneMonth;
+  // 배송 1주 + 입고 후 확보 목표 3주 = 총 4주 수준을 발주 판단선으로 사용합니다.
+  const reorderPoint=forecast.weekly*4;
   let status;
   if(!lastInput) status="확인 필요";
-  else if(oneMonth===0) status=currentStock===0?"확인 필요":"재고 적정";
-  else status=currentStock<oneMonth*.5?"발주 필요":currentStock<oneMonth?"확인 필요":"재고 적정";
-  return {status,currentStock,oneMonth,lastInput};
+  else if(forecast.weekly<=0) status=currentStock===0?"확인 필요":"재고 적정";
+  else status=currentStock<reorderPoint?"발주 필요":"재고 적정";
+  return {status,currentStock,oneMonth,lastInput,threeMonth:forecast.threeMonth,lastYear:forecast.lastYear,weeklyUsage:forecast.weekly,reorderPoint};
 }
 
 function openAttentionItems(){
@@ -1210,6 +1229,17 @@ function renderAttentionItems(){
 
 function closeOtherDeptStock(){
   document.getElementById("otherDeptStockModal").style.display="none";
+  // 확인 필요 품목 목록은 유지하여 다른 품목을 바로 확인할 수 있게 합니다.
+  document.getElementById("attentionItems").style.display="block";
+}
+
+function togglePurchaseCalculation(){
+  const el=document.getElementById("purchaseCalculationDetails");
+  const btn=document.getElementById("purchaseCalculationBtn");
+  if(!el||!btn) return;
+  const open=el.style.display!=="none";
+  el.style.display=open?"none":"block";
+  btn.textContent=open?"▾ 산정 내역 보기":"▴ 산정 내역 닫기";
 }
 
 function openOtherDeptStock(itemName, currentCategory){
@@ -1219,30 +1249,49 @@ function openOtherDeptStock(itemName, currentCategory){
   const activeDepartments=CATEGORIES.filter(c=>items.some(it=>it[0]===itemName && (it[5]||"P/S")===c));
   const rows=activeDepartments.map(c=>{
     const info=getInventoryStatus(itemName,c,today);
-    return {category:c,stock:Number(info.currentStock||0),oneMonth:Number(info.oneMonth||0),threeMonth:Number(getThreeMonthUsage(itemName,c,today)||0),currentClass:c===currentCategory?"current-dept":""};
+    const weekly=Number(info.weeklyUsage||0);
+    const coverage=weekly>0?Number(info.currentStock||0)/weekly:null;
+    const reserve=Math.max(0,Number(info.currentStock||0)-weekly*4);
+    return {category:c,stock:Number(info.currentStock||0),oneMonth:Number(info.oneMonth||0),threeMonth:Number(info.threeMonth||0),lastYear:info.lastYear===null?null:Number(info.lastYear||0),weekly,coverage,reserve,currentClass:c===currentCategory?"current-dept":""};
   });
-  const otherRows=rows.filter(x=>x.category!==currentCategory && x.stock>0);
+  // 다른 부서 자체의 4주(배송 1주 + 입고 후 3주) 확보분을 제외하고 남는 재고가 있을 때만 이동 추천합니다.
+  const otherRows=rows.filter(x=>x.category!==currentCategory && x.reserve>0);
   let recommendation=null;
   if(otherRows.length){
     recommendation=otherRows.slice().sort((a,b)=>{
-      if(a.oneMonth===0 && b.oneMonth!==0) return -1;
-      if(a.oneMonth!==0 && b.oneMonth===0) return 1;
-      if(a.oneMonth===0 && b.oneMonth===0) return b.stock-a.stock;
-      return (b.stock/b.oneMonth)-(a.stock/a.oneMonth);
+      if(a.coverage===null && b.coverage!==null) return -1;
+      if(a.coverage!==null && b.coverage===null) return 1;
+      return (b.reserve-a.reserve);
     })[0];
   }
   const tableRows=rows.map(x=>`<tr class="${recommendation && x.category===recommendation.category ? 'recommended-dept' : ''}"><td class="${x.currentClass}">${esc(x.category)}${x.category===currentCategory?' (현재 부서)':''}</td><td><b>${x.stock.toLocaleString()}</b> ${esc(getUnit(itemName,x.category))}</td><td>${x.oneMonth.toLocaleString()}</td><td>${x.threeMonth.toLocaleString()}</td></tr>`).join("");
+  const current=rows.find(x=>x.category===currentCategory)||{stock:0,weekly:0,coverage:null,oneMonth:0,threeMonth:0,lastYear:null};
   let recommendHtml="";
   if(recommendation){
     const unit=getUnit(itemName,recommendation.category);
-    if(recommendation.oneMonth===0){
-      recommendHtml=`<div class="other-stock-recommend"><div class="other-stock-recommend-title">👍 재고 사용 추천</div><div><b>${esc(recommendation.category)}</b>의 재고 사용을 추천합니다.</div><div>현재 재고 <b>${recommendation.stock.toLocaleString()} ${esc(unit)}</b>이며, 최근 1개월 사용량이 0이라 사용기간은 산정할 수 없습니다.</div></div>`;
-    }else{
-      const months=recommendation.stock/recommendation.oneMonth;
-      recommendHtml=`<div class="other-stock-recommend"><div class="other-stock-recommend-title">👍 재고 사용 추천</div><div><b>${esc(recommendation.category)}</b>의 재고 사용을 추천합니다.</div><div>현재 재고 <b>${recommendation.stock.toLocaleString()} ${esc(unit)}</b> / 최근 1개월 사용량 <b>${recommendation.oneMonth.toLocaleString()} ${esc(unit)}</b> 기준 약 <b>${months.toFixed(1)}개월</b> 사용 가능한 수량입니다.</div></div>`;
-    }
+    const months=recommendation.oneMonth>0?recommendation.stock/recommendation.oneMonth:null;
+    recommendHtml=`<div class="other-stock-recommend"><div class="other-stock-recommend-title">👍 재고 사용 추천</div><div><b>${esc(recommendation.category)}</b>의 재고 사용을 추천합니다.</div><div>현재 재고 <b>${recommendation.stock.toLocaleString()} ${esc(unit)}</b>${months!==null?` / 최근 1개월 사용량 <b>${recommendation.oneMonth.toLocaleString()} ${esc(unit)}</b> 기준 약 <b>${months.toFixed(1)}개월</b> 사용 가능합니다.`:`이며 최근 1개월 사용량이 0이라 사용기간은 산정할 수 없습니다.`}</div></div>`;
   }else{
-    recommendHtml=`<div class="other-stock-recommend"><div class="other-stock-recommend-title">ℹ️ 재고 이동 안내</div><div>다른 부서에 현재 재고가 있는 부서가 없습니다.</div></div>`;
+    const unit=getUnit(itemName,currentCategory);
+    const weekly=current.weekly;
+    const stockout=weekly>0?current.stock/weekly:null;
+    const leadWeeks=1;
+    const targetWeeks=3;
+    const currentAfterLead=Math.max(0,current.stock-weekly*leadWeeks);
+    const orderQty=weekly>0?Math.max(0,Math.ceil(weekly*targetWeeks-currentAfterLead)):0;
+    const expectedAfterDelivery=current.stock+orderQty-weekly*leadWeeks;
+    const expectedWeeks=weekly>0?expectedAfterDelivery/weekly:null;
+    const warning=weekly>0 && stockout<leadWeeks+targetWeeks;
+    const oneW=weekly*4.345;
+    const threeW=weekly*13.035;
+    const parts=[];
+    if(current.oneMonth>0) parts.push(`최근 1개월 ${current.oneMonth.toLocaleString()}${unit}`);
+    if(current.threeMonth>0) parts.push(`최근 3개월 ${current.threeMonth.toLocaleString()}${unit}`);
+    if(current.lastYear!==null && current.lastYear>0) parts.push(`전년 동월 ${current.lastYear.toLocaleString()}${unit}`);
+    const basis=parts.length?parts.join(' / '):'사용량 데이터 없음';
+    const warningHtml=warning?`<div class="purchase-warning">⚠️ 현재 재고가 배송기간을 고려한 권장 재고 수준보다 부족합니다.</div>`:'';
+    const mainHtml=weekly>0?`<div class="purchase-recommend"><div class="purchase-recommend-title">🛒 추천 발주량</div><div class="purchase-qty"><b>${orderQty.toLocaleString()} ${esc(unit)}</b></div><div class="purchase-after"><b>${orderQty.toLocaleString()}${esc(unit)} 입고 후 예상 보유량 약 ${expectedAfterDelivery.toFixed(1)}${esc(unit)}</b><br>- 예상 주간 사용량 ${weekly.toFixed(1)}${esc(unit)} 기준 약 ${expectedWeeks.toFixed(1)}주 사용 가능</div><button type="button" id="purchaseCalculationBtn" class="purchase-detail-btn" onclick="togglePurchaseCalculation()">▾ 산정 내역 보기</button><div id="purchaseCalculationDetails" class="purchase-calculation" style="display:none"><b>산정 내역</b><div>• 예상 주간 사용량: ${weekly.toFixed(1)}${esc(unit)}</div><div>• 참고 사용량: ${basis}</div><div>• 배송기간: ${leadWeeks}주</div><div>• 입고 후 재고 확보 목표: ${targetWeeks}주</div><div>• 배송기간 동안 예상 사용량: 약 ${(weekly*leadWeeks).toFixed(1)}${esc(unit)}</div><div>• 배송 후 ${targetWeeks}주 사용 가능하도록 필요한 수량을 계산하고 올림하여 추천합니다.</div></div></div>${warningHtml}`:`<div class="other-stock-recommend"><div class="other-stock-recommend-title">ℹ️ 발주량 산정 안내</div><div>1개월·3개월·전년 동월 사용량을 확인할 수 있는 데이터가 부족하여 예상 주간 사용량을 산정할 수 없습니다.</div></div>`;
+    recommendHtml=mainHtml;
   }
   content.innerHTML=`<div class="other-stock-item">품목명</div><div style="font-size:18px;font-weight:900;margin-top:3px">${esc(itemName)} <span class="item-unit">${esc(getUnit(itemName,currentCategory))}</span></div><div class="muted">현재 ${esc(currentCategory)}에는 재고가 부족하거나 확인이 필요합니다. 다른 부서의 보유 현황을 확인할 수 있습니다.</div><div class="other-stock-table"><table><thead><tr><th>부서</th><th>보유 수량</th><th>최근 1개월 사용량</th><th>최근 3개월 사용량</th></tr></thead><tbody>${tableRows}</tbody></table></div>${recommendHtml}`;
   openModal("otherDeptStockModal");
@@ -1684,13 +1733,64 @@ function getYearGroups(currentYear){
   }
   return groups.filter(g=>g.start<=g.end);
 }
-function renderYearPicker(target,tabsId,gridId,pendingYear){
-  const currentYear=new Date().getFullYear(),tabs=document.getElementById(tabsId),grid=document.getElementById(gridId); if(!tabs||!grid)return;
-  const groups=getYearGroups(currentYear); let active=groups.findIndex(g=>pendingYear>=g.start&&pendingYear<=g.end); if(active<0)active=groups.length-1;
-  tabs.innerHTML=groups.map((g,i)=>`<button type="button" class="${i===active?'active':''}" onclick="${target==='selectHistoryYear'?'selectHistoryYearGroup':target==='selectAdminUsageYear'?'selectAdminUsageYearGroup':''}(${i})">${g.label}</button>`).join('');
-  const g=groups[active]; grid.innerHTML=''; for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===pendingYear)btn.classList.add('selected');btn.onclick=()=>{if(target==='selectHistoryYear'){historyPendingYear=y;if(y===currentYear&&historyPendingMonth>new Date().getMonth())historyPendingMonth=new Date().getMonth();syncHistoryDateControls();openModal('cal');}else{adminUsagePendingYear=y;if(y===currentYear&&adminUsagePendingMonth>new Date().getMonth())adminUsagePendingMonth=new Date().getMonth();syncAdminUsageDateControls();openModal('adminStats');}};grid.appendChild(btn);}
+function getYearPickerTarget(target){
+  return {
+    selectHistoryYear:'history',
+    selectAdminUsageYear:'usage',
+    selectAdminStockYear:'stock',
+    selectAdminAnnualYear:'annual'
+  }[target]||'';
 }
-function selectHistoryYearGroup(i){ renderYearPicker('selectHistoryYear','historyYearPickerTabs','historyYearPickerGrid',historyPendingYear); const tabs=document.getElementById('historyYearPickerTabs'); if(tabs) [...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i)); const groups=getYearGroups(new Date().getFullYear()); const g=groups[i]; const grid=document.getElementById('historyYearPickerGrid'); if(g&&grid){grid.innerHTML=''; for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===historyPendingYear)btn.classList.add('selected');btn.onclick=()=>{historyPendingYear=y;if(y===new Date().getFullYear()&&historyPendingMonth>new Date().getMonth())historyPendingMonth=new Date().getMonth();syncHistoryDateControls();openModal('cal');};grid.appendChild(btn);}}}
+function applyPendingYear(target,year){
+  const now=new Date(), currentYear=now.getFullYear(), currentMonth=now.getMonth();
+  const type=getYearPickerTarget(target);
+  if(type==='history'){
+    historyPendingYear=year;
+    if(year===currentYear && historyPendingMonth>currentMonth) historyPendingMonth=currentMonth;
+    syncHistoryDateControls(); openModal('cal');
+  }else if(type==='usage'){
+    adminUsagePendingYear=year;
+    if(year===currentYear && adminUsagePendingMonth>currentMonth) adminUsagePendingMonth=currentMonth;
+    syncAdminUsageDateControls(); openModal('adminStats');
+  }else if(type==='stock'){
+    adminStockSelectedYear=year;
+    if(year===currentYear && adminStockSelectedMonth>currentMonth) adminStockSelectedMonth=currentMonth;
+    syncAdminStockDateControls(); openModal('adminStockCalendar'); renderAdminStockCalendar();
+  }else if(type==='annual'){
+    adminAnnualPendingYear=year;
+    if(year===currentYear && adminAnnualPendingMonth>currentMonth) adminAnnualPendingMonth=currentMonth;
+    syncAdminAnnualDateControls(); openModal('adminAnnualStats');
+  }
+}
+function renderYearPicker(target,tabsId,gridId,pendingYear){
+  const currentYear=new Date().getFullYear(),tabs=document.getElementById(tabsId),grid=document.getElementById(gridId);
+  if(!tabs||!grid)return;
+  const groups=getYearGroups(currentYear);
+  let active=groups.findIndex(g=>pendingYear>=g.start&&pendingYear<=g.end);
+  if(active<0)active=groups.length-1;
+  tabs.innerHTML=groups.map((g,i)=>`<button type="button" class="${i===active?'active':''}" onclick="selectSharedYearGroup('${target}',${i})">${g.label}</button>`).join('');
+  renderSharedYearGroup(target,active,tabsId,gridId,pendingYear);
+}
+function selectSharedYearGroup(target,i){
+  const groups=getYearGroups(new Date().getFullYear()),g=groups[i];
+  const tabs=document.getElementById(target==='selectHistoryYear'?'historyYearPickerTabs':target==='selectAdminUsageYear'?'adminUsageYearPickerTabs':target==='selectAdminStockYear'?'adminYearPickerTabs':'adminAnnualYearPickerTabs');
+  const grid=document.getElementById(target==='selectHistoryYear'?'historyYearPickerGrid':target==='selectAdminUsageYear'?'adminUsageYearPickerGrid':target==='selectAdminStockYear'?'adminYearPickerGrid':'adminAnnualYearPickerGrid');
+  if(!g||!grid)return;
+  if(tabs)[...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));
+  let pendingYear=target==='selectHistoryYear'?historyPendingYear:target==='selectAdminUsageYear'?adminUsagePendingYear:target==='selectAdminStockYear'?adminStockSelectedYear:adminAnnualPendingYear;
+  renderSharedYearGroup(target,i,tabs?.id,grid.id,pendingYear);
+}
+function renderSharedYearGroup(target,i,tabsId,gridId,pendingYear){
+  const groups=getYearGroups(new Date().getFullYear()),g=groups[i],grid=document.getElementById(gridId);
+  if(!g||!grid)return;
+  grid.innerHTML='';
+  for(let y=g.start;y<=g.end;y++){
+    const btn=document.createElement('button'); btn.type='button'; btn.textContent=`${y}년`;
+    if(y===pendingYear)btn.classList.add('selected');
+    btn.onclick=()=>applyPendingYear(target,y);
+    grid.appendChild(btn);
+  }
+}
 function openHistoryYearPicker(){renderYearPicker('selectHistoryYear','historyYearPickerTabs','historyYearPickerGrid',historyPendingYear);openModal('historyYearPicker');}
 function openHistoryMonthPicker(){const grid=document.getElementById('historyMonthPickerGrid');if(!grid)return;grid.innerHTML='';const currentYear=new Date().getFullYear(),max=historyPendingYear===currentYear?new Date().getMonth():11;for(let m=0;m<=max;m++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${m+1}월`;if(m===historyPendingMonth)btn.classList.add('selected');btn.onclick=()=>{historyPendingMonth=m;syncHistoryDateControls();openModal('cal');};grid.appendChild(btn);}openModal('historyMonthPicker');}
 function applyHistoryDateSelection(){historySelectedYear=historyPendingYear;historySelectedMonth=historyPendingMonth;historyCalendarDate=new Date(historySelectedYear,historySelectedMonth,1);renderHistoryDateCalendar();}
@@ -1858,8 +1958,8 @@ function closeAdminStockCalendar(){
   openModal("admin");
 }
 
-function selectAdminStockYearGroup(i){const groups=getYearGroups(new Date().getFullYear());const g=groups[i];const grid=document.getElementById('adminYearPickerGrid');const tabs=document.getElementById('adminYearPickerTabs');if(!g||!grid)return;if(tabs)[...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));grid.innerHTML='';for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===adminStockSelectedYear)btn.classList.add('selected');btn.onclick=()=>{adminStockSelectedYear=y;if(y===new Date().getFullYear()&&adminStockSelectedMonth>new Date().getMonth())adminStockSelectedMonth=new Date().getMonth();syncAdminStockDateControls();openModal('adminStockCalendar');renderAdminStockCalendar();};grid.appendChild(btn);}}
-function openAdminYearPicker(){const groups=getYearGroups(new Date().getFullYear());const tabs=document.getElementById('adminYearPickerTabs');const grid=document.getElementById('adminYearPickerGrid');const active=Math.max(0,groups.findIndex(g=>adminStockSelectedYear>=g.start&&adminStockSelectedYear<=g.end));tabs.innerHTML=groups.map((g,i)=>`<button type="button" class="${i===active?'active':''}" onclick="selectAdminStockYearGroup(${i})">${g.label}</button>`).join('');selectAdminStockYearGroup(active);openModal('adminYearPicker');}
+function selectAdminStockYearGroup(i){selectSharedYearGroup('selectAdminStockYear',i);}
+function openAdminYearPicker(){renderYearPicker('selectAdminStockYear','adminYearPickerTabs','adminYearPickerGrid',adminStockSelectedYear);openModal('adminYearPicker');}
 
 function openAdminMonthPicker(){
   const grid=document.getElementById("adminMonthPickerGrid");
@@ -1923,7 +2023,7 @@ function syncAdminUsageDateControls(){
   if(y)y.textContent=`${adminUsagePendingYear}년`; if(m)m.textContent=`${adminUsagePendingMonth+1}월`;
 }
 function resetAdminUsageDateToToday(){const now=new Date();adminUsageSelectedYear=now.getFullYear();adminUsageSelectedMonth=now.getMonth();adminUsagePendingYear=adminUsageSelectedYear;adminUsagePendingMonth=adminUsageSelectedMonth;adminUsageMonthDate=new Date(adminUsageSelectedYear,adminUsageSelectedMonth,1);}
-function selectAdminUsageYearGroup(i){const groups=getYearGroups(new Date().getFullYear());const g=groups[i],grid=document.getElementById('adminUsageYearPickerGrid'),tabs=document.getElementById('adminUsageYearPickerTabs');if(!g||!grid)return;if(tabs)[...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));grid.innerHTML='';for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===adminUsagePendingYear)btn.classList.add('selected');btn.onclick=()=>{adminUsagePendingYear=y;if(y===new Date().getFullYear()&&adminUsagePendingMonth>new Date().getMonth())adminUsagePendingMonth=new Date().getMonth();syncAdminUsageDateControls();openModal('adminStats');};grid.appendChild(btn);}}
+function selectAdminUsageYearGroup(i){selectSharedYearGroup('selectAdminUsageYear',i);}
 function openAdminUsageYearPicker(){renderYearPicker('selectAdminUsageYear','adminUsageYearPickerTabs','adminUsageYearPickerGrid',adminUsagePendingYear);openModal('adminUsageYearPicker');}
 function openAdminUsageMonthPicker(){const grid=document.getElementById('adminUsageMonthPickerGrid');if(!grid)return;grid.innerHTML='';const max=adminUsagePendingYear===new Date().getFullYear()?new Date().getMonth():11;for(let m=0;m<=max;m++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${m+1}월`;if(m===adminUsagePendingMonth)btn.classList.add('selected');btn.onclick=()=>{adminUsagePendingMonth=m;syncAdminUsageDateControls();openModal('adminStats');};grid.appendChild(btn);}openModal('adminUsageMonthPicker');}
 function applyAdminUsageDateSelection(){adminUsageSelectedYear=adminUsagePendingYear;adminUsageSelectedMonth=adminUsagePendingMonth;adminUsageMonthDate=new Date(adminUsageSelectedYear,adminUsageSelectedMonth,1);renderAdminUsageReport();}
@@ -1985,8 +2085,8 @@ function syncAdminAnnualDateControls(){
   if(m) m.textContent=`${adminAnnualPendingMonth+1}월`;
 }
 
-function selectAnnualYearGroup(i){const groups=getYearGroups(new Date().getFullYear());const g=groups[i];const grid=document.getElementById('adminAnnualYearPickerGrid');const tabs=document.getElementById('adminAnnualYearPickerTabs');if(!g||!grid)return;if(tabs)[...tabs.children].forEach((b,j)=>b.classList.toggle('active',j===i));grid.innerHTML='';for(let y=g.start;y<=g.end;y++){const btn=document.createElement('button');btn.type='button';btn.textContent=`${y}년`;if(y===adminAnnualPendingYear)btn.classList.add('selected');btn.onclick=()=>{adminAnnualPendingYear=y;if(y===new Date().getFullYear()&&adminAnnualPendingMonth>new Date().getMonth())adminAnnualPendingMonth=new Date().getMonth();syncAdminAnnualDateControls();openModal('adminAnnualStats');};grid.appendChild(btn);}}
-function openAdminAnnualYearPicker(){const currentYear=new Date().getFullYear();const groups=getYearGroups(currentYear);const tabs=document.getElementById('adminAnnualYearPickerTabs');const grid=document.getElementById('adminAnnualYearPickerGrid');const active=Math.max(0,groups.findIndex(g=>adminAnnualPendingYear>=g.start&&adminAnnualPendingYear<=g.end));tabs.innerHTML=groups.map((g,i)=>`<button type="button" class="${i===active?'active':''}" onclick="selectAnnualYearGroup(${i})">${g.label}</button>`).join('');selectAnnualYearGroup(active);openModal('adminAnnualYearPicker');}
+function selectAnnualYearGroup(i){selectSharedYearGroup('selectAdminAnnualYear',i);}
+function openAdminAnnualYearPicker(){renderYearPicker('selectAdminAnnualYear','adminAnnualYearPickerTabs','adminAnnualYearPickerGrid',adminAnnualPendingYear);openModal('adminAnnualYearPicker');}
 
 function openAdminAnnualMonthPicker(){
   const grid=document.getElementById('adminAnnualMonthPickerGrid');
