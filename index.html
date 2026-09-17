@@ -506,9 +506,9 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script>
-const APP_VERSION="1.98"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.99"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -2026,6 +2026,19 @@ async function saveHistoryExportItemOrder(){
     alert("재고이력 저장 순서를 서버에 저장하지 못했습니다.\n\n"+(err.message||err));
   }
 }
+function centerExcelSheet(ws){
+  if(!ws || !ws["!ref"]) return;
+  const range=XLSX.utils.decode_range(ws["!ref"]);
+  for(let r=range.s.r;r<=range.e.r;r++){
+    for(let c=range.s.c;c<=range.e.c;c++){
+      const cell=ws[XLSX.utils.encode_cell({r,c})];
+      if(!cell) continue;
+      cell.s=cell.s||{};
+      cell.s.alignment={...(cell.s.alignment||{}),horizontal:"center",vertical:"center"};
+    }
+  }
+}
+
 function getHistoryExportUnit(itemName){
   const matches=items.filter(x=>x[0]===itemName);
   if(matches.length&&matches[0][6]) return matches[0][6];
@@ -2073,6 +2086,7 @@ function downloadHistoryAllExcel(){
   const ws=XLSX.utils.json_to_sheet(rows,{header:["부자재품명",...CATEGORIES,"재고수량"]});
   ws['!cols']=[{wch:30},...CATEGORIES.map(()=>({wch:12})),{wch:14}];
   ws['!freeze']={xSplit:1,ySplit:1};
+  centerExcelSheet(ws);
   const d=new Date(date+"T00:00:00");
   const sheetName=`재고 ${d.getMonth()+1}월${d.getDate()}일`.slice(0,31);
   XLSX.utils.book_append_sheet(wb,ws,sheetName);
@@ -2500,6 +2514,7 @@ function downloadAnnualUsageExcel(){
   const rows=buildAnnualExportRows();
   const ws=XLSX.utils.json_to_sheet(rows);
   ws['!cols']=[{wch:10},{wch:30},{wch:10},{wch:12},{wch:10},{wch:14},{wch:22},{wch:14},{wch:10}];
+  centerExcelSheet(ws);
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,`${adminAnnualUsageYears}년 통계`);
   const info=getAnnualPeriodInfo(adminAnnualUsageYears);
