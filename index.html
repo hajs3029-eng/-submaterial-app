@@ -251,13 +251,13 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
     <div class="calendar-weekdays"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
     <div id="historyCalendarGrid" class="calendar-grid"></div>
     <div class="history-calendar-legend"><span class="calendar-dot"></span> 입력 이력이 있는 날짜</div>
-    <button type="button" class="history-excel-btn" onclick="downloadHistoryAllExcel()">📥 전체내역 엑셀 저장</button>
-    <div class="history-excel-note">입력 이력이 있는 날짜별로 시트가 생성되며, 부서 순서는 현재 설정된 순서를 그대로 반영합니다.</div>
   </div>
   <div id="historyDepartmentView" style="display:none">
     <button type="button" class="history-back-btn history-dept-back" onclick="resetHistoryView()">‹ 날짜 선택으로 돌아가기</button>
     <div id="historySelectedDate" class="history-selected-date"></div>
     <div id="historyDepartmentList" class="admin-dept-grid"></div>
+    <button type="button" class="history-excel-btn" onclick="downloadHistoryAllExcel()">📥 해당일자 엑셀 저장</button>
+    <div class="history-excel-note">선택한 날짜에 입력된 재고만 저장되며, 부서 순서는 현재 설정된 순서를 그대로 반영합니다.</div>
   </div>
   <div id="historyRecordView" style="display:none"></div>
 </div></div>
@@ -301,6 +301,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <div class="admin-menu">
     <button class="primary" onclick="openMaterialMaster()">📦 자재 마스터 관리</button>
     <button class="primary" onclick="openDepartmentMaster()">🏢 부서 마스터 관리</button>
+    <button class="primary" onclick="openHistoryExportOrderManagement()">📋 재고이력 저장 관리</button>
   </div>
 </div></div>
 
@@ -312,7 +313,6 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
   <div class="admin-menu">
     <button class="primary" onclick="openMaterialListManagement()">📋 자재 목록 관리</button>
     <button class="primary" onclick="openAdminDepartmentItems()">🏷️ 부서별 품목 관리</button>
-    <button class="primary" onclick="openHistoryExportOrderManagement()">📋 재고이력 저장 관리</button>
   </div>
 </div></div>
 
@@ -508,7 +508,7 @@ nav{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:auto;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-const APP_VERSION="1.94"; // 사용자에게 표시되는 앱 버전
+const APP_VERSION="1.96"; // 사용자에게 표시되는 앱 버전
 const DATA_VERSION="2026-09-02-v22";
 let CATEGORIES=["입고장","출하장","수출장","수동랙","DPS","P/S"];
 const DEFAULT_ITEMS=[
@@ -2031,38 +2031,53 @@ function getHistoryExportUnit(itemName){
   if(matches.length&&matches[0][6]) return matches[0][6];
   return itemName.startsWith("오리콘")?"파렛트":"박스";
 }
-function getHistoryExportSpec(itemName){
-  const m=String(itemName).match(/(\d+(?:\.\d+)?\s*[xX×*]\s*\d+(?:\.\d+)?(?:\s*[xX×*]\s*\d+(?:\.\d+)?)?)/);
-  return m ? m[1].replace(/\s+/g,"").replace(/[xX×]/g,"*") : "";
-}
 function downloadHistoryAllExcel(){
   if(typeof XLSX==='undefined'){ alert('엑셀 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 후 다시 시도해 주세요.'); return; }
-  const dates=getHistoryExportDates();
-  if(!dates.length){ alert('저장할 재고 이력이 없습니다.'); return; }
+  const date=historySelectedDate;
+  if(!date){ alert('먼저 재고 이력을 조회할 날짜를 선택해 주세요.'); return; }
+
+  // 선택한 날짜에 실제로 입력된 재고확인 기록만 엑셀로 저장합니다.
+  const dayRecords=getHistoryDayRecords(date);
+  if(!dayRecords.length){ alert('선택한 날짜에 저장된 재고 이력이 없습니다.'); return; }
+
   const wb=XLSX.utils.book_new();
   const itemOrder=getHistoryExportItemOrder();
-  dates.forEach(date=>{
-    const rows=[];
-    itemOrder.forEach(itemName=>{
-      const row={부자재품명:itemName, 규격:getHistoryExportSpec(itemName)};
-      let total=0, hasAny=false;
-      CATEGORIES.forEach(category=>{
-        const stock=getHistoryStockAsOfDate(itemName,category,date);
-        row[category]=stock===null?"":stock;
-        if(stock!==null){ total+=stock; hasAny=true; }
-      });
-      row.재고수량=hasAny?total:"";
-      if(hasAny) rows.push(row);
-    });
-    const ws=XLSX.utils.json_to_sheet(rows,{header:["부자재품명","규격",...CATEGORIES,"재고수량"]});
-    ws['!cols']=[{wch:30},{wch:16},...CATEGORIES.map(()=>({wch:12})),{wch:14}];
-    ws['!freeze']={xSplit:2,ySplit:1};
-    const sheetName=`재고 ${Number(date.slice(5,7))}월${Number(date.slice(8,10))}일`.slice(0,31);
-    XLSX.utils.book_append_sheet(wb,ws,sheetName);
+  const byItem=new Map();
+
+  dayRecords.forEach(r=>{
+    const name=r.name;
+    if(!name) return;
+    if(!byItem.has(name)) byItem.set(name,{});
+    const category=r.category||"P/S";
+    byItem.get(name)[category]=r.stock===undefined?"":Number(r.stock);
   });
-  const today=new Date();
-  const stamp=`${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
-  XLSX.writeFile(wb,`소모품관리_전체내역_${stamp}.xlsx`);
+
+  // 저장 관리에서 정한 자재 순서 + 새 자재는 마지막에 보존
+  const orderedNames=[];
+  itemOrder.forEach(name=>{ if(byItem.has(name)&&!orderedNames.includes(name)) orderedNames.push(name); });
+  byItem.forEach((_,name)=>{ if(!orderedNames.includes(name)) orderedNames.push(name); });
+
+  const rows=orderedNames.map(itemName=>{
+    const values=byItem.get(itemName)||{};
+    const row={부자재품명:itemName};
+    let total=0, hasAny=false;
+    CATEGORIES.forEach(category=>{
+      const value=Object.prototype.hasOwnProperty.call(values,category)?values[category]:"";
+      row[category]=value;
+      if(value!==""){ total+=Number(value)||0; hasAny=true; }
+    });
+    row.재고수량=hasAny?total:"";
+    return row;
+  });
+
+  const ws=XLSX.utils.json_to_sheet(rows,{header:["부자재품명",...CATEGORIES,"재고수량"]});
+  ws['!cols']=[{wch:30},...CATEGORIES.map(()=>({wch:12})),{wch:14}];
+  ws['!freeze']={xSplit:1,ySplit:1};
+  const d=new Date(date+"T00:00:00");
+  const sheetName=`재고 ${d.getMonth()+1}월${d.getDate()}일`.slice(0,31);
+  XLSX.utils.book_append_sheet(wb,ws,sheetName);
+
+  XLSX.writeFile(wb,`소모품관리_${date.replaceAll('-','')}.xlsx`);
 }
 
 function renderHistoryDateCalendar(){
